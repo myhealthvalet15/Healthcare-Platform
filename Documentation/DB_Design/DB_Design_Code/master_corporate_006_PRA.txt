@@ -1,0 +1,59 @@
+Table master_corporate {
+  id integer [primary key]
+  corporate_id varchar [unique]
+  location_id int
+  corporate_num varchar
+  corporate_name varchar
+  displayname varchar
+  registrationno varchar
+  specializations varchar
+  prof_image varchar
+  description text
+  specialities text
+  created_by varchar
+  created_role varchar
+  created_on datetime
+  age integer
+  color varchar
+  active_status boolean
+  created_on_date date
+}
+
+Table master_corporate_address {
+  id integer [primary key]
+  location_id int [ref: > master_corporate.location_id]
+  address1 varchar
+  address2 varchar
+  city varchar
+  state varchar
+  country varchar
+  pincode varchar
+  latitude varchar
+  longitude varchar
+  website_link varchar
+}
+
+Table master_corporate_financials {
+  id integer [primary key]
+  location_id int [ref: > master_corporate.location_id]
+  sgst integer
+  cgst integer
+  igst integer
+  dlno varchar
+  tinno varchar
+  storeid varchar
+  taxinvoiceno varchar
+  discount integer
+}
+
+Table master_corporate_thresholds {
+  id integer [primary key]
+  location_id int [ref: > master_corporate.location_id]
+  lab_threshold_count integer
+  lab_threshold_point double(10,2)
+  doctor_threshold_count integer
+  doctor_threshold_point double(10,2)
+  disease_mapping varchar
+  reminder_expiry integer
+  reminder_issue integer
+}

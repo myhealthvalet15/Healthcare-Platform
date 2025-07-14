@@ -1,0 +1,26 @@
+Table corporate_access_rights {
+    id int [pk] 
+    corporate_admin_user_id int [ref: > corporate_admin_user.id] 
+    location_id int [ref: > master_corporate.location_id] 
+    hl1_id int [ref: > corporate_hl1.hl1_id] 
+    department_all boolean 
+    location_admin boolean 
+    mhc_rights boolean 
+    ohc_rights boolean 
+    active_status boolean 
+    inserted_by int 
+    inserted_date timestamp 
+}
+Table corporate_admin_user{
+    id int [pk] 
+
+}
+Table master_corporate{
+corporate_id int [pk]
+    location_id int
+
+}
+Table corporate_hl1{
+    hl1_id int [pk] 
+
+}

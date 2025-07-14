@@ -1,0 +1,73 @@
+// Table corporate_hl1 {
+//   hl1_id int [pk]
+ 
+// }
+Table master_corporate{
+corporate_id int
+location_id int
+}
+Table master_user_details{
+user_id int
+}
+// Table master_doctor{
+// doctor_id int [pk]
+// }
+Table otc_data{
+  otc_id int [pk]
+  corporate_id int [ref: > master_corporate.corporate_id]
+  location_id int [ref: > master_corporate.location_id]
+  user_id int [ref: > master_user_details.user_id]
+  medical_symptoms int [ref: > outpatient_component.op_component_id]
+  medical_system int [ref: >outpatient_component.op_component_id]
+  prescription_id int
+  corporate_admin_user_id varchar [ref:> corporate_admin_user.corporate_admin_user_id]
+  firstaid_by varchar
+  remarks varchar
+  report_date datetime
+  inserted_by varchar
+  active_status bool
+
+
+ // type enum('otc','outpatient')
+  //sense_organs varchar //enum('ent','Eye','Skin','Dental')
+ // date datetime
+ // day int
+
+
+}
+table corporate_admin_user{
+  corporate_admin_user_id varchar
+}
+table outpatient_component{
+op_component_id int [pk]
+}
+// table pharmacy_sold_stock_detail{
+//   stock_generate_id int
+// }
+
+
+// Ref: "outpatient_condition"."user_id" < "master_user_details"."user_id"
+
+// Ref: "outpatient_condition"."medical_symptoms" < "outpatient_component"."op_component_id"
+
+// Ref: "outpatient_condition"."medical_system" < "outpatient_component"."op_component_id"
+
+// ///Ref: "outpatient_condition"."stock_generate_id" < "pharmacy_sold_stock_detail"."stock_generate_id"
+
+// Ref: "master_corporate"."location_id" < "outpatient_condition"."location_id"
+
+// // Ref: "outpatient_condition"."corporate_id" < "master_corporate"."corporate_id"
+
+// Ref: "master_corporate"."corporate_id" < "outpatient_condition"."corporate_id"
+
+// Ref: "master_corporate"."corporate_id" < "outpatient_condition"."corporate_id"
+
+// Ref: "master_corporate"."location_id" < "outpatient_condition"."location_id"
+
+// Ref: "outpatient_condition"."medical_symptoms" < "outpatient_component"."op_component_id"
+
+// Ref: "outpatient_condition"."medical_system" < "outpatient_component"."op_component_id"
+
+// Ref: "otc_data"."medical_symptoms" < "outpatient_component"."op_component_id"
+
+// Ref: "outpatient_component"."op_component_id" < "otc_data"."medical_symptoms"

@@ -1,0 +1,21 @@
+Table master_corporate {
+  id integer [primary key]
+  corporate_id varchar [unique]
+}
+
+
+Table corporate_healthplan {
+  corporate_healthplan_id integer [primary key]
+  corporate_id integer [ref: > master_corporate.corporate_id]
+  healthplan_title varchar
+  master_test_id json
+  certificate_id json
+  pre_emp_flag bool
+  created_by int
+  modified_by int
+  created_date timestamp
+  modified_date timestamp
+  forms int
+  gender enum 
+  active_status bool
+}

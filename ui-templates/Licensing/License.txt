@@ -1,0 +1,20 @@
+Frontend License
+
+This frontend project uses a commercially licensed UI template obtained from Envato (ThemeForest).
+
+The template is governed by a dual-license structure:
+
+1. The PHP code and integrated HTML are licensed under the GNU General Public License (GPL).  
+   A copy of the GPL license is included in this directory under the filename `GPL.txt`.
+
+2. All other assets—including but not limited to CSS, JavaScript, images, and design elements—are covered by the commercial license purchased from Envato (ThemeForest).  
+   These assets are not open source and cannot be redistributed or reused outside the scope of the purchased license.
+
+License Type: [Regular License / Extended License]  
+Purchase Source: Envato / ThemeForest  
+Purchase Code or Invoice: [Insert your purchase code or leave this line out if confidential]
+
+For full licensing terms, please refer to:  
+https://themeforest.net/licenses
+
+This license file is provided for reference and does not override the original terms defined by Envato.

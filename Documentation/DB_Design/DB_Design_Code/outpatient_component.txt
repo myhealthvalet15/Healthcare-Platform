@@ -1,0 +1,6 @@
+Table outpatient_component {
+  op_component_id int [pk, increment] 
+  op_component_name varchar(255) 
+  op_component_type varchar(100) 
+  active_status boolean 
+}

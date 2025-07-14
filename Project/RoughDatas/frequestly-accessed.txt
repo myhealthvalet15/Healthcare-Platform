@@ -1,0 +1,204 @@
+delete from employee_user_mapping;
+delete from master_user;
+delete from add_corporate_excel_backup;
+
+<?php
+echo "<pre>";
+
+$request = request();
+$sessionData = $request->session()->all();
+echo "Session Data:" . PHP_EOL;
+foreach ($sessionData as $key => $value) {
+  echo "- $key: " . (is_array($value) ? json_encode($value) : $value) . PHP_EOL;
+}
+
+$cookies = $request->cookie();
+echo "Cookies:" . PHP_EOL;
+foreach ($cookies as $key => $value) {
+  echo "- $key: " . (is_array($value) ? json_encode($value) : $value) . PHP_EOL;
+}
+
+echo "</pre>"; 
+?>
+
+
+
+SELECT AES_DECRYPT(UNHEX(first_name_hash), UNHEX('4f7c7b5793db99d9e02e7c18a9865dbb1f804d3b6ea8f178b0b12b4e2b1aadd9')) FROM master_user;
+
+
+SELECT first_name
+FROM (
+    SELECT AES_DECRYPT(UNHEX(first_name_hash), UNHEX('4f7c7b5793db99d9e02e7c18a9865dbb1f804d3b6ea8f178b0b12b4e2b1aadd9')) AS first_name
+    FROM master_user
+) decrypted_names
+WHERE first_name LIKE 'pra%';
+
+
+
+private function getHealthParameters($healthParameters)
+    {
+        $allergic_food_ids = $healthParameters->allergic_food;
+        $allergic_ingredient_ids = $healthParameters->allergic_ingredients;
+        $published_condition_ids = $healthParameters->published_conditions;
+        $unpublished_conditions = $healthParameters->unpublished_conditions;
+
+        $allergic_food = FoodAllergy::whereIn('id', $allergic_food_ids)->pluck('food_name')->toArray();
+        $allergic_ingredients = DrugIngredient::whereIn('id', $allergic_ingredient_ids)->pluck('drug_ingredients')->toArray();
+        $published_conditions = Outpatient::whereIn('op_component_id', $published_condition_ids)
+            ->where('op_component_type', 8)
+            ->pluck('op_component_name')
+            ->toArray();
+        return [
+            'Allergic Foods' => $allergic_food,
+            'Allergic Ingredients' => $allergic_ingredients,
+            'Published Conditions' => $published_conditions,
+            'Unpublished Conditions' => $unpublished_conditions,
+        ];
+    }
+    public function checkEmployeeId($employee_id = null, $op_registry_id = null)
+    {
+        if (! $employee_id || !ctype_alnum($employee_id)) {
+            return "Invalid Request";
+        }
+        if ($op_registry_id && !is_numeric($op_registry_id)) {
+            return "Invalid Request";
+        }
+        $employee = EmployeeUserMapping::where('employee_id', $employee_id)->first();
+        if ($employee) {
+            $employeeFirstname = $this->aes256DecryptData($employee->masterUser->first_name);
+            $employeeLastname = $this->aes256DecryptData($employee->masterUser->last_name);
+            $employeeId = $employee->employee_id;
+            $employeeCorporateName = MasterCorporate::where('corporate_id', $employee->corporate_id)->value('corporate_name');
+            $employeeLocationName = MasterCorporate::where('corporate_id', $employee->corporate_id)->where('location_id', $employee->location_id)->value('display_name');
+            $employeeDesignation = $employee->designation;
+            $employeeDepartment = $employee->hl1_id;
+            $employeeDepartment = CorporateHl1::where('hl1_id', $employeeDepartment)->value('hl1_name');
+            $employeeGender = $this->aes256DecryptData($employee->masterUser->gender);
+            $employeeAge = $this->aes256DecryptData($employee->masterUser->dob);
+            $employeeAge = date_diff(date_create($employeeAge), date_create('now'))->y;
+            $opRegistryOpenStatus = OpRegistry::where('corporate_id', $employee->corporate_id)
+                ->where('location_id', $employee->location_id)
+                ->where('master_user_id', $employee->user_id)
+                ->pluck('open_status')
+                ->first();
+            $isOutPatientAdded = 0;
+            $isOutPatientAddedAndClosed = 0;
+            $opRegistry = OpRegistry::where('corporate_id', $employee->corporate_id)
+                ->where('location_id', $employee->location_id)
+                ->where('master_user_id', $employee->user_id)
+                ->where('op_registry_id', $op_registry_id)
+                ->first();
+            if ($op_registry_id) {
+                $opRegistry = OpRegistry::where('corporate_id', $employee->corporate_id)
+                    ->where('location_id', $employee->location_id)
+                    ->where('master_user_id', $employee->user_id)
+                    ->where('op_registry_id', $op_registry_id)
+                    ->first();
+                if (!$opRegistry) {
+                    return "Invalid Request";
+                }
+            } else {
+                $opRegistry = OpRegistry::where('corporate_id', $employee->corporate_id)
+                    ->where('location_id', $employee->location_id)
+                    ->where('master_user_id', $employee->user_id)
+                    ->first();
+            }
+            $op_registry_datas = null;
+            $opOutsideReferral = null;
+            $isPrescriptionAdded = null;
+            $showWhiteStrip = false;
+            if ($op_registry_id != null) {
+                $showWhiteStrip = true;
+            }
+            $incidentTypeColorCodes = OhcComponents::where('corporate_id', $employee->corporate_id)
+                ->where('location_id', $employee->location_id)
+                ->pluck('injury_color_types')
+                ->first();
+            $isTestAdded = 0;
+            $healthParameters = HealthParameters::where('user_id', $employee->user_id)->first();
+            $healthParametersData = 0;
+            if ($healthParameters) {
+                $healthParametersData = $this->getHealthParameters($healthParameters);
+            }
+            if ($opRegistry and $op_registry_id != null) {
+                $isOutPatientAdded = $opRegistryOpenStatus !== null ? 1 : 0;
+                $isOutPatientAddedAndClosed = ($opRegistryOpenStatus === null) ? 0 : ($opRegistryOpenStatus == 0 ? 0 : 1);
+                $prescribedTest = PrescribedTest::where('corporate_id', $employee->corporate_id)
+                    ->where('user_id', $employee->user_id)
+                    ->where('op_registry_id', $opRegistry->op_registry_id)
+                    ->where('fromOp', 1)
+                    ->first();
+                $opRegistryTimes = OpRegistryTimes::where('op_registry_id', $opRegistry->op_registry_id)
+                    ->first();
+                $opOutsideReferral = OpOutsideReferral::where('op_registry_id', $opRegistry->op_registry_id)->first();
+                $isPrescriptionAdded = Prescription::where('op_registry_id', $opRegistry->op_registry_id)
+                    ->where('corporate_ohc_id', $opRegistry->corporate_ohc_id)
+                    ->first();
+                if ($isPrescriptionAdded) {
+                    $isPrescriptionAdded = 1;
+                }
+                if ($prescribedTest) {
+                    $prescribedTestData = PrescribedTestData::where('test_code', $prescribedTest->test_code)->where('fromOp', 1)->get();
+                } else {
+                    $prescribedTestData = collect();
+                }
+                $isTestAdded = PrescribedTest::where('corporate_id', $employee->corporate_id)
+                    ->where('user_id', $employee->user_id)
+                    ->where('op_registry_id', $opRegistry->op_registry_id)
+                    ->where('fromOp', 1)
+                    ->exists();
+                if ($isTestAdded) {
+                    $isTestAdded = 1;
+                }
+                $bodyParts = json_decode($opRegistry->body_part, true) ?? [];
+                $symptoms = json_decode($opRegistry->symptoms, true) ?? [];
+                $diagnosis = json_decode($opRegistry->diagnosis, true) ?? [];
+                $medicalSystems = json_decode($opRegistry->medical_system, true) ?? [];
+                $natureInjuries = json_decode($opRegistry->nature_injury, true) ?? [];
+                $mechanismInjuries = json_decode($opRegistry->mechanism_injury, true) ?? [];
+                $bodyPartsNames = Outpatient::whereIn('op_component_id', $bodyParts)->pluck('op_component_name');
+                $symptomsNames = Outpatient::whereIn('op_component_id', $symptoms)->pluck('op_component_name');
+                $diagnosisNames = Outpatient::whereIn('op_component_id', $diagnosis)->pluck('op_component_name');
+                $medicalSystemsNames = Outpatient::whereIn('op_component_id', $medicalSystems)->pluck('op_component_name');
+                $natureInjuriesNames = Outpatient::whereIn('op_component_id', $natureInjuries)->pluck('op_component_name');
+                $mechanismInjuriesNames = Outpatient::whereIn('op_component_id', $mechanismInjuries)->pluck('op_component_name');
+                $op_registry_datas = [
+                    'op_registry' => $opRegistry,
+                    'op_registry_times' => $opRegistryTimes,
+                    'prescribed_test' => $prescribedTest,
+                    'prescribed_test_data' => $prescribedTestData,
+                    'body_parts' => $bodyPartsNames,
+                    'symptoms' => $symptomsNames,
+                    'diagnosis' => $diagnosisNames,
+                    'medical_systems' => $medicalSystemsNames,
+                    'nature_injuries' => $natureInjuriesNames,
+                    'mechanism_injuries' => $mechanismInjuriesNames
+                ];
+            }
+            $payload = [
+                'employee_id' => $employeeId,
+                'employee_firstname' => $employeeFirstname,
+                'employee_lastname' => $employeeLastname,
+                'employee_corporate_name' => $employeeCorporateName,
+                'employee_location_name' => $employeeLocationName,
+                'employee_designation' => $employeeDesignation,
+                'employee_department' => $employeeDepartment,
+                'employee_gender' => $employeeGender,
+                'employee_age' => $employeeAge,
+                'employee_corporate_id' => $employee->corporate_id,
+                'employee_location_id' => $employee->location_id,
+                'employee_is_outpatient_added' => $isOutPatientAdded,
+                'employee_is_outpatient_open' => $isOutPatientAddedAndClosed,
+                'op_registry_datas' => $op_registry_datas ?? null,
+                'op_outside_referral' => $opOutsideReferral,
+                'isPrescriptionAdded' => $isPrescriptionAdded,
+                'isTestAdded' => $isTestAdded,
+                'incidentTypeColorCodes' => $incidentTypeColorCodes ?? null,
+                'incidentTypeColorCodesAdded' => $opRegistry->injury_color_text ?? null,
+                'showWhiteStrip' => $showWhiteStrip,
+                'healthParameters' => $healthParametersData,
+            ];
+            return response()->json(['result' => true, 'message' => $payload]);
+        }
+        return response()->json(['result' => false, 'message' => 'Employee ID does not exist'], 404);
+    }

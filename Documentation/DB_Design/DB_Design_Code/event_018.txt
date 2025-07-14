@@ -1,0 +1,45 @@
+Table employee_type {
+    employee_type_id int [pk, increment] 
+}
+
+Table master_test {
+    test_id int [pk, increment] 
+}
+
+Table corporate_event {
+    corporate_event_id int [pk, increment] 
+    event_name varchar(255) [not null] 
+    start_date_time datetime [not null] 
+    end_date_time datetime [not null] 
+    description text 
+    chief_guest varchar(255) 
+     hl1_id int [ref: > corporate_hl1.hl1_id] 
+     health_conditions int
+    // hl2_id int [ref: > corporate_hl2.hl2_id] 
+    // hl3_id int [ref: > corporate_hl3.hl3_id] 
+    employee_type_id int [ref: > employee_type.employee_type_id] 
+    test_id int [ref: > master_test.test_id] 
+    corporate_id int [ref: > master_corporate.corporate_id]
+    location_id int [ref: > master_corporate.location_id] 
+    created_by  int
+    created_on timestamp [default: `CURRENT_TIMESTAMP`] 
+    active_status Boolean [default: true]
+}
+Table master_corporate{
+  corporate_id int 
+  location_id int
+}
+Table  corporate_hl1{
+  hl1_id int [pk]
+}
+Table event_management {
+id int [pk]
+user_id varchar [ref: > master_user_details.user_id]
+location_id int  [ref: > master_corporate.location_id]
+corporate_event_id int [ref: > corporate_event.corporate_event_id]
+status ENUM('Accept', 'Attend', 'Rejected', 'No response')
+test_result bool
+}
+Table master_user_details{
+  user_id int
+}

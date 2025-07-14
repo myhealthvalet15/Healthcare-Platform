@@ -1,0 +1,106 @@
+// Table employee_type {
+//     employee_type_id int [pk, increment] 
+// }
+
+Table out_patient_data{
+  out_patient_id int [pk]
+  user_id int [ref:> master_user_details.user_id]
+  //corporate_id int [ref: >master_corporate.corporate_id]
+  location_id int [ref: >master_corporate.location_id]
+  doctor_id int [ref:> master_doctor.doctor_id]
+  hl1_id int [ref:> corporate_hl1.hl1_id]
+  reporting_date_time datetime  //cr_date // date and time 
+  incident_date_time datetime //act_date //date and time 
+  shift enum('1shift','2shift','3shift','genaral')//shift
+  incident_type enum ('industrial','outside','medical')
+  //ohc_incident_id int [ref:> ohc_incident.ohc_incident_id ]
+  //disease_mapping int //disease mapping
+  firstaid_by  varchar
+  //movement bool //movement
+ // firstaid varchar //firstaid
+  incident_type_id int  [ref: >incident_type.incident_type_id]
+  injury_color enum('green','red','yellow')
+  body_side enum('Right','left','both')//213
+  injury_type enum('Non Grevious','Grevious')
+  injury_side enum('Shop Floor','Non-Shop Floor ') //siteofInjury
+  nature_injury int [ref: >outpatient_component.op_component_id]
+  body_part int  [ref: >outpatient_component.op_component_id]
+  
+  mechanism_injury  int [ref: >outpatient_component.op_component_id]
+  medical_symptoms int [ref: >outpatient_component.op_component_id]
+
+  medical_system int  [ref: >outpatient_component.op_component_id]
+
+  diagnosis int  [ref: >outpatient_component.op_component_id]
+  prescription bool
+  test bool 
+
+  description varchar
+  notes varchar
+  past_medical_history varchar
+  leave_from_date_time  datetime
+  leave_upto_date_time  datetime
+  lost_hours datetime
+  out_time datetime
+  movement_slip____ bool
+  fitness_certificate bool
+  physiotherapy bool // physio
+  psychology bool
+  //medical_history varchar //medicaldata medicaldata
+  //fitness_certificate bool //fitness
+ // Physiotherapy bool //Physiotherapy
+  physio_treatment_type enum ('treatment1','treatment2','treatment3','treatment4')//treatment_type
+ // leave_from_date_time datetime 
+ // leave_to datetime
+  //out_date datetime //outtime
+  outside_referrals enum('No Outside Referral','outside referral','ama')
+  close_status bool
+  }
+Table master_corporate{
+ // corporate_id int 
+  location_id int
+}
+
+Table master_user_details{
+  user_id int
+}
+Table master_doctor{
+  doctor_id int [pk]
+}
+
+table incident_type{
+  incident_type_id int [pk]
+  
+}
+Table outpatient_component{
+  op_component_id int 
+
+}
+table outside_referral{
+  outside_referral_id int [pk]
+  out_patient_id int [ref:>out_patient_data.out_patient_id]
+  hospital_name varchar //emphannel
+  vehicle enum ('own','ambulance')
+  esi_scheme bool
+  pay_type enum ('Self Pay','bill to company') //paytype
+  ambulance_driver varchar //name and number 
+  //ambulance_no int
+  amb_mobile varchar
+  accompained_by varchar
+  ambulance_odometer int
+  ambulance_time int
+   
+  medical_ref_no int
+
+}
+table corporate_hl1{
+  hl1_id int [pk]
+}
+table physiotheraphy{
+  physiotheraphy_id int
+  physio_treatment_type varchar
+  days int
+}
+
+
+

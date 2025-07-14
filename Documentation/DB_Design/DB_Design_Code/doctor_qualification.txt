@@ -1,0 +1,6 @@
+Table doctor_qualification {
+  qualification_id int [pk, increment] 
+  qualification_name varchar(255) 
+  qualification_type varchar(100) 
+  active_status boolean 
+}

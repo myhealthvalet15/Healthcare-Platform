@@ -1,0 +1,152 @@
+Table hra_question {
+  id integer [primary key]
+  question_id int
+  question text
+  types integer
+  trigger_wer JSON
+  points JSON
+  active_status integer
+  image varchar(255)
+  input_box integer
+  formula varchar(255)
+  test_id__ varchar(150)
+  comments text
+  dashboard_title varchar(150)
+  comp_value JSON
+  gender enum('male', 'female')
+}
+
+Table hra_factors {
+  id integer [primary key]
+  factor_id int
+  factor_name varchar
+  active_status int 
+  priority varchar
+}
+
+Table hra_templates {
+  id int [primary key]
+  template_id int
+  template_name varchar(255)
+  total_adjustment_value int
+  factor_id int 
+  maximum_value int
+  factor_adjustment_value int
+  health_index_formula varchar
+  priority___ int 
+  active_status int
+}
+
+Table hra_template_questions{
+  id int [primary key]
+  template_id int
+  factor_id int
+  factor_priority int
+  question_id int
+  question_priority int
+  type int
+  trigger_1 int
+  trigger_2 int 
+  trigger_3 int
+  trigger_4 int
+  trigger_5 int
+  trigger_6 int
+  trigger_7 int
+  trigger_8 int
+  status int 
+  high_data int
+}
+
+
+Table hra_overall_result {
+  id int [primary key]
+  user_id int
+  corporate_template_id int
+  hra_template_id int
+  corporate_id int
+  location_id int
+  hl1 int
+  designation varchar(155)
+  obtained_points varchar(100)
+  actual_points varchar(10)
+  health_index varchar(10)
+  factor_score enum (1,2)
+  completed_date datetime
+  result_text varchar(100)
+  next_assessment_date__ date
+  certified_date__ date
+  certified_status__ varchar(50)
+  certified_color__ varchar(50)
+  certified_description__ text
+}
+
+
+Table hra_induvidual_answers{
+  id int [primary key]
+  template_id int
+  user_id int
+  // ctmp_id int
+  // tmqid int
+  question_id int
+  answer varchar
+  // trigger_wer varchar(255)
+  points int
+  test_results int 
+  question_status int
+  reference_question int
+}
+
+Table prescribed_tests_datas {
+  id int [primary key]
+  test_id int 
+  test_results int 
+}
+
+Table corporate_template_assign {
+  id int [primary key]
+  template_id int
+  corporate_id int
+  location_id int
+  hl1_id varchar
+  designation varchar2
+  employee_type int 
+  assigned_employees int
+  start_date timestamp
+  end_date timestamp
+  active_status int
+  certificate varchar
+  master_doctor_id int
+}
+
+Table master_user_details{
+  id int [primary key]
+  user_id int
+}
+
+Table master_user {
+  id int [primary key]
+  user_id int
+}
+
+Table master_corporate {
+  id int [primary key]
+  corporate_id int
+  location_id int
+}
+
+Ref: hra_templates.template_id < hra_template_questions.template_id
+Ref: hra_question.question_id < hra_template_questions.question_id
+Ref: hra_factors.factor_id < hra_template_questions.factor_id
+Ref: hra_templates.template_id < hra_induvidual_answers.template_id
+Ref: hra_templates.template_id < hra_overall_result.hra_template_id
+Ref: hra_induvidual_answers.question_id < hra_question.question_id
+Ref: hra_factors.factor_id < hra_templates.factor_id
+Ref: master_user.user_id < hra_overall_result.user_id
+Ref: master_user.user_id < hra_induvidual_answers.user_id
+Ref: hra_templates.template_id < corporate_template_assign.template_id
+Ref: master_corporate.corporate_id < hra_overall_result.corporate_id
+Ref: master_corporate.corporate_id < corporate_template_assign.corporate_id
+Ref: master_corporate.location_id < hra_overall_result.location_id
+Ref: master_corporate.location_id < corporate_template_assign.location_id
+Ref: master_user_details.user_id < corporate_template_assign.assigned_employees
+Ref: prescribed_tests_datas.test_results < hra_induvidual_answers.test_results

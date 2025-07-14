@@ -1,0 +1,70 @@
+
+Table master_corporate{
+corporate_id int
+location_id int
+}
+
+table candidate{
+  candidate_id int 
+  corporate_id int [ref:> master_corporate.corporate_id]
+  location_id int  [ref:> master_corporate.location_id]
+  first_name varchar
+  last_name varchar
+  gender enum('male','female')
+  father_name varchar
+  dob datetime
+  email varchar
+  mobile int
+  area_location int [ref: > address.area_id]
+  healthplan_id int [ref: > corp_healthplan.id ]
+  upload_generate_id int
+  pre_emp_type enum('corporate_components')// reference from 
+  created_on date
+  valid_upto date 
+  //random_no___ varchar
+  candidate_user_id varchar
+  certify_status enum('fit','unfit','pending') 
+  certify_date date
+  certify_attachment varchar
+  certify_remarks varchar
+  recertify_status enum('fit','unfit','pending') 
+  recertify_date date
+  recertify_attachment varchar
+  recertify_remarks varchar
+  user_id varchar [ref: > master_user_details.user_id]
+
+  active_status enum('Initialized','Booked')
+
+
+}
+table master_user_details{
+  user_id varchar
+}
+
+table corp_healthplan{
+  id  int
+   
+}
+
+table master_lab {
+  lab_id int 
+}
+table candidate_appointment{
+  candidate_appointment_id int
+   corporate_id int [ref:> master_corporate.corporate_id]
+  location_id int  [ref:> master_corporate.location_id]
+  candidate_user_id int [ref: > candidate.candidate_user_id]
+  lab_id int [ref:> master_lab.lab_id]
+  health_plan_id int [ref:> corp_healthplan.id]
+ // user_id varchar [ref: > master_user_details.user_id]
+  appointment_date_time datetime
+  booked_date_time datetime
+  status enum('booked','cancelled')
+}
+// table master_user_details{
+//   user_id varchar
+// }
+table address{
+  area_id int 
+}
+

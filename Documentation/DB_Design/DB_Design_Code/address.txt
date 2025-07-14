@@ -1,0 +1,10 @@
+Table address {
+  address_id int [pk, increment] 
+  address_name varchar(255) 
+  address_type varchar(100) 
+  area_id int 
+  city_id int 
+  state_id int 
+  country_id int 
+  active_status boolean 
+}

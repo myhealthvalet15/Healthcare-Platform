@@ -1,0 +1,90 @@
+  Table corporate_healthplan {
+  id int [primary key]
+  corporate_healthplan_id integer
+  corporate_id varchar [ref: > master_corporate.corporate_id]
+}
+
+Table master_corporate{
+  corporate_id varchar
+  location_id varchar
+}
+
+Table certification {
+  corporate_id varchar [ref: > master_corporate.corporate_id]
+  certificate_id int
+}
+
+Table employee_user_mapping {
+  user_id varchar
+}
+
+Table healthplan_assigned {
+  id int [primary key, increment]
+  master_lab_id int  
+  test_code varchar(100) [null] 
+  user_id varchar [ref: > employee_user_mapping.user_id]
+  lab_healthplan int [note: 'Templates by lab']
+  corporate_location_id varchar [ref: > master_corporate.location_id]
+  corporate_healthplan_id int [ref: > corporate_healthplan.corporate_healthplan_id] // Foreign key reference added
+  generate_test_request_id int 
+  visit_status enum('Application', 'Walkin') [null] 
+  pre_emp_user_id int [null]
+  next_assess_date timestamp [default: `CURRENT_TIMESTAMP`]
+  created_on timestamp [default: `CURRENT_TIMESTAMP`]
+  created_by int [null]
+}
+
+Table healthplan_assigned_status {
+  id int [primary key, increment]
+  test_code varchar [ref: > healthplan_assigned.test_code] 
+  status enum('Pending', 'Schedule', 'In Process', 'Test Completed', 'Result Ready', 'No Show', 'Certified', 'Cancelled')
+  status_date timestamp [default: `CURRENT_TIMESTAMP`]
+  status_time timestamp
+  inserted_on timestamp [default: `CURRENT_TIMESTAMP`]
+  inserted_by int [null]
+}
+
+Table prescribed_test {
+  id int [primary key]
+  test_code varchar [ref: > healthplan_assigned.test_code] 
+  prescription_id varchar(255)
+  case_id varchar(255)
+  user_id varchar(255) [ref: > employee_user_mapping.user_id] 
+  doctor_id varchar(255)
+  hosp_id int
+  lab_id int
+  ohc_id int
+  corporate_id varchar
+  preemp_user_id int
+  test_date date
+  test_due_date date
+  test_modified varchar(255)
+  favourite_lab int
+  created_on datetime
+  created_by varchar(255)
+  file_name varchar(255)
+}
+
+Table prescribed_test_data {
+  id int [primary key]
+  test_code varchar [ref: > prescribed_test.test_code]
+  test_id varchar(255)
+  test_results varchar(255)
+  text_condition varchar(255)
+}
+
+Table healthplan_certification {
+  id int [primary key]
+  healthplan_certification_id int 
+  user_id varchar [ref: > employee_user_mapping.user_id]
+  test_code varchar [ref: > healthplan_assigned.test_code] 
+  certification_id int [ref: > certification.certificate_id] 
+  certified_on datetime
+  next_assessment_date date
+  condition varchar
+  color_condition varchar
+  inserted_on datetime
+}
+
+
+

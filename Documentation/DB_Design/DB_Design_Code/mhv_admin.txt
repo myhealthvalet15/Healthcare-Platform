@@ -1,0 +1,10 @@
+Table mhv_admin {
+  mhv_admin_id int [pk, increment] 
+  admin_name varchar(100)  
+  email varchar(255) 
+  password varchar(255) [not null] 
+  active_status boolean [default: 0] 
+  ip_address varchar(45) 
+  created_at datetime  
+  updated_at datetime 
+}

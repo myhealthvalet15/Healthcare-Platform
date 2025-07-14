@@ -1,0 +1,40 @@
+# === Laravel ===
+/vendor/
+/node_modules/
+.env
+.env.*
+/storage/*.key
+/storage/*.log
+/storage/oauth-private.key
+/storage/oauth-public.key
+/storage/debugbar/
+/storage/logs/
+/storage/framework/
+
+# === Composer ===
+composer.lock
+
+# === NPM/Yarn ===
+package-lock.json
+yarn.lock
+
+# === Laravel Sail ===
+sail
+
+# === IDEs & OS ===
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# === Misc ===
+npm-debug.log*
+yarn-debug.log*
+.env.backup
+.env.example.local
+*.sqlite
+*.sqlite3
+
+# === Docker ===
+docker-compose.override.yml

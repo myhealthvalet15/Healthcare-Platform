@@ -1,0 +1,77 @@
+
+Table master_user {
+  id integer [primary key]
+  user_id varchar [unique]
+  user_type varchar
+  Aadhaar varchar
+  area varchar
+  zipcode varchar
+  password varchar
+  ispasswordchanged boolean
+  mob_country_code varchar
+  mob_num varchar
+  security_code varchar
+  first_name varchar
+  last_name varchar
+  gender varchar
+  dob date
+  email varchar [unique]
+  alternative_email varchar
+  valid_upto timestamp
+  email_confirm_status boolean
+}
+
+Table master_user_details {
+  id integer [primary key]
+  user_id integer [ref: > master_user.user_id]
+  salutation_doctype_static_id integer
+  prof_image varchar
+  secret_ques_secret_ans text
+  isactive boolean
+  isuser boolean
+  is_doctor boolean
+  doctorid integer
+  user_no_of_dep integer
+  expiry_date date
+  registration_date timestamp
+  pay_status varchar
+  dashboard_parameter varchar
+  insertedby integer
+  insertedrole varchar
+  created_on timestamp
+  modified_by integer
+  modified_role varchar
+  modified_on timestamp
+  age integer
+}
+
+Table emergency_contacts {
+  id integer [primary key]
+  user_id integer [ref: > master_user.user_id]
+  insurance_id_insurance_provider varchar
+  contact_name_contact_number varchar
+  relationship varchar
+  upload_generate_id integer
+  referredby integer
+  referencename varchar
+  dependent_of integer
+}
+
+Table signup {
+  id integer [primary key]
+  user_id integer [ref: > master_user.user_id]
+  signup_type varchar
+  signup_role varchar
+  signup_date timestamp
+}
+
+Table health_parameters {
+  id integer [primary key]
+  user_id integer [ref: > master_user.user_id]
+  blood_group_with_rh_factor varchar
+  height varchar
+  weight____________ varchar
+  health_color varchar
+  dashboard_parameters text
+  descriptive_mark text
+}

@@ -1,0 +1,16 @@
+Table master_corporate {
+  id integer [primary key]
+  corporate_id varchar [unique]
+}
+
+Table certification {
+  certificate_id integer [primary key]
+  corporate_id integer [ref: > master_corporate.corporate_id]
+  certification_title varchar
+  short_tag varchar
+  content json
+  condition json
+  color_condition json
+  active_status bool
+}
+

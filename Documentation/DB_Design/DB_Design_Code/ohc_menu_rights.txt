@@ -1,0 +1,38 @@
+Table ohc_menu_rights {
+    row_id int [pk] // Primary Key
+    corporate_admin_user_id int [ref: > corporate_admin_user.id] 
+    location_id int [ref: > master_corporate.location_id] 
+    doctor boolean [default: 0]
+    qualification_id int [ref: > doctor_qualification.qualification_id] 
+    pharmacy_id int [ref:>ohc_pharmacy.id]
+    ohc_dashboard boolean
+    out_patient enum('0', '1', '2') [null] 
+    prescription enum('0', '1', '2') [null] 
+    tests enum('0', '1', '2')
+    stocks enum('0', '1', '2') [null] 
+    ohc_report boolean [default: 0]
+    census_report boolean [default: 0]
+    safety_board enum('0', '1', '2')
+    invoice enum('0', '1', '2') [null] 
+    bio_medical enum('0', '1', '2') [null] 
+    inventory enum('0', '1', '2') [null] 
+    forms enum('0', '1', '2') 
+}
+Table corporate_admin_user{
+    id int [pk] 
+
+}
+Table master_corporate{
+corporate_id int [pk]
+    location_id int
+
+}
+Table doctor_qualification{
+ qualification_id int [pk]
+
+}
+
+Table ohc_pharmacy {
+    id int [pk] 
+   
+}

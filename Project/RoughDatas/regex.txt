@@ -1,0 +1,4 @@
+(?<!:)//.*
+To Remove HTML Comments => <!--(?!\s*TODO\b).*?-->
+To Remove // Comments => (?<!:)//(?!\s*TODO\b).*
+To Remove Empty Spaces => ^\s*[\r\n]+

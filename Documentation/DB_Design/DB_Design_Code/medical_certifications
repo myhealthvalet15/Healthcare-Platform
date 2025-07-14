@@ -1,0 +1,76 @@
+Table corporate_hl1 {
+  hl1_id int [pk]
+ 
+}
+Table master_corporate{
+corporate_id int
+location_id int
+}
+Table master_user_details{
+user_id int
+}
+Table master_doctor{
+doctor_id int [pk]
+}
+
+Table medical_certifications {
+  medical_certification_id INT [pk, increment]
+  certification_id int
+  corporate_id int [ref: >master_corporate.corporate_id]
+  location_id int
+  user_id int [ref: > master_user_details.user_id]
+  ohc_id int
+  hl1_id int [ref: >corporate_hl1.hl1_id]
+  fathers_name varchar
+  children int
+  address varchar
+  marital_status ENUM('Single', 'Married')
+  certificate_date DATE
+  doctor_id int [ref: > master_doctor.doctor_id]
+  paramedics_id INT
+  medical_history json
+  past_medical_history json //{"illness_over_7_days": "Not well for sometime", "hospitalized": "Well for sometime", "asthma": "No", "fits_or_epilepsy": "No", "breathlessness": "No", "operations": "No", "prolonged_medication": "No", "accidents": "No", "alcohol_or_smoking": "No"}
+
+  family_history JSON
+  family_medical_history json //{"Insanity or Epilepsy": "No", "Asthma/Tuberculosis": "No", "Heart Diseases/High Cholesterol": "No", "Diabetes/Hyper Tension": "No"}
+  mark_identification TEXT
+
+  vendor_name VARCHAR(255)
+      physical_examination json 
+
+      distance_vision VARCHAR(255)
+
+
+
+
+
+  
+  
+  
+
+  near_vision VARCHAR(255)
+  colour_vision VARCHAR(255)
+  distance_spec VARCHAR(255)
+  near_spec VARCHAR(255)
+  colour_spec VARCHAR(255)
+  general_examination TEXT
+  cardio_sys TEXT
+  respiratory_sys TEXT
+  musculo_sys TEXT
+  nervous_sys TEXT
+  skin_hair TEXT
+  ent_examination TEXT
+  grooming ENUM('Good', 'Fair', 'Need to be improved')
+  abnormal_investication TEXT
+  genaral_remarks varchar
+  audiometry_remarks TEXT
+
+  fitness ENUM('Fit', 'Fitness with Hold', 'Unfit')
+  chest_expansion TEXT
+  status bool
+}
+
+  
+
+
+

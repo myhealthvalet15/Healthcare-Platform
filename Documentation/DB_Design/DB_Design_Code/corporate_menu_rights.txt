@@ -1,0 +1,24 @@
+Table corporate_menu_rights {
+    row_id int [pk] 
+    corporate_admin_user_id int [ref: > corporate_admin_user.id] // References corporate admin users
+    location_id int [ref: > master_corporate.location_id] // References locations
+    landing_page int[1,2,3]
+    employees  enum('0', '1', '2') [null] 
+    employee_monitoring  enum('0', '1') [null] // ENUM for employee monitoring access
+    diagnostic_assessment  enum('0', '1', '2') [null] // ENUM for diagnostic assessments access
+    hra enum('0', '1', '2') [null] // ENUM for health risk assessments access
+    stress_management enum('0', '1', '2') [null] 
+    pre_employment enum('0', '1', '2') [null] 
+    reports enum('0', '1') [null] 
+    events enum('0', '1', '2') [null] 
+}
+
+Table corporate_admin_user{
+    id int [pk] 
+
+}
+Table master_corporate{
+corporate_id int [pk]
+    location_id int
+
+}

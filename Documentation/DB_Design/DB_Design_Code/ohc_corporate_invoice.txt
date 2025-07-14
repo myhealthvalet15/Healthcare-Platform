@@ -1,0 +1,41 @@
+Table ohc_corporate_invoice {
+    invoice_id INT [pk, increment] 
+    corporate_id INT [ref: > master_corporate.id]
+    location_id INT  [ref: > master_corporate.location_id]
+    invoice_date DATE
+    invoice_number VARCHAR(50)
+    amount INT
+    entry_date DATE
+    ohc_verification_date DATE
+    hr_verification_date DATE
+    ses_number VARCHAR(50)
+    ses_date DATE
+    dept_head_verification_date DATE
+    ses_released_date DATE
+    bill_submission_date DATE
+    payment_advance_date DATE
+    corporate_po_id INT [ref: > ohc_corporate_po.po_id] 
+    active_status boolean [default: true]
+
+}
+
+Table ohc_corporate_po {
+    po_id INT [pk, increment] 
+    corporate_id INT [ref: > master_corporate.id]
+    location_id INT  [ref: > master_corporate.location_id]
+    vendor_name varchar
+    po_number varchar
+    po_date DATE
+    corporate_admin_user_id INT [ref: > corporate_admin_user.id] 
+    active_status boolean [default: true]
+
+}
+
+Table master_corporate {
+    id int [pk, increment] 
+    location_id int
+}
+
+Table corporate_admin_user {
+    id int [pk, increment] 
+}

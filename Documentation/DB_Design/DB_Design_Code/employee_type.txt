@@ -1,0 +1,7 @@
+Table employee_type {
+  employee_type_id int [pk, increment] 
+  employee_type_name varchar(255) 
+  active_status boolean 
+  created_at timestamp 
+  updated_at timestamp 
+}

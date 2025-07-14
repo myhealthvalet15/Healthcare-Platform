@@ -1,0 +1,82 @@
+Table drug_type {
+  id integer [primary key]
+  drug_type_name varchar
+}
+
+Table drug_ingredients {
+  id integer [primary key]
+  drug_ingredients varchar
+}
+
+table master_corporate{
+  id int [primary key]
+  corporate_id int
+  location_id int  
+}
+
+table corporate_admin_user{
+  id int [primary key]
+  user_id int 
+}
+
+table ohc_pharmacy{
+  id int [primary key]
+  user_id int 
+}
+
+Table ohc_drug_template {
+  id int [primary key]
+  drug_template_id integer
+  drug_name varchar
+  drug_type varchar
+  drug_manufacturer varchar
+  drug_ingredient text
+  corporate_id integer
+  location_id integer
+  ohc varchar
+  master_pharmacy_id integer
+  drug_strength varchar
+  restock_alert_count integer
+  crd date
+  schedule varchar
+  id_no integer
+  hsn_code varchar
+  amount_per_strip float
+  unit_issue varchar
+  tablet_in_strip integer
+  amount_per_tab float
+  discount float
+  sgst float
+  cgst float
+  igst float
+  bill_status varchar
+  created_on timestamp
+  created_by varchar
+}
+
+table pharmacy_stock_detail {
+  id int [primary key]
+  drug_id int(15)
+  ohc_pharmacy_id int(15)
+  drug_name varchar(255)
+  drug_template_id varchar(56)
+  drug_batch varchar(255)
+  manufacter_date date
+  expiry_date date
+  drug_type varchar(255)
+  drug_strength varchar(255)
+  quantity int(11)
+  current_availability int(11)
+  sold_quantity int(11)
+  ohc int(5)
+  master_pharmacy_id int(255)
+}
+
+Ref: ohc_drug_template.drug_type > drug_type.drug_type_name
+Ref: ohc_drug_template.drug_ingredient > drug_ingredients.id
+Ref: ohc_drug_template.location_id > master_corporate.location_id
+Ref: ohc_drug_template.corporate_id > master_corporate.corporate_id
+Ref: ohc_drug_template.created_by > corporate_admin_user.user_id
+Ref: ohc_drug_template.drug_name > pharmacy_stock_detail.drug_name
+Ref: ohc_drug_template.drug_template_id > pharmacy_stock_detail.drug_template_id
+Ref: pharmacy_stock_detail.ohc_pharmacy_id > ohc_pharmacy.user_id

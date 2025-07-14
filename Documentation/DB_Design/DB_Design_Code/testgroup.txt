@@ -1,0 +1,8 @@
+Table testgroup {
+  testgroup_id int [pk, increment]
+  testgroup_name varchar(255)
+  group_type int
+  group_id int
+  sub_group_id int
+  active_status boolean
+}

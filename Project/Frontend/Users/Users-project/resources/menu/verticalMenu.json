@@ -1,0 +1,85 @@
+{
+  "menu": [
+    {
+      "name": "Dashboards",
+      "icon": "menu-icon fas fa-tachometer-alt",
+      "slug": "dashboard",
+      "badge": [
+        "danger",
+        "5"
+      ],
+      "submenu": [
+        {
+          "url": "/",
+          "name": "Health Index",
+          "slug": "health-index"
+        },
+        {
+          "url": "dashboard/dmin-dashboard",
+          "name": "Admin Dashboard",
+          "slug": "admin-dashboard"
+        },
+        {
+          "url": "profile-dashboard",
+          "name": "Profile",
+          "slug": "profile-dashboard"
+        }
+           ]
+    },
+    {
+      "name": "Employees",
+      "icon": "menu-icon fas fa-user-md",
+      "slug": "employee",
+      "submenu": [
+        {
+          "url": "/employees/employee-list",
+          "name": "List",
+          "slug": "employee-list"
+        },
+        {
+          "url": "/employees/employee-type",
+          "name": "Employee Type",
+          "slug": "employee-type"
+        },
+        {
+          "url": "/employees/department/hl1",
+          "name": "Departments",
+          "slug": "employee-Department-hl1"
+        },
+        {
+          "url": "/employees/corporate/add-corporate-users",
+          "name": "Upload Users",
+          "slug": "employee-add-users"
+        },
+        {
+          "url": "/corporate/list-contractors",
+          "name": "Contractors",
+          "slug": "employee-add-contractor"
+        }
+      ]
+    },
+    {
+      "name": "Corporate Users",
+      "icon": "menu-icon fas fa-user-md",
+      "slug": "corporate-users",
+      "submenu": [
+        {
+          "url": "/corporate-users/users-list",
+          "name": "User List",
+          "slug": "corporate-users-list"
+        },
+        {
+          "url": "/corporate-users/users-rights",
+          "name": "User Rights",
+          "slug": "corporate-users-rights"
+        }
+      ]
+    },
+    {
+      "name": "Health Partners",
+      "icon": "menu-icon fas fa-user-md",
+      "slug": "health-partners"
+      
+    }
+  ]
+}

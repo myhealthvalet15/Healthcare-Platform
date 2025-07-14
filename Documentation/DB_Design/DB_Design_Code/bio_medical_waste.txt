@@ -1,0 +1,19 @@
+Table master_corporate {
+    corporate_id int 
+    location_id int
+}
+
+Table bio_medical_waste {
+    id int [pk]
+    transfer_date date
+    red_grams int
+    yellow_grams int
+    blue_grams int
+    white_grams int
+    handed_over_by varchar
+    received_by varchar
+    corporate_id int [ref: > master_corporate.id]
+    location_id int [ref: > master_corporate.location_id]
+    active_status boolean
+    created_at timestamp
+}

@@ -1,0 +1,20 @@
+{
+  "name": "myhelathvalet",
+  "version": "1.0.0",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^1.6.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-obfuscator": "^8.0.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "javascript-obfuscator": "^4.1.1"
+  },
+  "dependencies": {
+    "bower": "^1.8.14"
+  }
+}

@@ -1,0 +1,23 @@
+Table corporate_admin_user {
+  id integer [primary key]
+  user_id varchar
+  first_name varchar
+  last_name varchar
+  dob date
+  gender varchar
+  email varchar
+  password varchar
+  mobile_country_code varchar
+  mobile_num varchar
+  created_on datetime
+  createdby integer
+  isactive boolean
+  ispasswordchanged boolean
+  super_admin boolean
+  signup_by varchar
+  signup_role varchar
+  signup_type varchar
+  signup_on datetime
+  aadhar varchar
+  age integer
+}

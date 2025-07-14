@@ -1,0 +1,19 @@
+Proprietary License
+
+Copyright © Hygeiaes 2025
+
+This software and associated documentation files (the "Software") are the confidential and proprietary property of Hygeiaes.
+
+Permission is granted only to authorized users within Hygeiaes or its designated partners to use the Software exclusively for internal business and operational purposes related to healthcare management.
+
+Restrictions:
+- You may not copy, modify, merge, publish, distribute, sublicense, or sell any part of the Software without prior written permission from Hygeiaes.
+- Reverse engineering, decompilation, or disassembly of the Software is strictly prohibited.
+- Use of the Software for any external, commercial, or unauthorized purpose is not permitted.
+
+Disclaimer:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+In no event shall Hygeiaes or its authors be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the Software.
+
+All rights reserved.

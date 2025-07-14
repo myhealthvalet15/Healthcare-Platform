@@ -1,0 +1,16 @@
+Table ohc_pharmacy {
+    pharmacy_id int [pk] 
+    pharmacy_name varchar(150) [not null] 
+    corporate_id int  [ref: > master_corporate.corporate_id]
+    location_id int  [ref: > master_corporate.location_id]
+    
+    main_pharmacy boolean [not null, default: 0] 
+    inserted_date timestamp 
+    active_status boolean [not null, default: 0] 
+}
+
+Table master_corporate{
+corporate_id int [pk]
+    location_id int
+
+}

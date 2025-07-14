@@ -1,0 +1,120 @@
+table corporate_admin_user{
+  id int [primary key]
+  user_id int 
+}
+
+table master_corporate{
+  id int [primary key]
+  corporate_id int
+  location_id int  
+}
+
+Table prescription_template {
+  id int [primary key]
+  corporate_id int
+  location_id int
+  pharmacy_id int
+  template_name varchar(255)
+  drug_template_id int
+  drug_name varchar(255)
+  drug_type int
+  prescribed_days int
+  intake_condition varchar(255)
+  early_morning int
+  morning int
+  late_morning int
+  afternoon int
+  late_afternoon int
+  evening int
+  night int
+  late_night int
+  remarks varhar(255)
+  ohc int
+  created_by int
+  created_on timestamp
+}
+
+Table prescription {
+  id int [primary key]
+  user_id int
+  prescription_id varchar(255)
+  doctor_id int
+  // role_id int
+  template_id int
+  drug_template_id int
+  // drug_time timestamp
+  from_date timestamp
+  prescribed_days__ int
+  test_id int
+  assigned_lab int
+  master_specialization_id__ int
+  master_hospital_user_id int
+  attachment_id int 
+  conformance_status int
+  doctor_notes varchar(255)
+  user_notes varchar(255)
+  share_doctor varchar(255)
+  status int
+  is_prescribed__ int
+  test_modified__ int
+  case_id int
+  save_draft int
+  condition varchar(255)
+  condition_cat__ varchar(255)
+  treatment_overcome__ varchar(255)
+  pharmacy_assigned int
+  order_status int
+  location_id int
+  ohc int
+  alternate_drug int
+  created_on timestamp
+  created_by int
+  created_role varchar(255)
+  modified_on int
+}
+
+Table prescription_details {
+  id int [primary key]
+  prescription_id varchar(255)
+  drug_template_id int
+  drug_name varchar(255)
+  remaining_unit int
+  substitude_drug__ int
+  prescribed_days int
+  early_morning int
+  morning int
+  late_morning int
+  afternoon int
+  late_afternoon int
+  evening int
+  night int
+  late_night int
+  drug_type int
+  intake_condition int
+  read__ varchar(255)
+  remarks varchar(255)
+  created_on timestamp
+  prescription_type int
+  alternate_drug__ varchar(255)
+  alternate_qty__ int
+}
+
+Table master_doctor {
+  id int [primary key]
+  doctor_id int 
+}
+
+Table master_user_details {
+  id int [primary key]
+  user_id int 
+}
+
+Ref: corporate_admin_user.user_id < prescription_template.created_by
+Ref: master_corporate.location_id < prescription_template.location_id
+Ref: master_corporate.corporate_id < prescription_template.corporate_id
+Ref: prescription_template.id < prescription.template_id
+Ref: prescription_template.id < prescription_details.drug_template_id
+Ref: corporate_admin_user.user_id < prescription.created_by
+Ref: master_doctor.doctor_id < prescription.doctor_id
+Ref: master_user_details.user_id < prescription.user_id
+Ref: prescription.prescription_id < prescription_details.prescription_id

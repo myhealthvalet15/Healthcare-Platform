@@ -1,0 +1,53 @@
+Table admin {
+  mhv_admin_id int [pk, increment] 
+  admin_name varchar(100)  
+  email varchar(255) 
+  password varchar(255) [not null] 
+  active_status boolean [default: 0] 
+  ip_address varchar(45) 
+  created_at datetime  
+  updated_at datetime 
+}
+
+
+Table employee_type {
+  employee_type_id int [pk, increment] 
+  employee_type_name varchar(255) 
+  active_status boolean 
+  created_at timestamp 
+  updated_at timestamp 
+}
+Table outpatient_component {
+  op_component_id int [pk, increment] 
+  op_component_name varchar(255) 
+  op_component_type varchar(100) 
+  active_status boolean 
+}
+Table address {
+  address_id int [pk, increment] 
+  address_name varchar(255) 
+  address_type varchar(100) 
+  area_id int 
+  city_id int 
+  state_id int 
+  country_id int 
+  active_status boolean 
+}
+
+Table doctor_qualification {
+  qualification_id int [pk, increment] 
+  qualification_name varchar(255) 
+  qualification_type varchar(100) 
+  active_status boolean 
+}
+
+
+Table testgroup {
+  testgroup_id int [pk, increment]
+  testgroup_name varchar(255)
+  group_type int
+  group_id int
+  sub_group_id int
+  active_status boolean
+}
+

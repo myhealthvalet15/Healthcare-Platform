@@ -1,0 +1,31 @@
+Table master_user_detail {
+  id integer [primary key]
+  user_id varchar [unique]
+}
+
+Table user_corporate_mapping {
+  id int [primary key]
+  user_id int [ref: > master_user_detail.user_id]
+  corporate_id int 
+  location_id int
+  employee_id varchar
+  employee_type int
+  designation varchar
+  hl1_id int
+  hl2_id int
+  hl3_id int
+  contractor_id int
+  contract_worker_id varchar
+  other_id varchar
+  // created_role int
+  created_by int
+  created_on datetime
+  // modified_role int
+  modified_by int
+  modified_on datetime
+  upload_generate_id int
+
+  from_date date
+  to_date date
+  active_status int
+}

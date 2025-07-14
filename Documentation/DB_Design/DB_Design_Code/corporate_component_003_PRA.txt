@@ -1,0 +1,29 @@
+
+Table corporate_component_modules {
+  id integer [primary key]
+  module_id integer 
+  module_name varchar [note: 'Name of the module'] // Name of the module
+}
+
+Table corporate_component_submodules {
+  id integer [primary key]
+  module_id int
+  sub_module_name varchar [note: 'Name of the module'] // Name of the module
+}
+
+Table corporate {
+  id integer [primary key]
+  corporate_id integer  // Unique identifier for the user
+}
+
+Table corporate_components {
+  id integer [primary key]
+  corporate_id integer // Foreign key referencing corporate
+  module_id integer // Foreign key referencing corporate_component_modules
+  sub_module_id integer
+}
+
+// Relationships
+Ref: corporate_components.corporate_id > corporate.corporate_id // many-to-one relationship: corporate_components references corporate
+Ref: corporate_components.module_id > corporate_component_modules.module_id // many-to-one relationship: corporate_components references corporate_component_modules
+Ref: corporate_component_modules.module_id > corporate_component_submodules.module_id // many-to-one relationship: corporate_components references corporate_component_modules

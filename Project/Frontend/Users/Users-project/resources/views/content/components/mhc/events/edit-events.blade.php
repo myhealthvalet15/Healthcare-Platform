@@ -282,6 +282,10 @@ const prefillDepartments = (departments = []) => {
     });
   };
 
+  const prefillEmployeeTypes = (employeeTypes = []) => {
+    const employeeTypeIds = employeeTypes.map(emp => emp.employee_type_id);
+    $('#employee_type').val(employeeTypeIds).trigger('change');
+  };
   // 4. Prefill the form with event data
   const prefillForm = async (data) => {
     const event = data.event || {};

@@ -635,12 +635,10 @@
         </div>
         <div class="hra-header-right">
             <div>
-                <div class="progress-info">Question <span
-                        id="progressQuestionCount">0</span> of <span
+                <div class="progress-info">Question <span id="progressQuestionCount">0</span> of <span
                         id="totalQuestions">0</span> completed</div>
                 <div class="progress">
-                    <div class="progress-bar" id="progressBar"
-                        role="progressbar" style="width:0%" aria-valuenow="0"
+                    <div class="progress-bar" id="progressBar" role="progressbar" style="width:0%" aria-valuenow="0"
                         aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
@@ -653,10 +651,8 @@
                 ?>
             </h2>
             <?php if ($isQuestionsAvailableForThisTemplate == 0): ?>
-            <div class="no-questions-card p-4 text-center"
-                style="background-color: #f8f9fa; border-radius: 12px;">
-                <i class="fas fa-info-circle text-warning mb-3"
-                    style="font-size: 2rem;"></i>
+            <div class="no-questions-card p-4 text-center" style="background-color: #f8f9fa; border-radius: 12px;">
+                <i class="fas fa-info-circle text-warning mb-3" style="font-size: 2rem;"></i>
                 <h4 class="text-dark">No Questions Assigned</h4>
                 <p class="text-muted mb-0">
                     This assessment template currently has no questions
@@ -690,8 +686,7 @@
                         <i class="fas fa-exclamation-triangle error-icon"></i>
                         <h4>Unable to Load Questions</h4>
                         <p id="errorMessage"></p>
-                        <button type="button" class="btn btn-primary mt-3"
-                            onclick="location.reload()">Try
+                        <button type="button" class="btn btn-primary mt-3" onclick="location.reload()">Try
                             Again</button>
                     </div>
                 </div>
@@ -706,18 +701,15 @@
                 </div>
             </div>
             <div class="nav-buttons" id="navigationButtons">
-                <button type="button" class="btn btn-outline-secondary"
-                    id="prevBtn" disabled><i
+                <button type="button" class="btn btn-outline-secondary" id="prevBtn" disabled><i
                         class="fas fa-chevron-left me-2"></i>Previous</button>
                 <div class="text-muted">Page <span id="navCurrentPage">1</span>
                     of <span id="navTotalPages">1</span>
                 </div>
                 <div class="nav-right">
-                    <button type="button" class="btn btn-primary"
-                        id="savePartiallyBtn"><i
+                    <button type="button" class="btn btn-primary" id="savePartiallyBtn"><i
                             class="fas fa-save me-2"></i>Save Partially</button>
-                    <button type="button" class="btn btn-primary"
-                        id="nextBtn">Next<i
+                    <button type="button" class="btn btn-primary" id="nextBtn">Next<i
                             class="fas fa-chevron-right ms-2"></i></button>
                 </div>
             </div>
@@ -729,8 +721,7 @@
         <div class="toast-header">
             <i class="fas fa-save text-success me-2"></i>
             <strong class="me-auto">Saved</strong>
-            <button type="button" class="btn-close"
-                data-bs-dismiss="toast"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body">Your progress has been saved successfully!</div>
     </div>
@@ -894,6 +885,92 @@
                     this.showSaveError('Failed to save responses. Please try again.')
                 }
             })
+        }
+        savePartially() {
+            this.save();
+            const data = {
+                template_id: this.tId,
+                answers: [],
+                is_partial: true
+            };
+            this.q.forEach(q => {
+                let answerValue;
+                if (this.s.has(q.id)) {
+                    answerValue = "SKIP";
+                } else if (this.r[q.id] !== undefined) {
+                    answerValue = this.r[q.id];
+                } else {
+                    return;
+                }
+                const response = {
+                    question_id: q.id,
+                    answer: answerValue
+                };
+                if (!this.s.has(q.id) && this.activeTriggers.has(q.id)) {
+                    response.triggers = [];
+                    const activeTriggerKeys = this.activeTriggers.get(q.id);
+                    activeTriggerKeys.forEach(triggerKey => {
+                        if (q.triggers[triggerKey]) {
+                            q.triggers[triggerKey].forEach(triggerQuestion => {
+                                let triggerAnswer;
+                                if (this.s.has(triggerQuestion.id)) {
+                                    triggerAnswer = "SKIP";
+                                } else if (this.r[triggerQuestion.id] !== undefined) {
+                                    triggerAnswer = this.r[triggerQuestion.id];
+                                } else {
+                                    return;
+                                }
+                                const triggerResponse = {
+                                    question_id: triggerQuestion.originalId,
+                                    answer: triggerAnswer
+                                };
+                                response.triggers.push(triggerResponse);
+                            });
+                        }
+                    });
+                }
+                data.answers.push(response);
+            });
+            this.showPartialSaveLoader();
+            apiRequest({
+                url: `https://login-users.hygeiaes.com/UserEmployee/dashboard/templates/saveHraTemplateQuestionnaireAnswers/${encodeURIComponent(this.tId)}`,
+                method: 'POST',
+                data: data,
+                onSuccess: (result) => {
+                    this.hidePartialSaveLoader();
+                    if (result.result) {
+                        const toast = new bootstrap.Toast(document.getElementById('saveToast'));
+                        toast.show();
+                        showToast('success', 'Success', 'Partial assessment saved successfully! You can continue later.');
+                    } else {
+                        this.showPartialSaveError(result.data || 'Failed to save partial responses');
+                    }
+                },
+                onError: (error) => {
+                    this.hidePartialSaveLoader();
+                    console.error('Partial Save Error:', error);
+                    this.showPartialSaveError('Failed to save partial responses. Please try again.');
+                }
+            });
+        }
+        showPartialSaveLoader() {
+            const saveBtn = document.getElementById('savePartiallyBtn');
+            const originalContent = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+            saveBtn.setAttribute('data-original-content', originalContent);
+        }
+        hidePartialSaveLoader() {
+            const saveBtn = document.getElementById('savePartiallyBtn');
+            const originalContent = saveBtn.getAttribute('data-original-content');
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalContent || '<i class="fas fa-save me-2"></i>Save Partially';
+            saveBtn.removeAttribute('data-original-content');
+        }
+        showPartialSaveError(message) {
+            this.hidePartialSaveLoader();
+            showToast('error', 'Error', message);
+            console.error('Partial Save Error:', message);
         }
         showSaveLoader() {
             const navButtons = document.getElementById('navigationButtons');
@@ -1459,7 +1536,10 @@
                 } else {
                     this.saveToServer()
                 }
-            })
+            });
+            document.getElementById('savePartiallyBtn').addEventListener('click', () => {
+                this.savePartially();
+            });
         }
         save() {
             const processedQuestions = new Set();

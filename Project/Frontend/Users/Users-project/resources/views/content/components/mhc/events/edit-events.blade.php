@@ -239,7 +239,12 @@ document.addEventListener('DOMContentLoaded', function () {
 const prefillDepartments = (departments = []) => {
   const departmentIds = departments.map(dep => dep.hl1_id);
   $('#department').val(departmentIds).trigger('change');
-};  // Employee Type (multiselect)
+}; 
+ const prefillEmployeeTypes = (employeeTypes = []) => {
+    const employeeTypeIds = employeeTypes.map(emp => emp.employee_type_id);
+    $('#employee_type').val(employeeTypeIds).trigger('change');
+  };
+// Employee Type (multiselect)
         const employeeTypeSelect = document.getElementById('employee_type');
         employeeTypeSelect.setAttribute('multiple', 'multiple');
         apiRequest({
@@ -282,10 +287,7 @@ const prefillDepartments = (departments = []) => {
     });
   };
 
-  const prefillEmployeeTypes = (employeeTypes = []) => {
-    const employeeTypeIds = employeeTypes.map(emp => emp.employee_type_id);
-    $('#employee_type').val(employeeTypeIds).trigger('change');
-  };
+  
   // 4. Prefill the form with event data
   const prefillForm = async (data) => {
     const event = data.event || {};

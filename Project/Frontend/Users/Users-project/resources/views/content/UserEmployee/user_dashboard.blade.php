@@ -109,59 +109,61 @@
   }
 
   // 👑 Load and display event invitations
-  function getEventDetails() {
-    apiRequest({
-      url: 'https://login-users.hygeiaes.com/UserEmployee/dashboard/events/getEventDetails',
-      method: 'GET',
-      dataType: 'json',
-      onSuccess: function (response) {
-        const modalBody = document.getElementById('eventModalBody');
+ function getEventDetails() {
+  apiRequest({
+    url: 'https://login-users.hygeiaes.com/UserEmployee/dashboard/events/getEventDetails',
+    method: 'GET',
+    dataType: 'json',
+    onSuccess: function (response) {
+      const modalBody = document.getElementById('eventModalBody');
 
-        if (response.result && Array.isArray(response.data) && response.data.length > 0) {
-          modalBody.innerHTML = '';
+      if (response.result && Array.isArray(response.data) && response.data.length > 0) {
+        // ✅ Sort by event_id DESC
+        const sortedEvents = response.data.sort((a, b) => b.event_id - a.event_id);
 
-          response.data.forEach(event => {
-            const from = new Date(event.from_datetime).toLocaleString();
-            const to = new Date(event.to_datetime).toLocaleString();
+        // ✅ Get the latest event
+        const event = sortedEvents[0];
 
-            const eventBlock = document.createElement('div');
-            eventBlock.classList.add('mb-4', 'pb-3', 'border-bottom');
+        const from = new Date(event.from_datetime).toLocaleString();
+        const to = new Date(event.to_datetime).toLocaleString();
 
-           eventBlock.innerHTML = `
-  <div class="d-flex justify-content-between align-items-start">
-    <h5 class="fw-bold mb-0">${event.event_name}</h5>
-    <div class="text-end ms-3">
-      <p class="mb-1 text-muted small">
-        <i class="fa fa-calendar"></i> <strong>From:</strong> ${from}<br>
-        <strong>To:</strong> ${to}
-      </p>
-    </div>
-  </div>
-  <p class="mt-2"><i class="fa fa-user"></i> <strong>Guest:</strong> ${event.guest_name || 'TBA'}</p>
-  <p><strong>Description:</strong><br>${event.event_description || 'No description available.'}</p>
-  <p><strong>Tests Linked:</strong> ${
-      event.test_names
-        ? Object.values(event.test_names).join(', ')
-        : 'No tests linked.'
-    }</p>
-`;
+        const eventBlock = document.createElement('div');
+        eventBlock.classList.add('mb-4', 'pb-3', 'border-bottom');
 
+        eventBlock.innerHTML = `
+          <div class="d-flex justify-content-between align-items-start">
+            <h5 class="fw-bold mb-0">${event.event_name}</h5>
+            <div class="text-end ms-3">
+              <p class="mb-1 text-muted small">
+                <i class="fa fa-calendar"></i> <strong>From:</strong> ${from}<br>
+                <strong>To:</strong> ${to}
+              </p>
+            </div>
+          </div>
+          <p class="mt-2"><i class="fa fa-user"></i> <strong>Guest:</strong> ${event.guest_name || 'TBA'}</p>
+          <p><strong>Description:</strong><br>${event.event_description || 'No description available.'}</p>
+          <p><strong>Tests Linked:</strong> ${
+            event.test_names
+              ? Object.values(event.test_names).join(', ')
+              : 'No tests linked.'
+          }</p>
+        `;
 
-            modalBody.appendChild(eventBlock);
-          });
+        modalBody.innerHTML = '';
+        modalBody.appendChild(eventBlock);
 
-          const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-          eventModal.show();
-        } else {
-          modalBody.innerHTML = '<p class="text-muted text-center">No royal invitations await at the moment.</p>';
-        }
-      },
-      onError: function () {
-        const modalBody = document.getElementById('eventModalBody');
-        modalBody.innerHTML = '<p class="text-danger text-center">Failed to fetch the event scrolls.</p>';
+        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+        eventModal.show();
+      } else {
+        modalBody.innerHTML = '<p class="text-muted text-center">No royal invitations await at the moment.</p>';
       }
-    });
-  }
+    },
+    onError: function () {
+      const modalBody = document.getElementById('eventModalBody');
+      modalBody.innerHTML = '<p class="text-danger text-center">Failed to fetch the event scrolls.</p>';
+    }
+  });
+}
 
   // 🚀 Init on page load
   $(document).ready(function () {

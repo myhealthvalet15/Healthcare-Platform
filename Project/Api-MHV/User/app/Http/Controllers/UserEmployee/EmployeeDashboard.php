@@ -112,6 +112,7 @@ class EmployeeDashboard extends Controller
             if (!$data['result']) {
                 return response()->json(['result' => false, 'data' => 'Invalid Template'], 403);
             }
+            // TODO: send actual answers of partial questions answered by user
             $templateQuestions = DB::table('hra_template_questions as htq')
                 ->join('hra_question as hq', 'htq.question_id', '=', 'hq.question_id')
                 ->where('htq.template_id', $templateId)
@@ -228,6 +229,7 @@ class EmployeeDashboard extends Controller
             }
             // TODO: TO Check the answers before saving ...
             // TODO: TO Check whether all the questions in this templates are answered or skipped ...
+            // TODO: To check is_partial if false check all the questions are answered or not else save partially by dont add reduntant rows
             foreach ($validated['answers'] as $answer) {
                 $motherId = $answer['question_id'];
                 if (isset($answer['triggers'])) {

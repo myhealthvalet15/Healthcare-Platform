@@ -7,7 +7,8 @@ use App\Http\Controllers\Corporate\events\EventsController;
 use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth:api'])->group(function () {
-    // Here include the routes only accessible for corporate and not employees Route::post('/storeEvents/{corporate_id}/{location_id}', [EventsController::class, 'addEvents']);
+    // Here include the routes only accessible for corporate and not employees 
+    Route::post('/storeEvents/{corporate_id}/{location_id}', [EventsController::class, 'addEvents']);
 
     Route::post('/saveCertificateCondition', [corporateEmployees::class, 'saveCertificateCondition']);
     // TODO: To Move This To Add registry Route (Registry Route Page)

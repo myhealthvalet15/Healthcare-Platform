@@ -2,7 +2,7 @@
 /vendor/
 /node_modules/
 .env
-.env.*
+
 /storage/*.key
 /storage/*.log
 /storage/oauth-private.key

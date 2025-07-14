@@ -692,5 +692,5 @@ Route::get('/add-test', function () {
 // Route::get('/test-add', function () {
 //     return view('content.components.ohc.others.test-add');
 // })->name('test-add');
-Route::get('/test-add/{employee_id}', [health_registry::class, 'displayAddTestPage'])->name('test-add');
+Route::get('/test-add', [health_registry::class, 'displayRegistryOutpatientPage'])->name('test-add');
 

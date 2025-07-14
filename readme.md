@@ -130,7 +130,17 @@ This platform serves major corporations including **L&T, Hyundai, Apollo, Nissan
 
 ## 📱 API Documentation
 
-- Yet To Add with Laravel Swagger (TODO: Priority HIGH)
+- Yet To Add with Laravel Swagger (TODO: Priority HIGH, Out Team is generating api docs wth postman collection, soon the link for postman collection will be added here)
+
+### 🔐 Authentication Strategy
+This platform uses **Laravel Passport** for API authentication.  
+Each user type (Corporate Admin, Employee, Doctor, Lab User) is assigned a **dedicated Passport client**, ensuring:
+- Isolated access tokens per user type
+- Scoped API permissions
+- Role-specific access controls
+
+This separation ensures secure, modular authentication for multiple user roles across corporate clients.
+
 
 ## 🔒 Security Features
 

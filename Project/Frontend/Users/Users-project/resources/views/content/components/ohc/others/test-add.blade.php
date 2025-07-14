@@ -35,46 +35,6 @@
 ])
 @endsection
 @section('content')
-@php
-$url = request()->url();
-$lastSegment = basename($url);
-$opRegistryData = $employeeData['op_registry_datas'] ?? [];
-$body_part = $opRegistryData['body_parts'] ?? [];
-$symptoms = $opRegistryData['symptoms'] ?? [];
-$diagnosis = $opRegistryData['diagnosis'] ?? [];
-$medical_systems = $opRegistryData['medical_systems'] ?? [];
-$mechanism_injuries = $opRegistryData['mechanism_injuries'] ?? [];
-$body_side = $opRegistryData['op_registry']['body_side'] ?? [];
-$site_of_injury = $opRegistryData['op_registry']['site_of_injury'] ?? [];
-$nature_injuries = $opRegistryData['nature_injuries'] ?? [];
-function safeJsonDecode($data) {
-if (is_string($data)) {
-$decoded = json_decode($data, true);
-return $decoded !== null ? $decoded : $data;
-}
-return $data;
-}
-$body_part = safeJsonDecode($body_part);
-$symptoms = safeJsonDecode($symptoms);
-$diagnosis = safeJsonDecode($diagnosis);
-$medical_systems = safeJsonDecode($medical_systems);
-$mechanism_injuries = safeJsonDecode($mechanism_injuries);
-$body_side = safeJsonDecode($body_side);
-$site_of_injury = safeJsonDecode($site_of_injury);
-$nature_injuries = safeJsonDecode($nature_injuries);
-$body_part = is_array($body_part) ? $body_part : [$body_part];
-$symptoms = is_array($symptoms) ? $symptoms : [$symptoms];
-$diagnosis = is_array($diagnosis) ? $diagnosis : [$diagnosis];
-$medical_systems = is_array($medical_systems) ? $medical_systems :
-[$medical_systems];
-$mechanism_injuries = is_array($mechanism_injuries) ? $mechanism_injuries :
-[$mechanism_injuries];
-$site_of_injury = safeJsonDecode($site_of_injury) ? $site_of_injury :
-[$site_of_injury];
-$nature_injuries = is_array($nature_injuries) ? $nature_injuries :
-[$nature_injuries];
-$referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
-@endphp
 <style>
     .medical-info-row {
         display: flex;

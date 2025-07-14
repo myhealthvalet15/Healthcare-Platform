@@ -258,7 +258,7 @@ $('#testModalBody').html(`
       <ul>${tests}</ul>
     </div>
   </div>
-  <div class="row">
+  <div class="row" >
     <div class="col-12">
       <strong>Description:</strong> ${rowData.event_description || 'N/A'}
     </div>

@@ -111,7 +111,7 @@
   // 👑 Load and display event invitations
  function getEventDetails() {
   apiRequest({
-    url: 'https://login-users.hygeiaes.com/UserEmployee/dashboard/events/getEventDetails',
+    url: 'https://login-users.hygeiaes.com/UserEmployee/events/getEventDetails',
     method: 'GET',
     dataType: 'json',
     onSuccess: function (response) {
@@ -168,7 +168,11 @@
   // 🚀 Init on page load
   $(document).ready(function () {
     getAllAssignedHraTemplates();
-    getEventDetails(); // Show fantasy modal popup
+    //if (!sessionStorage.getItem('eventPopupShown')) {
+  getEventDetails(); // Show fantasy modal popup
+  //sessionStorage.setItem('eventPopupShown', 'true');
+//}
+ // Show fantasy modal popup
   });
 </script>
 @endsection

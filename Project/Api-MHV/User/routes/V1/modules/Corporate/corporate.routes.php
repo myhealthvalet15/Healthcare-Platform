@@ -7,12 +7,13 @@ use App\Http\Controllers\Corporate\events\EventsController;
 use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth:api'])->group(function () {
-    // Here include the routes only accessible for corporate and not employees 
+    // Here include the routes only accessible for corporate and not employees
     Route::post('/storeEvents/{corporate_id}/{location_id}', [EventsController::class, 'addEvents']);
 
     Route::post('/saveCertificateCondition', [corporateEmployees::class, 'saveCertificateCondition']);
     // TODO: To Move This To Add registry Route (Registry Route Page)
     Route::post('/add-test/{employee_id}/op/{op_registry_id}', [corporateEmployees::class, 'addTest']);
+    Route::post('/add-test/{employee_id}', [corporateEmployees::class, 'addTest']);
     Route::post('/add-test/{employee_id}/prescription/{prescription_id}', [corporateEmployees::class, 'addTest']);
     Route::get('/getAllSymptoms', [corporateEmployees::class, 'getAllSymptoms']);
     Route::get('/getAllDiagnosis', [corporateEmployees::class, 'getAllDiagnosis']);
@@ -68,5 +69,6 @@ Route::middleware(['authGuard.corporate.employee'])->group(function () {
     Route::get('/checkEmployeeId/followUp/{isFollowUp}/{employee_id}', [corporateEmployees::class, 'checkEmployeeId']);
     Route::get('/checkEmployeeId/followUp/{isFollowUp}/{employee_id}/op/{op_registry_id}', [corporateEmployees::class, 'checkEmployeeId']);
     Route::get('/checkEmployeeId/followUp/{isFollowUp}/{employee_id}/prescription/{prescription_id}', [corporateEmployees::class, 'checkEmployeeId']);
+    Route::get('/getAllSubGroup', [corporateEmployees::class, 'getAllSubGroup']);
 
 });

@@ -330,12 +330,17 @@ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? null;
                 <?php
                 }
                 ?>
-                <button type="button" class="btn btn-primary" id="addTest">Add
-                    Tests</button>
+                <button type="button" class="btn btn-primary" id="addTest">Assign Test
+                </button>
             </div>
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('addTest').addEventListener('click', function () {
+        window.location.href = 'https://login-users.hygeiaes.com/ohc/test-list';
+    });
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const now = new Date();
@@ -574,7 +579,8 @@ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? null;
             return testNamesByID.get(option.id) || option.text.replace(/^[\s—]+/, '');
         }
         if (employeeIds === null || !/^[a-zA-Z0-9]+$/.test(employeeIds)) {
-            showToast("error", "Invalid Employee ID");
+            console.log("xxx", employeeIds);
+            //showToast("error", "Invalid Employee ID");
             return;
         }
         let apiUrl = 'https://login-users.hygeiaes.com/mhc/diagnostic-assessment/getAllMasterTests/' + employeeIds;

@@ -277,6 +277,7 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/ohc/health-registry/add-test/{employee_id}/op/{op_registry_id}', [health_registry::class, 'displayAddTestPage'])->name('health-registry-add-registry');
     Route::get('/ohc/health-registry/add-test/{employee_id}', [health_registry::class, 'displayAddTestPage'])->name('health-registry-add-registry');
     Route::post('/ohc/health-registry/add-test/{employee_id}/op/{op_registry_id}', [health_registry::class, 'addTestForEmployee'])->name('health-registry-add-registry');
+    Route::post('/ohc/health-registry/add-test/{employee_id}', [health_registry::class, 'addTestForEmployee'])->name('health-registry-add-registry');
     Route::get('/ohc/health-registry/add-test/{employee_id}/prescription/{prescription_id}', [health_registry::class, 'displayAddTestPage'])->name('health-registry-add-registry');
     Route::post('/ohc/health-registry/add-test/{employee_id}/prescription/{prescription_id}', [health_registry::class, 'addTestForEmployeeForPrescription'])->name('health-registry-add-registry');
     Route::get('/ohc/health-registry/list-registry', [health_registry::class, 'displayListRegistryPage'])->name('health-registry-list-registry');
@@ -678,8 +679,10 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/UserEmployee/getEmployeeTestForGraph/{master_user_id}/{test_id}', [EmployeeUserController::class, 'getEmployeeTestForGraph'])->name('employee-test-reports');
 
     Route::get('/UserEmployee/getEventsforEmployees', [EmployeeUserController::class, 'getEventsforEmployees'])->name('employee-get-events-for-employees');
-    Route::get('/UserEmployee/dashboard/events/getEventDetails', [EmployeeUserController::class, 'getEventDetails'])->name('getEventDetails');
-
+    Route::get('/UserEmployee/events/getEventDetails', [EmployeeUserController::class, 'getEventDetails'])->name('getEventDetails');
+    Route::post('/UserEmployee/events/submitResponse', [EmployeeUserController::class, 'submitResponse'])->name('submitResponse');
+    Route::get('/UserEmployee/events/getEventFromEmail', [EmployeeUserController::class, 'getEventFromEmail'])->name('getEventFromEmail');
+   
     Route::get('/UserEmployee/dashboard/templates/getAllAssignedTemplates', [EmployeeDashboard::class, 'getAllAssignedTemplates']);
     Route::get('/UserEmployee/dashboard/templates/hra-questionaire/template/{template_id}', [EmployeeDashboard::class, 'displayHraQuestionaireTemplate'])->name('hra-questionaire-template');
     Route::get('/UserEmployee/dashboard/templates/getTemplateQuestions/{templateId}', [EmployeeDashboard::class, 'getTemplateQuestions']);

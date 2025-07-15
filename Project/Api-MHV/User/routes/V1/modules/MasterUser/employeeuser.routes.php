@@ -16,5 +16,6 @@ Route::middleware(['auth:employee_api', 'validate.employee.request'])->group(fun
     Route::post('/updateEmployeesDetailById/{employeeId}', [EmployeeUserController::class, 'updateEmployeesDetailById']);
     Route::get('getEventsforEmployees/{user_id}', [EmployeeUserController::class, 'getEventsforEmployeesByUserId']);
     Route::get('getEventDetails/{user_id}', [EmployeeUserController::class, 'getEventDetails']);
-
+    Route::post('/submitEventResponse', [EmployeeUserController::class, 'submitEventResponseByEmployeeId']);
+   
 });

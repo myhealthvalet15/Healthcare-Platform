@@ -332,7 +332,7 @@ const prefillDepartments = (departments = []) => {
       document.getElementById('guest_name').value = data.event?.guest_name || '';
 
       waitUntilLoaded().then(() => {
-        prefillDepartments(data.departments);
+       prefillForm(data);
         // other dropdowns will be handled separately
       });
       } else {
@@ -344,5 +344,47 @@ const prefillDepartments = (departments = []) => {
     });
 });
 
+</script><script>
+document.getElementById('eventForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const formData = {
+    event_name: document.getElementById('event_name').value,
+    from_date: document.getElementById('from_date').value,
+    to_date: document.getElementById('to_date').value,
+    event_description: document.getElementById('event_description').value,
+    guest_name: document.getElementById('guest_name').value,
+    department: $('#department').val() || [],
+    employee_type: $('#employee_type').val() || [],
+    test: $('#test').val() || []
+  };
+
+  // Optional: log what you're submitting
+  console.log('Submitting:', formData);
+
+  fetch(`/mhc/events/update-events/${EVENT_ID}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+    },
+    body: JSON.stringify(formData)
+  })
+    .then(response => response.json())
+    .then(res => {
+      if (res.result) {
+        Swal.fire('Success', 'Event updated successfully!', 'success');
+        // Optionally redirect:
+        // window.location.href = '/mhc/events';
+      } else {
+        Swal.fire('Error', res.message || 'Update failed.', 'error');
+      }
+    })
+    .catch(() => {
+      Swal.fire('Error', 'Something went wrong while submitting the form.', 'error');
+    });
+});
 </script>
+
+
 @endsection

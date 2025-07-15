@@ -82,7 +82,7 @@ class EmployeeDashboard extends Controller
                 $employeeTypeMatch = is_null($template->employee_type) || in_array($employeeTypeId, $employeeTypes) || in_array('all', $employeeTypes);
                 $departmentMatch = is_null($template->department) || in_array($departmentId, $departments) || in_array('all', $departments);
                 if ($designationMatch && $employeeTypeMatch && $departmentMatch) {
-                    $templateData = HraTemplate::where('template_id', $template->template_id)->first(); 
+                    $templateData = HraTemplate::where('template_id', $template->template_id)->first();
                     if ($templateData) {
                         $isQuestionsAvailableForThisTemplate = HraTemplateQuestions::where('template_id', $templateData->template_id)->exists();
                         return response()->json([
@@ -115,9 +115,11 @@ class EmployeeDashboard extends Controller
             // TODO: send actual answers of partial questions answered by user
             $templateQuestions = DB::table('hra_template_questions as htq')
                 ->join('hra_question as hq', 'htq.question_id', '=', 'hq.question_id')
+                ->leftJoin('hra_factors as hf', 'htq.factor_id', '=', 'hf.factor_id')
                 ->where('htq.template_id', $templateId)
                 ->orderBy('htq.factor_priority', 'asc')
                 ->select([
+                    'hf.factor_name',
                     'htq.factor_priority',
                     'htq.question_id',
                     'htq.question_priority',
@@ -171,6 +173,7 @@ class EmployeeDashboard extends Controller
                     }
                     return $item;
                 });
+
             if ($templateQuestions->isEmpty()) {
                 return response()->json(['result' => false, 'data' => 'No questions found for this template'], 404);
             }

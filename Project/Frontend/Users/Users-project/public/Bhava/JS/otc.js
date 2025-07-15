@@ -66,28 +66,24 @@ if (dt_basic_table.length) {
  
  {
   data: 'drugs',
-  title: 'Issued Tablets',
+  title: 'Issued Tablets (Quantity)',
   render: function(data) {
     if (Array.isArray(data) && data.length > 0) {
       return data.map(drug => {
         const typeName = drugTypeMapping[drug.drug_type] || "Unknown";
-        const drugName = drug.drug_name.charAt(0).toUpperCase() + drug.drug_name.slice(1).toLowerCase();
-        return `${drugName} ${typeName} - ${drug.drug_strength}`;
+        const drugName = drug.drug_name
+          ? drug.drug_name.charAt(0).toUpperCase() + drug.drug_name.slice(1).toLowerCase()
+          : "Unnamed";
+        const strength = drug.drug_strength || '';
+        const quantity = drug.issued_quantity !== undefined ? drug.issued_quantity : 'N/A';
+
+        return `${drugName} ${typeName} - ${strength} (${quantity})`;
       }).join('<br>');
     }
     return 'N/A';
   }
-},
-{
-  data: 'drugs',
-  title: 'Issued Quantity',
-  render: function(data) {
-    if (Array.isArray(data) && data.length > 0) {
-      return data.map(drug => drug.issued_quantity !== undefined ? drug.issued_quantity : 'N/A').join('<br>');
-    }
-    return 'N/A';
-  }
-},
+}
+,
   { 
     data: 'doctor_notes', 
     title: 'Remarks'

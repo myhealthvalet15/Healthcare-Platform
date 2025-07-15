@@ -18,6 +18,8 @@ use App\Models\PrescribedTestData;
 use App\Models\OpRegistry;
 use App\Models\Hra\Master_Tests\MasterTest;
 use App\Models\Corporate\MasterUser;
+use App\Models\EventsResponse;
+
 
 class EmployeeUserController extends Controller
 {
@@ -245,7 +247,7 @@ class EmployeeUserController extends Controller
 
     $employeeTypeId = $employee->employee_type_id;
     $employeeTypeName = DB::table('employee_type')->where('employee_type_id', $employeeTypeId)->value('employee_type_name');
-
+    $employee_userId = $employee->user_id;
     return [
         'employee_id'               => $employee->employee_id,
         'employee_firstname'        => $employeeFirstname,
@@ -269,7 +271,8 @@ class EmployeeUserController extends Controller
         'abha_id'                   => $employeeAbhaId,
         'area'                      => $employeeArea,
         'zipcode'                   => $employeeZipcode,
-        'alternative_email'         => $employeeAlternativeEmail
+        'alternative_email'         => $employeeAlternativeEmail,
+        'employee_user_id'          => $employee_userId
     ];
 }
 
@@ -622,7 +625,7 @@ class EmployeeUserController extends Controller
 public function getEventDetails($userId)
 {
     $employeeInfo = $this->getEmployeesDetailById($userId);
-
+//return $employeeInfo;
     if (!$employeeInfo) {
         return response()->json([
             'result' => false,
@@ -632,7 +635,7 @@ public function getEventDetails($userId)
 
     $employeeType = (string) ($employeeInfo['employee_type_id'] ?? '');
     $department = (string) ($employeeInfo['employee_department_id'] ?? '');
-
+    $employee_userId = (string) $employeeInfo['employee_user_id'];
     // Step 1: Fetch matching events based on employee_type and department
     $events = DB::table('events')
         ->join('event_details', function ($join) use ($employeeType, $department) {
@@ -640,7 +643,11 @@ public function getEventDetails($userId)
                 ->whereRaw('JSON_CONTAINS(event_details.employee_type, ?)', [json_encode($employeeType)])
                 ->whereRaw('JSON_CONTAINS(event_details.department, ?)', [json_encode($department)]);
         })
-        ->orderBy('events.event_id', 'asc')
+        ->leftJoin('event_responses', function ($join) use ($employee_userId) {
+            $join->on('events.event_id', '=', 'event_responses.event_id')
+                ->where('event_responses.user_id', '=', $employee_userId);
+        })
+        ->orderBy('events.event_id', 'desc')
         ->get([
             'events.event_id',
             'events.from_datetime',
@@ -650,7 +657,8 @@ public function getEventDetails($userId)
             'events.event_description',
             'event_details.test_taken',
             'event_details.event_row_id',
-            'event_details.condition'
+            'event_details.condition',
+            'event_responses.status as response_status' // Include response status
         ]);
 
     if ($events->isEmpty()) {
@@ -684,6 +692,42 @@ public function getEventDetails($userId)
         'employee_department_name' => $employeeInfo['employee_department_name'] ?? ''
     ], 200);
 }
+public function submitEventResponseByEmployeeId(Request $request)
+{
+    $validatedData = $request->validate([
+        'event_id'     => 'required|integer|exists:events,event_id',
+        'user_id'      => 'required|string',
+        'response'       => 'required|in:yes,no',
+        'corporate_id' => 'nullable|string',
+    ]);
 
+    try {
+        $response = EventsResponse::updateOrCreate(
+            [
+                // These are the "where" conditions — check if this combination exists
+                'event_id' => $validatedData['event_id'],
+                'user_id'  => $validatedData['user_id']
+            ],
+            [
+                // These will be inserted or updated
+                'status'       => $validatedData['response'],
+                'corporate_id' => $validatedData['corporate_id'] ?? null,
+            ]
+        );
 
+        return response()->json([
+            'result' => true,
+            'message' => 'Event response submitted successfully.',
+            'data' => $response
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'result' => false,
+            'message' => 'An error occurred while submitting the event response.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+ 
 }

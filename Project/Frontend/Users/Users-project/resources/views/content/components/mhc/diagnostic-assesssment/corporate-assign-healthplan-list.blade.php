@@ -978,7 +978,7 @@
                 if (allConditions.length > 0) {
                     allConditionsHtml = `
                 <div class="mb-3">
-                    <strong class="text-dark d-block mb-1">All Conditions for "${certification.certification_title}":</strong>
+                    <strong class="text-dark d-block mb-1">Available Conditions for "${certification.certification_title}" Certificate:</strong>
                     <div class="d-flex flex-wrap align-items-center">
                         ${allConditions.map(cd => `
                             <div class="d-flex align-items-center me-3 mb-2">

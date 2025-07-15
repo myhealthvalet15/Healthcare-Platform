@@ -872,21 +872,30 @@ function capitalizeFirstLetter(string) {
     }
 
     function createTestRow(test) {
-      console.log("checking the test value",test);
       const row = document.createElement('tr');
       const dateCell = document.createElement('td');
       const dateWrapper = document.createElement('div');
      dateWrapper.className = 'date-with-icon d-flex align-items-center justify-content-center gap-2';
      dateWrapper.style.cursor = 'pointer'; // make whole wrapper look clickable
        dateWrapper.setAttribute('data-item-id', test.id); // store ID
+       //
+       dateCell.className = 'text-center';
 
       const dateSpan = document.createElement('span');
       dateSpan.className = 'fw-medium';
+
+      const calendarIcon = document.createElement('i');
+      calendarIcon.className = 'fas fa-calendar-alt calendar-icon';
+      calendarIcon.setAttribute('title', 'View all dates');
+
       if (test.reporting_date_time) {
         const testDate = new Date(test.reporting_date_time);
         const formattedDate = `${testDate.getDate().toString().padStart(2, '0')}-${(testDate.getMonth() + 1).toString().padStart(2, '0')}-${testDate.getFullYear().toString().substring(2)}`;
         dateSpan.textContent = formattedDate;
+        calendarIcon.style.visibility = 'hidden';
         dateWrapper.appendChild(dateSpan);
+        dateWrapper.appendChild(calendarIcon); // show icon
+
       }
        else if(test.test_date)
       {
@@ -1158,7 +1167,7 @@ function openCertificationModal(element) {
                 if (allConditions.length > 0) {
                     allConditionsHtml = `
                 <div class="mb-3">
-                    <strong class="text-dark d-block mb-1">All Conditions for "${certification.certification_title}":</strong>
+                    <strong class="text-dark d-block mb-1">Available Conditions for "${certification.certification_title}" Certificate:</strong>
                     <div class="d-flex flex-wrap align-items-center">
                         ${allConditions.map(cd => `
                             <div class="d-flex align-items-center me-3 mb-2">

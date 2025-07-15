@@ -1425,7 +1425,7 @@ class corporateEmployees extends Controller
                 ->where('isVp', 1)
                 ->where('fromOp', 1)
                 ->pluck('test_code')
-                ->map(fn($code) => (int) $code)
+                ->map(fn ($code) => (int) $code)
                 ->first();
             PrescribedTest::where('op_registry_id', $opRegistryId)->where('fromOp', 1)->where('isVp', 1)->delete();
             PrescribedTestData::where('test_code', $testCode)->where('fromOp', 1)->delete();
@@ -1563,12 +1563,12 @@ class corporateEmployees extends Controller
             ]);
             $locationId = $validatedData['locationId'];
             if (!$employee_id || !ctype_alnum($employee_id)) {
-                return response()->json(['result' => false, 'message' => 'Invalid Request 1'], 400);
+                return response()->json(['result' => false, 'message' => 'Invalid Request'], 400);
             }
             $isOpRegistry = $op_registry_id !== null;
             $isPrescription = $prescription_id !== null;
             if ($isOpRegistry && !is_numeric($op_registry_id)) {
-                return response()->json(['result' => false, 'message' => 'Invalid Request 2'], 400);
+                return response()->json(['result' => false, 'message' => 'Invalid Request'], 400);
             }
             if ($isPrescription && !is_numeric($prescription_id)) {
                 return response()->json(['result' => false, 'message' => 'Invalid Prescription ID'], 400);
@@ -1578,7 +1578,7 @@ class corporateEmployees extends Controller
                     ->where('open_status', 1)
                     ->exists();
                 if (!$isOpen) {
-                    return response()->json(['result' => false, 'message' => 'Invalid Request 3'], 422);
+                    return response()->json(['result' => false, 'message' => 'Invalid Request'], 422);
                 }
             }
             if ($isPrescription && $prescription_id > 0) {
@@ -1587,6 +1587,9 @@ class corporateEmployees extends Controller
                 if (!$prescriptionExists) {
                     return response()->json(['result' => false, 'message' => 'Invalid Prescription'], 422);
                 }
+            }
+            if ($isOpRegistry === null && $isPrescription === null && $employee_id) {
+                return response()->json(['result' => false, 'message' => 'Request praveen to unlock the access to this api ...'], 422);
             }
             $employee = EmployeeUserMapping::where('corporate_id', $validatedData['corporateId'])
                 ->where('location_id', $locationId)

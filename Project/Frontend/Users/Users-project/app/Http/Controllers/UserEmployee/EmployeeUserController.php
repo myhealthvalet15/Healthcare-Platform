@@ -354,5 +354,39 @@ class EmployeeUserController extends Controller
 
     return view('content.components.ohc.others.testadd', compact('employeeData'));
    }
+   public function submitResponse(Request $request)
+    { 
+       
+        $response = $request->validate([
+            'event_id' => 'required|integer',
+            'response' => 'required|string|in:yes,no',
+        ]);
+        $response['corporate_id'] = session('corporate_id');
+        try {
+            $apiResponse = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->post('https://api-user.hygeiaes.com/V1/master-user/masteruser/submitEventResponse', $response);
+         //  return $apiResponse;
+            if ($apiResponse->successful()) {
+                return response()->json(['result' => true, 'message' => 'Response submitted successfully']);
+            } else {
+                return response()->json(['result' => false, 'message' => 'Failed to submit response'], $apiResponse->status());
+            }
+        } catch (\Exception $e) {
+            return response()->json(['result' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        }
+    } public function getEventFromEmail(Request $request)
+    {
+       //ssss return $request;
+       
+       $eventId = $request->query('event_id');
+    $userId = $request->query('user_id');
+
+    // Pass both to the Blade view
+    return view('content.UserEmployee.user_employee_event_response', compact('eventId', 'userId'));
+        }
+
    
 }

@@ -33,7 +33,7 @@ class EventsController extends Controller
     'Accept' => 'application/json',
     'Authorization' => 'Bearer ' . $request->cookie('access_token'),
 ])->post('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/storeEvents/' . $corporateId . '/' . $locationId, $request->all());
- return $response;
+ //return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => $response['message']]);
             }

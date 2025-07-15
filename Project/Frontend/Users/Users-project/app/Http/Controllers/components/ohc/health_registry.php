@@ -42,7 +42,7 @@ class health_registry extends Controller
         }
         return "Invalid Request";
     }
-    public function getAllHealthRegistry(Request $request,$employeeId = null)
+    public function getAllHealthRegistry(Request $request, $employeeId = null)
     {
         if ($employeeId && !ctype_alnum($employeeId)) {
             return response()->json(['result' => false, 'message' => 'Invalid Request'], 404);
@@ -61,7 +61,7 @@ class health_registry extends Controller
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
-            
+
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
 
         ])->get($url);
@@ -134,9 +134,9 @@ class health_registry extends Controller
 
 
     //
-        public function RegistryOutpatientPage(Request $request, $employee_id = null, $op_registry_id = null)
+    public function RegistryOutpatientPage(Request $request, $employee_id = null, $op_registry_id = null)
     {
-         $employee_id = $request->query('emp');
+        $employee_id = $request->query('emp');
 
         $url = 'https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/checkEmployeeId/followUp/' . 0 .  '/' . $employee_id;
         if ($op_registry_id !== null) {
@@ -154,12 +154,12 @@ class health_registry extends Controller
             }
             $headerData = 'Add Out Patient';
             if ($op_registry_id !== null) {
-                return view('content.components.ohc.health-registry.edit-registry-outpatient', [
+                return view('content.components.ohc.others.test-add', [
                     'HeaderData' => $headerData,
                     'employeeData' => $data['message']
                 ]);
             }
-            return view('content.components.ohc.health-registry.add-registry-outpatient', [
+            return view('content.components.ohc.others.test-add', [
                 'HeaderData' => $headerData,
                 'employeeData' => $data['message']
             ]);
@@ -278,9 +278,8 @@ class health_registry extends Controller
         if ($employee_id === null || !ctype_alnum($employee_id)) {
             return "Invalid Request";
         }
-
-        if ($op_registry_id === null || !is_numeric($op_registry_id)) {
-            return "Invalid Request";
+        if ($op_registry_id && !is_numeric($op_registry_id)) {
+            return "Invalid Request..";
         }
         $locationId = session('location_id');
         $corporateId = session('corporate_id');
@@ -295,22 +294,26 @@ class health_registry extends Controller
             'test_ids.*' => 'required|integer',
             'selected_datetime' => 'required|date'
         ]);
-
+        if ($op_registry_id) {
+            $apiUrl = "https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/add-test/" . $employee_id . '/op/' . $op_registry_id;
+        } else {
+            $apiUrl = "https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/add-test/" . $employee_id;
+        }
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . request()->cookie('access_token'),
-        ])->post('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/add-test/' . $employee_id . '/op/' . $op_registry_id, [
+        ])->post($apiUrl, [
             'corporateId' => $corporateId,
             'locationId' => $locationId,
             'employeeId' => $employee_id,
             'selected_datetime' => $validatedData['selected_datetime'],
             'test_ids' => $validatedData['test_ids']
-        ]);  
+        ]);
         if ($response->successful()) {
             return response()->json(['result' => true, 'message' => $response['message']]);
         }
-        return response()->json(['result' => false, 'message' => 'Invalid Request'], $response->status());
+        return response()->json(['result' => false, 'message' => $response['message']], $response->status());
     }
     public function getAllBodyParts(Request $request)
     {

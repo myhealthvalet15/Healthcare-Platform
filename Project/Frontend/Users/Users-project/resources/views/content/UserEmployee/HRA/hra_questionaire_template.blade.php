@@ -621,6 +621,47 @@
         gap: 0.5rem;
     }
 </style>
+<style>
+    /* Your existing styles remain the same */
+    /* Add these new styles for factor grouping */
+    .factor-group {
+        margin-bottom: 30px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .factor-header {
+        background: linear-gradient(135deg, #667eea 0, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .factor-icon {
+        font-size: 1.2rem;
+    }
+
+    .factor-questions {
+        background: white;
+        padding: 15px;
+    }
+
+    .factor-priority {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+</style>
 <div class="card hra-main-card">
     <div class="hra-header">
         <div class="hra-header-left">
@@ -1091,24 +1132,60 @@
                 cq = this.q.slice(s, e),
                 c = document.getElementById('questionsContainer');
             this.clearElement(c);
-            cq.forEach(q => {
-                const mainCard = this.create(q);
-                c.appendChild(mainCard);
-                if (this.activeTriggers.has(q.id)) {
-                    const activeTriggerKeys = this.activeTriggers.get(q.id);
-                    activeTriggerKeys.forEach(triggerKey => {
-                        if (q.triggers[triggerKey]) {
-                            const triggerQuestions = q.triggers[triggerKey];
-                            triggerQuestions.forEach(triggerQuestion => {
-                                const triggerCard = this.createTriggerQuestion(triggerQuestion);
-                                c.appendChild(triggerCard)
-                            })
-                        }
-                    })
-                }
+            const groupedQuestions = this.groupQuestionsByFactor(cq);
+            groupedQuestions.forEach(group => {
+                const factorGroup = document.createElement('div');
+                factorGroup.className = 'factor-group';
+                const factorHeader = document.createElement('div');
+                factorHeader.className = 'factor-header';
+                const priorityBadge = document.createElement('div');
+                priorityBadge.className = 'factor-priority';
+                priorityBadge.textContent = group.factor_priority;
+                const factorIcon = document.createElement('i');
+                factorIcon.className = 'fas fa-layer-group factor-icon';
+                const factorTitle = document.createElement('span');
+                factorTitle.textContent = group.factor_name;
+                factorHeader.appendChild(priorityBadge);
+                factorHeader.appendChild(factorIcon);
+                factorHeader.appendChild(factorTitle);
+                const questionsContainer = document.createElement('div');
+                questionsContainer.className = 'factor-questions';
+                group.questions.forEach(q => {
+                    const mainCard = this.create(q);
+                    questionsContainer.appendChild(mainCard);
+                    if (this.activeTriggers.has(q.id)) {
+                        const activeTriggerKeys = this.activeTriggers.get(q.id);
+                        activeTriggerKeys.forEach(triggerKey => {
+                            if (q.triggers[triggerKey]) {
+                                const triggerQuestions = q.triggers[triggerKey];
+                                triggerQuestions.forEach(triggerQuestion => {
+                                    const triggerCard = this.createTriggerQuestion(triggerQuestion);
+                                    questionsContainer.appendChild(triggerCard);
+                                });
+                            }
+                        });
+                    }
+                });
+                factorGroup.appendChild(factorHeader);
+                factorGroup.appendChild(questionsContainer);
+                c.appendChild(factorGroup);
             });
             this.upInfo();
-            this.upNav()
+            this.upNav();
+        }
+        groupQuestionsByFactor(questions) {
+            const factorMap = new Map();
+            questions.forEach(q => {
+                if (!factorMap.has(q.rawData.factor_name)) {
+                    factorMap.set(q.rawData.factor_name, {
+                        factor_name: q.rawData.factor_name,
+                        factor_priority: q.rawData.factor_priority,
+                        questions: []
+                    });
+                }
+                factorMap.get(q.rawData.factor_name).questions.push(q);
+            });
+            return Array.from(factorMap.values()).sort((a, b) => a.factor_priority - b.factor_priority);
         }
         clearElement(el) {
             while (el.firstChild) el.removeChild(el.firstChild)
@@ -1358,7 +1435,7 @@
                         if (question.triggers[triggerKey]) {
                             question.triggers[triggerKey].forEach(triggerQuestion => {
                                 if (this.a.has(triggerQuestion.id) || this.s.has(triggerQuestion.id)) {
-                                    completed++
+                                    completed++;
                                 }
                             })
                         }

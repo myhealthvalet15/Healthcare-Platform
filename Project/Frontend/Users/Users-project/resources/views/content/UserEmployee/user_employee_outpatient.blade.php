@@ -307,8 +307,8 @@
                     <th>INCIDENT DATE</th> 
                     <th style="text-align:left;">TYPE OF INCIDENT</th> 
                     <th style="text-align:left;">NATURE OF INJURY/SYMPTOMS</th> 
-                    <th style="text-align:left;">MECHANISM OF INJURY/MEDICAL SYSTEM</th> 
-                    <th style="text-align:left;">DIAGNOSIS</th>                    
+                    <th style="text-align:left;">MECHANISM OF INJURY/DIAGNOSIS</th> 
+                    <th style="text-align:left;">BODY PART INJURED/MEDICAL SYSTEM</th>                    
                     <th >DETAILS</th>
                 </tr>
             </thead>

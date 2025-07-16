@@ -86,7 +86,7 @@
 </script>
 
 <script>
-    const testAddUrl = "{{ url('/test-add') }}";  // NOT route(), use full URL
+    const testAddUrl = "{{ url('/ohc/addtest') }}";  // NOT route(), use full URL
 </script>
 
 <script>

@@ -555,24 +555,82 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
             </div>
             @endif
             
-            
+               @if (session('user_type') != 'MasterUser')
             <div class="col-md-2" style="margin-left: 50px;">
-                 @if (session('user_type') != 'MasterUser')
+              
 
                 <p> <input type="checkbox" name="share_patient">&nbsp;Share with
                     Patient</p>
                 <p style="margin-bottom: 10px;"> <input type="checkbox" name="share_patient">&nbsp;Send Mail To Patient
                 </p>
-                @endif
-            </div>
-            <div class="col-md-3" style="margin-left:-10px;">
-                <textarea name="doctorNotes" style="padding: 7px;
+              
+            </div>  @endif
+            <div class="col-md-3" style="margin-left:20px;">
+
+    <!-- 🔗 Attach Prescription -->
    
-    width: 270px;
-    border: 1px solid #d1d0d4;margin-left: -25px;" class="form-control">Doctor Notes</textarea><br />
-                <button class="btn btn-primary me-2" id="addTest">Add
-                    Test</button>
-            </div>
+        <label for="prescriptionAttachment" class="form-label fw-semibold">Attach Prescription</label>
+        <input type="file" id="prescriptionAttachment" accept="image/*" multiple class="form-control" />
+<!-- 📷 Thumbnails -->
+    <div id="prescriptionThumbnails" class="d-flex flex-wrap gap-2 mb-2" 
+    style="margin-top: 25px;">
+        <!-- Thumbnails will appear here -->
+    </div>
+    </div>
+
+ <div class="mb-2">
+    
+
+    <!-- 📝 Doctor Notes -->
+    <textarea name="doctorNotes" style="padding: 7px; width: 270px; border: 1px solid #d1d0d4; margin-left: -25px;" class="form-control">Doctor Notes</textarea><br />
+    <button class="btn btn-primary me-2" id="addTest">Add Test</button>
+</div>
+<script>
+let prescriptionFilesBase64 = [];
+
+document.getElementById('prescriptionAttachment').addEventListener('change', async function () {
+    const container = document.getElementById('prescriptionThumbnails');
+    container.innerHTML = '';
+    prescriptionFilesBase64 = []; // Reset stored images
+
+    const files = Array.from(this.files);
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    const maxSize = 1024 * 1024; // 1MB per file
+
+    for (const file of files) {
+        if (!allowedTypes.includes(file.type)) {
+            showToast('error', 'Invalid File', `${file.name} is not a valid image.`);
+            continue;
+        }
+
+        if (file.size > maxSize) {
+            showToast('error', 'File Too Large', `${file.name} exceeds 1MB.`);
+            continue;
+        }
+
+        const base64 = await fileToBase64(file);
+        prescriptionFilesBase64.push(base64);
+
+        const img = document.createElement('img');
+        img.src = base64;
+        img.className = 'img-thumbnail';
+        img.style.width = '100px';
+        img.style.height = '100px';
+        img.style.objectFit = 'cover';
+        container.appendChild(img);
+    }
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+});
+</script>
+
             <script>
                 var opRegistryId = "{{ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? 0 }}";
             </script>
@@ -593,8 +651,12 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
     border: 1px solid #d1d0d4;margin-left:-33px;">Patient Notes</textarea><br />
                 <a class="btn btn-secondary add-new btn-primary waves-effect waves-light" id="add_prescription"
                     style="margin-left:-30px;">
-                    <span><span style="color:#fff;">Add
-                            Prescription</span></span>
+                      @if (session('user_type') === 'MasterUser')
+                    <span><span style="color:#fff;">Save Prescription</span></span>
+                     @else 
+                     <span><span style="color:#fff;">Add Prescription</span></span>
+
+                  @endif 
                 </a>
             </div>
 
@@ -603,6 +665,65 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
         <br />
     </div>
 </div>
+
+<!-- 📌 Prescription Image Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center p-0">
+        <img id="prescriptionModalImage" src="" class="img-fluid w-100" />
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    const attachmentInput = document.getElementById('prescriptionAttachment');
+    const thumbnailsContainer = document.getElementById('prescriptionThumbnails');
+
+    attachmentInput.addEventListener('change', function () {
+        thumbnailsContainer.innerHTML = ''; // Clear previous previews
+
+        Array.from(this.files).forEach((file, index) => {
+            if (!file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const thumbWrapper = document.createElement('div');
+                thumbWrapper.className = 'position-relative';
+                thumbWrapper.style.width = '100px';
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-thumbnail';
+                img.style.cursor = 'pointer';
+                img.style.width = '100px';
+                img.style.height = '100px';
+                img.addEventListener('click', () => {
+                    document.getElementById('prescriptionModalImage').src = e.target.result;
+                    const modal = new bootstrap.Modal(document.getElementById('prescriptionModal'));
+                    modal.show();
+                });
+
+                const deleteBtn = document.createElement('span');
+                deleteBtn.className = 'position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger';
+                deleteBtn.textContent = '×';
+                deleteBtn.style.cursor = 'pointer';
+                deleteBtn.title = 'Remove';
+                deleteBtn.onclick = () => {
+                    thumbWrapper.remove();
+                };
+
+                thumbWrapper.appendChild(img);
+                thumbWrapper.appendChild(deleteBtn);
+                thumbnailsContainer.appendChild(thumbWrapper);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+</script>
+
 <script>
     function addRow1(isPrefilling = false, lastRowId = 0) {
         var container = document.querySelector('.prescription-inputs');
@@ -1020,20 +1141,24 @@ if (prescription_Date) {
     }
 }
 
-            var formData = {
-                _token: csrfToken,
-                prescriptionTemplate: $('#prescriptionTemplate').val(),
-                drugs: [],
-                pharmacy: $('select[name="fav_pharmacy"]').val(),
-                shareWithPatient: $('input[name="share_patient"]:checked').length > 0 ? 1 : 0,
-                sendMailToPatient: $('input[name="share_patient"]:checked').length > 0 ? 1 : 0,
-                doctorNotes: $('textarea[name="doctorNotes"]').val(),
-                patientNotes: $('textarea[name="patientNotes"]').val(),
-                user_id: $('input[name="emp_id"]').val(),
-                prescription_date: formattedDate,
-                ohc: 1,
-                op_registry_id: opRegistryId
-            };
+            const formData = {
+    _token: csrfToken,
+    prescriptionTemplate: $('#prescriptionTemplate').val(),
+    drugs: [], // filled as you already do
+    pharmacy: $('select[name="fav_pharmacy"]').val(),
+    shareWithPatient: $('input[name="share_patient"]:checked').length > 0 ? 1 : 0,
+    sendMailToPatient: $('input[name="share_patient"]:checked').length > 0 ? 1 : 0,
+    doctorNotes: $('textarea[name="doctorNotes"]').val(),
+    patientNotes: $('textarea[name="patientNotes"]').val(),
+    user_id: $('input[name="emp_id"]').val(),
+    prescription_date: formattedDate,
+    ohc: 1,
+    op_registry_id: opRegistryId,
+    
+   
+    prescription_attachments: prescriptionFilesBase64,
+};
+//console.log('Form Data:', formData); // Log the form data to check its structure
 
             // Loop through all prescription rows to get drug data
             $('.prescription-row').each(function (index, row) {
@@ -1095,8 +1220,9 @@ if (prescription_Date) {
             $.ajax({
                 url: "{{ route('store_EmployeePrescription') }}", // Route for storing prescription
                 type: 'POST',
-                data: formData,
-                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+               
                 success: function (response) {
               
                     if (response.message) {
@@ -1337,7 +1463,7 @@ if (prescription_Date) {
                             <div style="width: 5%;">Days</div>
                             <div style="width: 30%;">
                                 <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                                    <img src="https://www.hygeiaes.co/img/Morning.png">
+                                    <img src="">
                                 </div>
                                 <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
                                     <img src="https://www.hygeiaes.co/img/Noon.png">

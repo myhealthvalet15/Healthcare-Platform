@@ -183,6 +183,7 @@ use App\Http\Controllers\drug\drug_ingredients\DrugIngredientController;
 use App\Http\Controllers\drug\drug_types\DrugTypeController;
 use App\Http\Controllers\medicalcondition\MedicalConditionController;
 use App\Http\Controllers\forms\CorporateFormController;
+use App\Http\Controllers\corporate\IncidentTypeController;
 // icons
 Route::get('/icons/tabler', [Tabler::class, 'index'])->name('icons-tabler');
 Route::get('/icons/font-awesome', [FontAwesome::class, 'index'])->name('icons-font-awesome');
@@ -299,6 +300,11 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/corporate/linkCorporateToHra', [link2hra::class, 'linkCorporate2Hra']);
     Route::post('/corporate/updateCorporateHraLink', [link2hra::class, 'updateCorporateHraLink']);
     Route::get('/corporate/getCorporateOfHraTemplate', [link2hra::class, 'getCorporateOfHraTemplate']);
+
+    Route::get('/corporate/getAllIncidentTypes', [IncidentTypeController::class, 'getAllIncidentTypes']);
+    Route::post('/corporate/addIncidentType', [IncidentTypeController::class, 'addIncidentType']);
+    Route::post('/corporate/editIncidentType/{id}', [IncidentTypeController::class, 'editIncidentType']);
+    Route::delete('/corporate/deleteIncidentType/{id}', [IncidentTypeController::class, 'deleteIncidentType']);
     // ------------------------------------------------------------------------------------------------------------------------------
     Route::group(['prefix' => 'location'], function () {
         Route::get('/country', [AddressController::class, 'countryindex'])->name('location.country');

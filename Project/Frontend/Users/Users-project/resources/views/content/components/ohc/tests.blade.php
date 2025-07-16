@@ -298,7 +298,7 @@
         </div>
       
 <div class="mb-3 d-flex justify-content-end me-3">
-  <a href="{{ route('addtest') }}" class="btn btn-primary btn-md" id="addtest">
+  <a href="{{ route('addtest.view') }}" class="btn btn-primary btn-md" id="addtest">
     Add Test
   </a>
 </div>
@@ -403,7 +403,7 @@
           <th>Name (Age) - Employee ID</th>
           <th>Department</th>
           <th>Test List</th>
-          <th>Status</th>
+          <th>Observation</th>
         </tr>
       </thead>
       <tbody class="table-border-bottom-0"></tbody>
@@ -935,32 +935,7 @@
       }
       observationCell.appendChild(prescriptionIcon);
       row.appendChild(observationCell);
-      const statusCell = document.createElement('td');
-      const statusBadge = document.createElement('span');
-      const icon = document.createElement('i');
-      const status = test.healthplan_status || 'Unknown';
-      if (status === 'Pending' || status === 'Cancelled') {
-        statusBadge.className = 'badge bg-label-danger d-inline-flex align-items-center gap-1 px-3 py-2 fs-6 status-badge';
-        icon.className = status === 'Pending' ? 'fa-solid fa-pencil' : 'fa-solid fa-ban';
-      } else if (status === 'Schedule' || status === 'In Process') {
-        statusBadge.className = 'badge bg-label-warning d-inline-flex align-items-center gap-1 px-3 py-2 fs-6 status-badge';
-        icon.className = 'fa-solid fa-clock';
-      } else if (['Test Completed', 'Result Ready', 'No Show', 'Certified'].includes(status)) {
-        statusBadge.className = 'badge bg-label-success d-inline-flex align-items-center gap-1 px-3 py-2 fs-6 status-badge';
-        icon.className = status === 'Result Ready' ? 'fa-solid fa-binoculars' : 'fa-solid fa-check';
-      } else {
-        statusBadge.className = 'badge bg-label-info d-inline-flex align-items-center gap-1 px-3 py-2 fs-6 status-badge';
-        icon.className = 'fa-solid fa-info-circle';
-      }
-      statusBadge.appendChild(icon);
-      statusBadge.appendChild(document.createTextNode(' ' + status));
-      statusBadge.dataset.testCode = test.test_code;
-      statusBadge.title = "Click to view test details";
-      statusBadge.addEventListener('click', function () {
-        navigateToTestDetails(this.dataset.testCode);
-      });
-      statusCell.appendChild(statusBadge);
-      row.appendChild(statusCell);
+      
       return row;
     }
     function showPrescriptionModal(test) {

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CertificationController;
 use App\Http\Controllers\V1Controllers\CorporateController\TestGroups;
 use App\Http\Controllers\V1Controllers\CorporateController\linkCorporateToHra;
+use App\Http\Controllers\V1Controllers\IncidentType\IncidentTypeController;
 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/getAllCertificates', [CertificationController::class, 'getAllCertificates']);
@@ -33,4 +34,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/link2hra', [linkCorporateToHra::class, 'linkCorporate2Hra']);
     Route::post('/updateCorporateHraLink', [linkCorporateToHra::class, 'updateCorporateHraLink']);
     Route::get('/getCorporateOfHraTemplate', [linkCorporateToHra::class, 'getCorporateOfHraTemplate']);
+
+    Route::get('/getAllIncidentTypes', [IncidentTypeController::class, 'getAllIncidentTypes']);
+    Route::post('/addIncidentType', [IncidentTypeController::class, 'addIncidentType']);
+    Route::post('/editIncidentType/{incident_type_id}', [IncidentTypeController::class, 'editIncidentType']);
+    Route::delete('/deleteIncidentType/{incident_type_id}', [IncidentTypeController::class, 'deleteIncidentType']);
 });

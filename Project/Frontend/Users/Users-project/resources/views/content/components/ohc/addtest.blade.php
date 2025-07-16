@@ -158,7 +158,7 @@ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? null;
 ?>
 <script>
     var employeeData = <?php echo json_encode($employeeData); ?>;
-    var isOpRegistryIdIsthere = <?php echo json_encode($opRegistryId); ?>;
+    //var isOpRegistryIdIsthere = <?php echo json_encode($opRegistryId); ?>;
 </script>
 <div class="card mb-4">
     <div class="card-header text-white p-2 border-0 rounded-top" style="background-color: #6B1BC7;">
@@ -383,26 +383,35 @@ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? null;
         }
     `;
         document.head.appendChild(style);
-        const pathSegments = window.location.pathname.split('/');
-        const employeeIdIndex = pathSegments.indexOf('add-test') + 1;
-        const employeeIds = pathSegments[employeeIdIndex];
-        let mode = 'op'; // default mode is now 'op'
-        let opId = '0'; // default to '0'
-        let prescriptionId = null;
+       let employeeIds = null;
 
+// First, try to get it from query params (recommended method)
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('emp')) {
+    employeeIds = urlParams.get('emp');
+} else {
+    // Fallback: try to extract from URL path (e.g., /test-add/EMP00081)
+    const pathSegments = window.location.pathname.split('/');
+    const employeeIdIndex = pathSegments.indexOf('test-add') + 1;
+    if (employeeIdIndex > 0 && pathSegments.length > employeeIdIndex) {
+        employeeIds = pathSegments[employeeIdIndex];
+    }
+}
+
+console.log("Employee ID:", employeeIds);
         // Determine if it's op mode or prescription mode
-        if (pathSegments.length > employeeIdIndex + 1) {
-            if (pathSegments[employeeIdIndex + 1] === 'op') {
-                mode = 'op';
-                opId = pathSegments[employeeIdIndex + 2] || '0';
-            } else if (pathSegments[employeeIdIndex + 1] === 'prescription') {
-                mode = 'prescription';
-                prescriptionId = pathSegments[employeeIdIndex + 2];
-            }
-        }
-        if (mode === 'prescription' && backToHealthReg) {
-            backToHealthReg.style.display = 'none';
-        }
+        // if (pathSegments.length > employeeIdIndex + 1) {
+        //     if (pathSegments[employeeIdIndex + 1] === 'op') {
+        //         mode = 'op';
+        //         opId = pathSegments[employeeIdIndex + 2] || '0';
+        //     } else if (pathSegments[employeeIdIndex + 1] === 'prescription') {
+        //         mode = 'prescription';
+        //         prescriptionId = pathSegments[employeeIdIndex + 2];
+        //     }
+        // }
+        // if (mode === 'prescription' && backToHealthReg) {
+        //     backToHealthReg.style.display = 'none';
+        // }
         apiRequest({
             url: 'https://login-users.hygeiaes.com/mhc/diagnostic-assessment/getAllSubGroup',
             method: 'GET',
@@ -579,16 +588,15 @@ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? null;
             return testNamesByID.get(option.id) || option.text.replace(/^[\s—]+/, '');
         }
         if (employeeIds === null || !/^[a-zA-Z0-9]+$/.test(employeeIds)) {
-            console.log("xxx", employeeIds);
-            //showToast("error", "Invalid Employee ID");
+            showToast("error", "Invalid Employee ID");
             return;
         }
         let apiUrl = 'https://login-users.hygeiaes.com/mhc/diagnostic-assessment/getAllMasterTests/' + employeeIds;
-        if (mode === 'op') {
-            apiUrl += '/op/' + opId;
-        } else if (mode === 'prescription') {
-            apiUrl += '/prescription/' + prescriptionId;
-        }
+        // if (mode === 'op') {
+        //     apiUrl += '/op/' + opId;
+        // } else if (mode === 'prescription') {
+        //     apiUrl += '/prescription/' + prescriptionId;
+        // }
         apiRequest({
             url: apiUrl,
             method: 'GET',
@@ -627,6 +635,8 @@ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? null;
             const testIds = Array.from(selectedTestIds).filter(id =>
                 !id.startsWith('sg_') && !id.startsWith('ssg_')
             );
+            console.log("abscd", testIds);
+
             if (testIds.length === 0) {
                 showToast("info", "Please select at least one test.");
                 return;
@@ -634,11 +644,9 @@ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? null;
             const dateTimeInput = document.getElementById('html5-datetime-local-input');
             const selectedDateTime = dateTimeInput.value;
             let apiUrl;
-            if (mode === 'prescription') {
-                apiUrl = `/ohc/health-registry/add-test/${employeeIds}/prescription/${prescriptionId}`;
-            } else {
-                apiUrl = `/ohc/health-registry/add-test/${employeeIds}/op/${opId}`;
-            }
+            apiUrl = `/ohc/health-registry/add-test/${employeeIds}`;
+
+           
             Swal.fire({
                 title: 'Confirm Add Tests?',
                 text: "Do you want to add the selected test(s)?",
@@ -658,6 +666,7 @@ $employeeData['op_registry_datas']['op_registry']['op_registry_id'] ?? null;
                             selected_datetime: selectedDateTime
                         },
                         onSuccess: function (response) {
+                            console.log("checking the flow",response);
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Success',

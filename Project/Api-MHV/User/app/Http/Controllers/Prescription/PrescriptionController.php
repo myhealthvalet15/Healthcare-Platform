@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Str;
 class PrescriptionController extends Controller
 {
     public function getAllPrescriptionTemplate($location_id)
@@ -299,113 +299,117 @@ class PrescriptionController extends Controller
     ], 500);
 }
     }
-    private function addPrescriptionFromEmployee(Request $request)
-    {
-       // return 'Hi';
 
 
-        try {
-            $date = now()->format('dmY');
-            $lastPrescription = Prescription::where('prescription_id', 'like', $date . '%')
-                ->orderBy('prescription_id', 'desc')
-                ->first();
-            if ($lastPrescription) {
-                $lastIdSuffix = (int)substr($lastPrescription->prescription_id, 8);
-                $nextId = $lastIdSuffix + 1;
-            } else {
-                $nextId = 1;
+private function addPrescriptionFromEmployee(Request $request)
+{
+    try {
+        $date = now()->format('dmY');
+        $lastPrescription = Prescription::where('prescription_id', 'like', $date . '%')
+            ->orderBy('prescription_id', 'desc')
+            ->first();
+
+        $nextId = $lastPrescription ? ((int)substr($lastPrescription->prescription_id, 8)) + 1 : 1;
+        $prescriptionId = $date . str_pad($nextId, 5, '0', STR_PAD_LEFT);
+
+        $cleanDate = str_replace(['-', '/'], '-', $request->prescription_date);
+        $prescriptionDate = Carbon::createFromFormat('d-m-Y', $cleanDate)->format('Y-m-d H:i:s');
+
+        // Create prescription main record
+        $prescriptionTemplate = Prescription::create([
+            'user_id' => $request->user_id,
+            'prescription_id' => $prescriptionId,
+            'role_id' => 2,
+            'master_doctor_id' => $request->master_user_user_id,
+            'op_registry_id' => $request->op_registry_id ?? 0,
+            'corporate_ohc_id' => 0,
+            'template_id' => $request->prescriptionTemplate,
+            'master_hcsp_user_id' => null,
+            'attachment_id' => null,
+            'is_conformance' => null,
+            'doctor_notes' => $request->doctorNotes,
+            'user_notes' => $request->patientNotes,
+            'share_with_patient' => $request->shareWithPatient,
+            'case_id' => $request->case_id,
+            'draft_save' => 'no',
+            'fav_pharmacy' => $request->pharmacy ?? 0,
+            'fav_lab' => $request->fav_lab ?? 0,
+            'prescription_date' => $prescriptionDate,
+            'order_status' => 0,
+            'created_by' => auth('employee_api')->user()->id,
+            'created_role' => 2,
+            'corporate_location_id' => $request->corporate_id,
+            'ohc' => $request->ohc ?? 0,
+            'alternate_drug' => 0,
+            'active_status' => 1,
+            'prescription_attachments' => !empty($request->prescription_attachments) && is_array($request->prescription_attachments)
+                ? json_encode($request->prescription_attachments)
+                : null,
+        ]);
+
+        $prescriptionRowId = $prescriptionTemplate->prescription_id;
+
+        // Add drugs
+        if (isset($request->drugs) && is_array($request->drugs)) {
+            foreach ($request->drugs as $drug) {
+                $morning = $drug['morning'] ?? 0;
+                $afternoon = $drug['afternoon'] ?? 0;
+                $evening = $drug['evening'] ?? 0;
+                $night = $drug['night'] ?? 0;
+                $prescribedDays = $drug['duration'] ?? 0;
+                $totalDosesPerDay = $morning + $afternoon + $evening + $night;
+
+                PrescriptionDetails::create([
+                    'prescription_row_id' => $prescriptionRowId,
+                    'drug_name' => !empty($drug['drugName']) ? $drug['drugName'] : null,
+                    'drug_template_id' => !empty($drug['drugTemplateId']) ? $drug['drugTemplateId'] : 0,
+                    'to_issue' => $prescribedDays * $totalDosesPerDay,
+                    'remaining_medicine' => $prescribedDays * $totalDosesPerDay,
+                    'substitute_drug' => $drug['substituteDrug'] ?? 0,
+                    'prescribed_days' => $prescribedDays > 0 ? $prescribedDays : 1,
+                    'early_morning' => null,
+                    'morning' => $morning,
+                    'late_morning' => null,
+                    'afternoon' => $afternoon,
+                    'late_afternoon' => null,
+                    'evening' => $evening,
+                    'night' => $night,
+                    'late_night' => null,
+                    'intake_condition' => $drug['drugIntakeCondition'] ?? null,
+                    'remarks' => $drug['remarks'] ?? '',
+                    'prescription_type' => $drug['prescription_type'] ?? 'Type1',
+                    'alternate_drug' => $drug['alternateDrug'] ?? 0,
+                    'alternate_quantity' => $drug['alternateQuantity'] ?? 0,
+                ]);
             }
-            $prescriptionId = $date . str_pad($nextId, 5, '0', STR_PAD_LEFT);
-            $prescriptionDate = null;
-             $cleanDate = str_replace(['-', '/'], '-', $request->prescription_date);
-            $prescriptionDate = \Carbon\Carbon::createFromFormat('d-m-Y', $cleanDate)->format('Y-m-d H:i:s');
-   
-            $prescriptionTemplateData = [
-                'user_id' => $request->user_id,
-                'prescription_id' => $prescriptionId,
-                'role_id' => 2,
-                'master_doctor_id' =>$request->master_user_user_id,
-                'op_registry_id' => $request->op_registry_id ?? 0,
-                'corporate_ohc_id' => 0,
-                'template_id' => $request->prescriptionTemplate,
-                'master_hcsp_user_id' => null,
-                'attachment_id' => null,
-                'is_conformance' => null,
-                'doctor_notes' => $request->doctorNotes,
-                'user_notes' => $request->patientNotes,
-                'share_with_patient' => $request->shareWithPatient,
-                'case_id' => $request->case_id,
-                'draft_save' => 'no',
-                'fav_pharmacy' => $request->pharmacy ?? 0,
-                'fav_lab' => $request->fav_lab ?? 0,
-                'prescription_date' => $prescriptionDate,
-                'order_status' => 0,
-                'created_by' =>  auth('employee_api')->user()->id,
-                'created_role' => 2,
-                'corporate_location_id' => $request->corporate_id,
-                'ohc' => $request->ohc ?? 0,
-                'alternate_drug' => 0,
-                'active_status' => 1,
-            ];
-           
-            $prescriptionTemplate = Prescription::create($prescriptionTemplateData);
-         
-            $prescriptionRowId = $prescriptionTemplate->prescription_id;
-            if (isset($request->drugs) && is_array($request->drugs)) {
-                foreach ($request->drugs as $drug) {
-                    $morning = $drug['morning'] ?? 0;
-                    $afternoon = $drug['afternoon'] ?? 0;
-                    $evening = $drug['evening'] ?? 0;
-                    $night = $drug['night'] ?? 0;
-                    $prescribedDays = $drug['duration'] ?? 0;
-                    $totalDosesPerDay = $morning + $afternoon + $evening + $night;
-                    $toIssue = $prescribedDays * $totalDosesPerDay;
-                    $remainingMedicine = $prescribedDays * $totalDosesPerDay;
-                    $prescriptionDetailsData = [
-                        'prescription_row_id' => $prescriptionRowId,
-                        'drug_name' => !empty($drug['drugName']) ? $drug['drugName'] : null,
-                        'drug_template_id' => !empty($drug['drugTemplateId']) ? $drug['drugTemplateId'] : 0,
-                        'to_issue' => $toIssue > 0 ? $toIssue : 0,
-                        'remaining_medicine' => $remainingMedicine > 0 ? $remainingMedicine : 0,
-                        'substitute_drug' => isset($drug['substituteDrug']) ? $drug['substituteDrug'] : 0,
-                        'prescribed_days' => isset($drug['duration']) && $drug['duration'] > 0 ? $drug['duration'] : 1,
-                        'early_morning' => null,
-                        'morning' => isset($drug['morning']) && $drug['morning'] >= 0 ? $drug['morning'] : 0,
-                        'late_morning' => null,
-                        'afternoon' => isset($drug['afternoon']) && $drug['afternoon'] >= 0 ? $drug['afternoon'] : 0,
-                        'late_afternoon' => null,
-                        'evening' => isset($drug['evening']) && $drug['evening'] >= 0 ? $drug['evening'] : 0,
-                        'night' => isset($drug['night']) && $drug['night'] >= 0 ? $drug['night'] : 0,
-                        'late_night' => null,
-                        'intake_condition' => isset($drug['drugIntakeCondition']) ? $drug['drugIntakeCondition'] : null,
-                        'remarks' => isset($drug['remarks']) ? $drug['remarks'] : '',
-                        'prescription_type' => isset($drug['prescription_type']) ? $drug['prescription_type'] : 'Type1',
-                        'alternate_drug' => isset($drug['alternateDrug']) ? $drug['alternateDrug'] : 0,
-                        'alternate_quantity' => isset($drug['alternateQuantity']) ? $drug['alternateQuantity'] : 0,
-                    ];
-                    PrescriptionDetails::create($prescriptionDetailsData);
-                }
-            }
-            if ($request->has('test') && $request->test == 1) {
-                return response()->json([
-                    'result' => true,
-                    'message' => 'Test Prescription added successfully',
-                    'prescription_id' => $prescriptionRowId,
-                    'employee_id' => $request->user_id
-                ], 201);
-            } else {
-                return response()->json(['result' => true, 'message' => 'Prescription added successfully'], 201);
-            }
-          } catch (\Exception $e) {
-    logger()->error('Exception in addPrescriptionFromCorporate: ' . $e->getMessage());
-    logger()->error($e->getTraceAsString());
-    return response()->json([
-        'result' => false,
-        'message' => 'An error occurred while saving the prescription.',
-        'error' => $e->getMessage() // include this temporarily for debugging
-    ], 500);
-}
+        }
+
+        // Response
+        if ($request->has('test') && $request->test == 1) {
+            return response()->json([
+                'result' => true,
+                'message' => 'Test Prescription added successfully',
+                'prescription_id' => $prescriptionRowId,
+                'employee_id' => $request->user_id
+            ], 201);
+        }
+
+        return response()->json([
+            'result' => true,
+            'message' => 'Prescription added successfully',
+            'prescription_id' => $prescriptionRowId
+        ], 201);
+
+    } catch (\Exception $e) {
+        logger()->error('Exception in addPrescriptionFromEmployee: ' . $e->getMessage());
+        return response()->json([
+            'result' => false,
+            'message' => 'An error occurred while saving the prescription.',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
     public function getEmployeePrescription($userId, Request $request)
     {
         try {

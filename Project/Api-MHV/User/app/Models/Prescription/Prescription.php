@@ -20,6 +20,7 @@ class Prescription extends Model
         'master_hcsp_user_id',
         'attachment_id',
         'is_conformance',
+        'prescription_attachments',
         'doctor_notes',
         'user_notes',
         'share_with_patient',

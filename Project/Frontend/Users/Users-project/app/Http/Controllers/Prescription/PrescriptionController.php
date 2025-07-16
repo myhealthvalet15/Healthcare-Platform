@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Str;
 class PrescriptionController extends Controller
 {
     /**
@@ -199,6 +199,7 @@ class PrescriptionController extends Controller
 
     public function addEmployeePrescription($employee_id = null, $op_registry_id = null)
     {
+        //return $employee_id;
         try {
             if (!is_null($op_registry_id) && !is_numeric($op_registry_id)) {
                 return "Invalid Request";
@@ -209,7 +210,7 @@ class PrescriptionController extends Controller
             // return $employee_id;
             // Retrieve location ID from session
             $locationId = session('location_id');
-            // return $locationId;
+            $locationId;
             if (!$locationId) {
                 return response()->json([
                     'result' => false,
@@ -230,14 +231,14 @@ class PrescriptionController extends Controller
                     'Authorization' => 'Bearer ' . request()->cookie('access_token'),
                 ])->get('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/checkEmployeeId/followUp/' . 0 .  '/' . $employee_id . "/op/" . $op_registry_id);
             }
-           // return $employeeResponse;
+           //return $employeeResponse;
             // Second API Request: Get prescription templates
             $prescriptionResponse = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . request()->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getOnlyPrescriptionTemplate/' . $locationId);
-          //  return $prescriptionResponse;
+          // return $prescriptionResponse;
             $pharmacyResponse = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
@@ -277,34 +278,35 @@ class PrescriptionController extends Controller
     }
     public function store_EmployeePrescription(Request $request)
     {
-        // return $request;
+       // return $request;
         Log::info('User Type: ' . $request->user_type);
 
         $locationId = session('location_id');
         $corporateId = session('corporate_id');
         $userId = session('corporate_admin_user_id');
         $user_type = session('user_type');
-        $master_user_user_id = session('master_user_user_id');
-       
+        $user_id = session('master_user_user_id');
+        $prescriptionImages = $request->input('prescription_attachments', []);
         $requestData = array_merge($request->all(), [
             'location_id' => $locationId,
             'corporate_id' => $corporateId,
             'corporate_user_id' => $userId,
             'user_type'=> $user_type,
-             'master_user_user_id'=> $master_user_user_id,
+            'prescription_attachments' => $prescriptionImages 
+
               
         ]);
         try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-            ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPrescription', $requestData);
-           return $response;
-            return response()->json($response->json());
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'An error occurred: ');
-        }
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+        ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPrescription', $requestData);
+
+        return $response;
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred while sending prescription data.'], 500);
+    }
     }
     public function prescriptionView()
     {

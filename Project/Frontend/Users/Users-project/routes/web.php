@@ -691,9 +691,9 @@ Route::middleware([Authcheck::class])->group(function () {
 //addtest page
 Route::get('/add-test', function () {
     return view('content.components.ohc.others.addtest');
-})->name('addtest');
+})->name('addtest.view');
 // Route::get('/test-add', function () {
 //     return view('content.components.ohc.others.test-add');
 // })->name('test-add');
-Route::get('/test-add', [health_registry::class, 'RegistryOutpatientPage'])->name('test-add');
+Route::get('/ohc/addtest', [health_registry::class, 'RegistryOutpatientPage'])->name('addtest');
 

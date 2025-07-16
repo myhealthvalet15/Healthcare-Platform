@@ -1596,13 +1596,13 @@ class corporateEmployees extends Controller
                 ->where('employee_id', $validatedData['employeeId'])
                 ->first();
             if (!$employee) {
-                return response()->json(['result' => false, 'message' => 'Invalid Request 4'], 422);
+                return response()->json(['result' => false, 'message' => 'Invalid Request'], 422);
             }
             $masterTestIds = MasterTest::whereIn('master_test_id', $validatedData['test_ids'])
                 ->pluck('master_test_id')
                 ->toArray();
             if (count($masterTestIds) !== count($validatedData['test_ids'])) {
-                return response()->json(['result' => false, 'message' => 'Invalid Request 5'], 422);
+                return response()->json(['result' => false, 'message' => 'Invalid Request'], 422);
             }
             DB::beginTransaction();
             $userId = $employee->user_id;

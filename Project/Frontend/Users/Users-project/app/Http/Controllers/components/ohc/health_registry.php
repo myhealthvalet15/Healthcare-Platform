@@ -154,12 +154,12 @@ class health_registry extends Controller
             }
             $headerData = 'Add Out Patient';
             if ($op_registry_id !== null) {
-                return view('content.components.ohc.others.test-add', [
+                return view('content.components.ohc.addtest', [
                     'HeaderData' => $headerData,
                     'employeeData' => $data['message']
                 ]);
             }
-            return view('content.components.ohc.others.test-add', [
+            return view('content.components.ohc.addtest', [
                 'HeaderData' => $headerData,
                 'employeeData' => $data['message']
             ]);

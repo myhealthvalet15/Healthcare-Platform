@@ -379,32 +379,39 @@ row.appendChild(typeCell);
     row.appendChild(createCell(symptomsOrInjury));
 
     // 5. MECHANISM OF INJURY or MEDICAL SYSTEM (based on type_of_incident)
-    let mechanismOrMedical = 'N/A';
-    if (entry.registry?.type_of_incident === 'medicalIllness') {
-        mechanismOrMedical = entry.medical_system?.join(', ') || 'N/A';
-    } else {
-        mechanismOrMedical = entry.mechanism_injury?.join(', ') || 'N/A';
-    }
-    row.appendChild(createCell(mechanismOrMedical));
+   // 5. MECHANISM OF INJURY / Diagnosis
+let mechanismAndDiagnosis = [];
 
-// 6. DIAGNOSIS
-let diagnosis = 'N/A';
-
-// Handle non-empty array with actual values
-if (Array.isArray(entry.diagnosis_names)) {
-    const filtered = entry.diagnosis_names.filter(name => typeof name === 'string' && name.trim() !== '');
-    if (filtered.length > 0) {
-        diagnosis = filtered.join(', ');
-    }
+if (Array.isArray(entry.mechanism_injury) && entry.mechanism_injury.length > 0) {
+    mechanismAndDiagnosis.push(`Mechanism: ${entry.mechanism_injury.join(', ')}`);
 }
 
-// Fallback if no valid diagnosis names but registry.diagnosis exists
-if ((diagnosis === 'N/A' || diagnosis === '') && typeof entry.registry?.diagnosis === 'string' && entry.registry.diagnosis.trim() !== '') {
-    diagnosis = entry.registry.diagnosis.trim();
+if (Array.isArray(entry.diagnosis_names) && entry.diagnosis_names.length > 0) {
+    const validDiagnosis = entry.diagnosis_names.filter(d => typeof d === 'string' && d.trim() !== '');
+    if (validDiagnosis.length > 0) {
+        mechanismAndDiagnosis.push(`${validDiagnosis.join(', ')}`);
+    }
+} else if (typeof entry.registry?.diagnosis === 'string' && entry.registry.diagnosis.trim() !== '') {
+    mechanismAndDiagnosis.push(` ${entry.registry.diagnosis.trim()}`);
 }
 
-// Always append cell, show 'N/A' if no valid diagnosis
-row.appendChild(createCell(diagnosis));
+const mechanismDiagnosisCell = mechanismAndDiagnosis.length > 0 ? mechanismAndDiagnosis.join(' | ') : 'N/A';
+row.appendChild(createCell(mechanismDiagnosisCell));
+
+
+// 6. Body Part Injured / Medical System
+let bodyPartAndSystem = [];
+
+if (Array.isArray(entry.body_part) && entry.body_part.length > 0) {
+    bodyPartAndSystem.push(`Body Part: ${entry.body_part.join(', ')}`);
+}
+
+if (Array.isArray(entry.medical_system) && entry.medical_system.length > 0) {
+    bodyPartAndSystem.push(`Medical System: ${entry.medical_system.join(', ')}`);
+}
+
+const bodySystemCell = bodyPartAndSystem.length > 0 ? bodyPartAndSystem.join(' | ') : 'N/A';
+row.appendChild(createCell(bodySystemCell));
 
 
    // 9. DETAILS (icons/actions)

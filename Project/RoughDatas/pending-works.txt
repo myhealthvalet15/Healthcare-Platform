@@ -1,7 +1,6 @@
 type of incident shld be dynamic 
 hra questions in employee login
 
-
 test list page instead redirect show in popup 
 
 view past history 

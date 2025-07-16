@@ -296,12 +296,12 @@
             </div>
           </form>
         </div>
-      
-<div class="mb-3 d-flex justify-content-end me-3">
-  <a href="{{ route('addtest.view') }}" class="btn btn-primary btn-md" id="addtest">
-    Add Test
-  </a>
-</div>
+
+        <div class="mb-3 d-flex justify-content-end me-3">
+          <a href="/ohc/add-test" class="btn btn-primary btn-md" id="addtest">
+            Add Test
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -935,7 +935,7 @@
       }
       observationCell.appendChild(prescriptionIcon);
       row.appendChild(observationCell);
-      
+
       return row;
     }
     function showPrescriptionModal(test) {

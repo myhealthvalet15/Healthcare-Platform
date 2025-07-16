@@ -267,10 +267,13 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::delete('/mhc/events/delete/{id}', [EventsController::class, 'destroy']);
     Route::get('/mhc/events/edit-events/{id}', [EventsController::class, 'editEvents'])->name('edit-events');
     Route::get('/mhc/events/modify-events/{id}', [EventsController::class, 'getEventsById'])->name('modify-events');
-
-
-
-
+    Route::get('/ohc/add-test/{employee_id}', function () {
+        return "sample page";
+    });
+    Route::post('/ohc/add-test/{employee_id}', [health_registry::class, 'addTestForEmployee']);
+    Route::get('/ohc/add-test', function () {
+        return view('content.components.ohc.others.add-test');
+    });
     Route::get('/ohc/health-registry/add-registry', [health_registry::class, 'displayAddRegistryPage'])->name('health-registry-add-registry');
     Route::get('/ohc/health-registry/add-registry/search/{keyword}', [health_registry::class, 'getDataByKeywordForAddRegistryPage'])->name('health-registry-add-registry');
     Route::get('/ohc/health-registry/add-registry/add-outpatient/{employee_id}', [health_registry::class, 'displayRegistryOutpatientPage'])->name('health-registry-add-registry');
@@ -682,18 +685,9 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/UserEmployee/events/getEventDetails', [EmployeeUserController::class, 'getEventDetails'])->name('getEventDetails');
     Route::post('/UserEmployee/events/submitResponse', [EmployeeUserController::class, 'submitResponse'])->name('submitResponse');
     Route::get('/UserEmployee/events/getEventFromEmail', [EmployeeUserController::class, 'getEventFromEmail'])->name('getEventFromEmail');
-   
+
     Route::get('/UserEmployee/dashboard/templates/getAllAssignedTemplates', [EmployeeDashboard::class, 'getAllAssignedTemplates']);
     Route::get('/UserEmployee/dashboard/templates/hra-questionaire/template/{template_id}', [EmployeeDashboard::class, 'displayHraQuestionaireTemplate'])->name('hra-questionaire-template');
     Route::get('/UserEmployee/dashboard/templates/getTemplateQuestions/{templateId}', [EmployeeDashboard::class, 'getTemplateQuestions']);
     Route::post('/UserEmployee/dashboard/templates/saveHraTemplateQuestionnaireAnswers/{templateId}', [EmployeeDashboard::class, 'saveHraTemplateQuestionnaireAnswers'])->name('hra-questionaire-submit');
 });
-//addtest page
-Route::get('/add-test', function () {
-    return view('content.components.ohc.others.addtest');
-})->name('addtest.view');
-// Route::get('/test-add', function () {
-//     return view('content.components.ohc.others.test-add');
-// })->name('test-add');
-Route::get('/ohc/addtest', [health_registry::class, 'RegistryOutpatientPage'])->name('addtest');
-

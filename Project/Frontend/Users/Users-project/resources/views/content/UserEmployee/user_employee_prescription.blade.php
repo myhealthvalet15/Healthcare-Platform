@@ -473,8 +473,8 @@ function openPrintModal(prescriptionId, groupType) {
             var groupRows = api.rows({ page: 'current' }).data().toArray().filter(r => r.prescription_id === group);
             var hasType1 = groupRows.some(r => r.prescription_type === 'Type1');
             var hasType2 = groupRows.some(r => r.prescription_type === 'Type2');
-            var type1IconColor = hasType1 ? '#000' : 'gray';
-            var type2IconColor = hasType2 ? '#000' : 'gray';
+            var type1IconColor = hasType1 ? '#fff' : 'gray';
+            var type2IconColor = hasType2 ? '#fff' : 'gray';
             var type1Link = hasType1
   ? `<a href="javascript:void(0);" onclick="openPrintModal('${group}', 'Type1')">
       <i class="fa fa-print" title="Print Prescription" style="color:${type1IconColor}; cursor:pointer;"></i>
@@ -487,10 +487,25 @@ function openPrintModal(prescriptionId, groupType) {
     </a>`
               : `<i class="fa fa-external-link" title="Type2 Prescription not available" alt="Print Prescription" style="color:${type2IconColor};"></i>`;
             var hospitalIconColor = rowData.op_registry_id > 0 ? '#000' : 'gray';
-            var employeeInfo = `<tr class="group" style="background-color: #d3d3d3 !important; color: #31708f; font-weight: bold;">
-                            <td colspan="8">
-                            <span style="float: right;">
-                          <a style="color:${hospitalIconColor};cursor: pointer;" onclick="openHospitalPopup(
+            
+                      // Determine doctor name or fallback to 'Self'
+var doctorName = (rowData.doctor_firstname && rowData.doctor_lastname)
+    ? `Dr. ${rowData.doctor_firstname} ${rowData.doctor_lastname}`
+    : 'Self';
+    
+
+var additionalRow = `<tr class="additional-info" style="line-height: 35px;background-color: rgb(107, 27, 199); color:#fff;">
+  <td colspan="12" style="color:#fff; text-align:center;">
+    <div style="display: flex; justify-content: space-between; align-items: center; position: relative;">
+      <span style="flex: 1; text-align: left;"> ${doctorName} </span>
+      
+      <span style="position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;">
+        <span style="color: white;">${rowData.master_doctor_id}</span> 
+        <span style="color: yellow;">${group}</span>
+      </span>
+      
+      <span style="flex: 1; text-align: right; color: white;">
+       <a style="color:${hospitalIconColor};cursor: pointer;" onclick="openHospitalPopup(
   '${rowData.op_registry_id}',
   '${rowData.body_part_names}',
   '${rowData.type_of_incident}',
@@ -500,32 +515,20 @@ function openPrintModal(prescriptionId, groupType) {
   '${rowData.employee_gender}',
   'Dr. ${rowData.doctor_firstname} ${rowData.doctor_lastname}'
 )">
- <i class="fa-solid fa-hospital-user"></i></a>
+ <i class="fa-solid fa-hospital-user" style="color:#fff;"></i></a>
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
  <a style="color:#000;cursor: pointer;" onclick="openTestPopup('${rowData.op_registry_id}', '${rowData.employee_id}')">
-    <i class="fa-solid fa-flask-vial"></i>
+    <i class="fa-solid fa-flask-vial"style="color:#fff;" ></i>
 </a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                               <a onclick="sendMailPrecription('873')"><i class="fa-solid fa-envelope" style="color:#000;"></i></a>&nbsp;&nbsp;&nbsp;
+                               <a onclick="sendMailPrecription('873')"><i class="fa-solid fa-envelope" style="color:#fff;"></i></a>&nbsp;&nbsp;&nbsp;
                                ${type1Link}&nbsp;&nbsp;&nbsp;
                                ${type2Link}&nbsp;&nbsp;&nbsp;
-                                </span>
-                            </td>              
-                        </tr>`;
-                        var additionalRow = `<tr class="additional-info" style="line-height: 35px;background-color: rgb(107, 27, 199); color:#fff;">
-  <td colspan="12" style="color:#fff; text-align:center;">
-    <div style="display: flex; justify-content: space-between; align-items: center; position: relative;">
-      <span style="flex: 1; text-align: left;"> Dr. ${rowData.doctor_firstname} ${rowData.doctor_lastname}
-</span>
-      <span style="position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;">
-        
+                         
       </span>
-      <span style="flex: 1; text-align: right; color: white;">
-      <span style="color: white;">${rowData.master_doctor_id}</span> 
-        <span style="color: yellow;">${group}</span>
-             </span>
     </div>
   </td>
 </tr>`;
+
 
             var newHeaderRow = `<tr class="new-header-row" style="background-color:rgb(240, 232, 232); color: #333;">
                                 <th>Drug Name - Strength (Type)</th>
@@ -559,7 +562,7 @@ let notesRow = `
 
            if (last !== group) {
   $(rows[i]).before(additionalRow);
-  $(rows[i]).before(employeeInfo);
+  //$(rows[i]).before(employeeInfo);
   $(rows[i]).before(newHeaderRow);
 
   // Insert notes row after the last row of the current group

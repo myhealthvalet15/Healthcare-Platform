@@ -1,5 +1,5 @@
 @extends('layouts/layoutMaster')
-@section('title', 'Employee Search')
+@section('title', 'Add Test')
 <!-- Vendor Styles -->
 @section('vendor-style')
 @vite([
@@ -33,8 +33,9 @@
                     <div class="col-9">
                         <div class="input-group input-group-merge">
                             <span class="input-group-text" id="basic-addon-search31"><i class="ti ti-search"></i></span>
-                            <input type="text" class="form-control" id="searchEmployees" placeholder="Search by Name/Employee ID/Phone #"
-                                aria-label="Search..." aria-describedby="basic-addon-search31">
+                            <input type="text" class="form-control" id="searchEmployees"
+                                placeholder="Search by Name/Employee ID/Phone #" aria-label="Search..."
+                                aria-describedby="basic-addon-search31">
                         </div>
                     </div>
                     <div class="col-3">
@@ -81,14 +82,8 @@
 
 @endsection
 <script>
-    var ohcRights = {!! json_encode($ohcRights) !!};
-   
+    var ohcRights = {!! json_encode($ohcRights)!!};
 </script>
-
-<script>
-    const testAddUrl = "{{ url('/ohc/addtest') }}";  // NOT route(), use full URL
-</script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function (e) {
         'use strict';
@@ -168,69 +163,69 @@
             }
         });
         $('#searchBtn').on('click', function () {
-    const searchValue = $('#searchEmployees').val().trim();
-    if (searchValue === '') {
-        showToast("error", "Please enter a search term");
-        return;
-    }
-    if (searchValue.length < 3) {
-        showToast("error", "Please enter at least 3 characters for search");
-        return;
-    }
+            const searchValue = $('#searchEmployees').val().trim();
+            if (searchValue === '') {
+                showToast("error", "Please enter a search term");
+                return;
+            }
+            if (searchValue.length < 3) {
+                showToast("error", "Please enter at least 3 characters for search");
+                return;
+            }
 
-    $('#searchSpinner').show();
-    $('#resultsCard').hide();
-    const spinnerStartTime = Date.now();
-    const minSpinnerTime = 1500;
+            $('#searchSpinner').show();
+            $('#resultsCard').hide();
+            const spinnerStartTime = Date.now();
+            const minSpinnerTime = 1500;
 
-    fetch(`https://login-users.hygeiaes.com/ohc/health-registry/add-registry/search/${searchValue}`)
-        .then(response => response.json())
-        .then(data => {
-            employeeTable.clear();
-            const elapsedTime = Date.now() - spinnerStartTime;
-            const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
+            fetch(`https://login-users.hygeiaes.com/ohc/health-registry/add-registry/search/${searchValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    employeeTable.clear();
+                    const elapsedTime = Date.now() - spinnerStartTime;
+                    const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
 
-            setTimeout(() => {
-                $('#searchSpinner').hide();
+                    setTimeout(() => {
+                        $('#searchSpinner').hide();
 
-                if (data.result && data.message && data.message.length > 0) {
-                    data.message.forEach(employee => {
-                        const fullName = `${employee.first_name} ${employee.last_name}`;
-                        const initials = getInitials(fullName);
+                        if (data.result && data.message && data.message.length > 0) {
+                            data.message.forEach(employee => {
+                                const fullName = `${employee.first_name} ${employee.last_name}`;
+                                const initials = getInitials(fullName);
 
-                       const addButton = (healthRegistryPermission === 2)
-                        ? '<button class="btn btn-primary btn-sm add-employee" onclick="window.location.href=\'' + testAddUrl + '?emp=' + employee.employee_id + '\'">Add</button>'
-                                    : ''; 
-                        employeeTable.row.add([
-                            createEmployeeIdCell(employee.employee_id, initials),
-                            createEmployeeNameCell(employee.first_name, employee.last_name, employee.designation),
-                            employee.hl1_name || 'N/A',
-                            createContactDetailsCell(employee.email, employee.mob_num),
-                            employee.employee_type_name || 'N/A',
-                            addButton
-                        ]);
-                    });
+                                const addButton = (healthRegistryPermission === 2)
+                                    ? '<button class="btn btn-primary btn-sm add-employee" data-employee-id="' + employee.employee_id + '">Add</button>'
+                                    : '';
+                                employeeTable.row.add([
+                                    createEmployeeIdCell(employee.employee_id, initials),
+                                    createEmployeeNameCell(employee.first_name, employee.last_name, employee.designation),
+                                    employee.hl1_name || 'N/A',
+                                    createContactDetailsCell(employee.email, employee.mob_num),
+                                    employee.employee_type_name || 'N/A',
+                                    addButton
+                                ]);
+                            });
 
-                    employeeTable.draw();
-                    $('#resultsCard').show();
-                    showToast("success", `Data retrieved successfully. Found ${data.message.length} employee(s).`);
-                } else {
-                    $('#resultsCard').show();
-                    employeeTable.clear().draw();
-                    showToast("info", "No employees found matching your search criteria.");
-                }
-            }, remainingTime);
-        })
-        .catch(error => {
-            console.error('Error fetching employee data:', error);
-            const elapsedTime = Date.now() - spinnerStartTime;
-            const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
-            setTimeout(() => {
-                $('#searchSpinner').hide();
-                showToast('error', 'An error occurred while searching for employees. Please try again.');
-            }, remainingTime);
+                            employeeTable.draw();
+                            $('#resultsCard').show();
+                            showToast("success", `Data retrieved successfully. Found ${data.message.length} employee(s).`);
+                        } else {
+                            $('#resultsCard').show();
+                            employeeTable.clear().draw();
+                            showToast("info", "No employees found matching your search criteria.");
+                        }
+                    }, remainingTime);
+                })
+                .catch(error => {
+                    console.error('Error fetching employee data:', error);
+                    const elapsedTime = Date.now() - spinnerStartTime;
+                    const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
+                    setTimeout(() => {
+                        $('#searchSpinner').hide();
+                        showToast('error', 'An error occurred while searching for employees. Please try again.');
+                    }, remainingTime);
+                });
         });
-});
 
         function createEmployeeIdCell(userId, initials) {
             const stateNum = Math.floor(Math.random() * 6);
@@ -269,7 +264,7 @@
         }
         $(document).on('click', '.add-employee', function () {
             const employeeId = $(this).data('employee-id').toString().toLowerCase();
-            window.location = '/ohc/health-registry/add-registry/add-outpatient/' + employeeId;
+            window.location = '/ohc/add-test/' + employeeId;
         });
 
         $('#searchEmployees').on('keypress', function (e) {

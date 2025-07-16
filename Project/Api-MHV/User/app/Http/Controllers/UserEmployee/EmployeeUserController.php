@@ -53,6 +53,7 @@ class EmployeeUserController extends Controller
                     'prescription.master_doctor_id',
                     'prescription.role_id',
                     'prescription.template_id',
+                     'prescription.template_id',
                     'prescription.doctor_notes',
                     'prescription.user_notes',
                     'prescription.prescription_date',

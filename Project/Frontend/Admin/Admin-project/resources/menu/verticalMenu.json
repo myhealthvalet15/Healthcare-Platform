@@ -92,7 +92,7 @@
           "slug": "link-form"
         },
         {
-          "url": "/",
+          "url": "/corporate/incident-types",
           "name": "Incident Type",
           "slug": "incident-type"
         },

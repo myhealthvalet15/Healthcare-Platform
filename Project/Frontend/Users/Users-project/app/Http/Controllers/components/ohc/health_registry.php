@@ -131,43 +131,6 @@ class health_registry extends Controller
         }
         return "Invalid Request";
     }
-
-
-    //
-    public function RegistryOutpatientPage(Request $request, $employee_id = null, $op_registry_id = null)
-    {
-        $employee_id = $request->query('emp');
-
-        $url = 'https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/checkEmployeeId/followUp/' . 0 .  '/' . $employee_id;
-        if ($op_registry_id !== null) {
-            $url .= "/op/" . $op_registry_id;
-        }
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . request()->cookie('access_token'),
-        ])->get($url);
-        if ($response->successful()) {
-            $data = $response->json();
-            if (!isset($data['result']) || !$data['result']) {
-                return "Invalid Request";
-            }
-            $headerData = 'Add Out Patient';
-            if ($op_registry_id !== null) {
-                return view('content.components.ohc.addtest', [
-                    'HeaderData' => $headerData,
-                    'employeeData' => $data['message']
-                ]);
-            }
-            return view('content.components.ohc.addtest', [
-                'HeaderData' => $headerData,
-                'employeeData' => $data['message']
-            ]);
-        }
-        return "Invalid Request";
-    }
-
-
     public function displayAddTestPage(Request $request, $employee_id = null)
     {
         $route = $request->route();
@@ -233,7 +196,6 @@ class health_registry extends Controller
             'message' => 'Invalid Request'
         ]);
     }
-
     public function addTestForEmployeeForPrescription(Request $request, $employee_id = null, $prescription_id = null)
     {
         if ($employee_id === null || !ctype_alnum($employee_id)) {

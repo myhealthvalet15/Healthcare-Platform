@@ -445,8 +445,9 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
                 style="display: flex; flex-direction: column; gap: 15px; padding: 16px 0; border-bottom: 1px #6B1BC7 solid; font-weight: bold;">
               
                 <div class="prescription-header" style="display: flex; justify-content: space-between;">
-                    <div style="width: 35%;color:#7367f0 !important;">Outside
-                        Prescription</div>
+                    <div style="width: 35%;color:#7367f0 !important;"> @if (session('user_type') != 'MasterUser')
+Outside
+                        Prescription @endif Drug Name - Type - Strength </div>
                     <div style="width: 5%;">Days</div>
                     <div style="width: 30%;">
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">

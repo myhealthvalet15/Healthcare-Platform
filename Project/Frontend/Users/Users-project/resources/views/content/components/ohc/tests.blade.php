@@ -266,30 +266,36 @@
               <div class="mb-3">
                 <label for="searchInput" class="form-label">Employee Name /
                   Id</label>
-                <input type="text" id="searchInput" class="form-control" placeholder="Employee Name or Employee Id">
+                <input type="text" id="searchInput" class="form-control"
+                  placeholder="Employee Name or Employee Id">
               </div>
               <div class="mb-3">
                 <label for="fromDate" class="form-label">From Date</label>
-                <input class="form-control flatpickr-date small-date" type="text" id="fromDate"
+                <input class="form-control flatpickr-date small-date"
+                  type="text" id="fromDate"
                   placeholder="Select From Date" />
               </div>
               <div class="mb-3">
                 <label for="toDate" class="form-label">To Date</label>
-                <input class="form-control flatpickr-date small-date" type="text" id="toDate"
+                <input class="form-control flatpickr-date small-date"
+                  type="text" id="toDate"
                   placeholder="Select To Date" />
               </div>
               <div class="mb-3 wide-select">
                 <label for="filterTestSelect" class="form-label">Tests</label>
                 <div class="select2-primary">
-                  <select id="filterTestSelect" class="select2 form-select" multiple>
+                  <select id="filterTestSelect" class="select2 form-select"
+                    multiple>
                   </select>
                 </div>
               </div>
               <div class="mb-3 d-flex gap-2">
-                <button type="button" id="applyFilters" class="btn btn-primary btn-md">
+                <button type="button" id="applyFilters"
+                  class="btn btn-primary btn-md">
                   Apply Filters
                 </button>
-                <button type="button" id="clearFilters" class="btn btn-outline-secondary btn-md">
+                <button type="button" id="clearFilters"
+                  class="btn btn-outline-secondary btn-md">
                   Clear Filters
                 </button>
               </div>
@@ -308,12 +314,15 @@
 </div>
 <div class="col-lg-4 col-md-6">
   <div class="mt-4">
-    <div class="modal fade" id="prescriptionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="prescriptionModal" tabindex="-1"
+      aria-hidden="true">
       <div class="modal-dialog modal-xl custom-modal-width" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="prescriptionModalLabel1">Prescriptions</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title"
+              id="prescriptionModalLabel1">Prescriptions</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+              aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="prescription-container">
@@ -387,7 +396,8 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-label-secondary"
+              data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -502,17 +512,29 @@
         url: 'https://login-users.hygeiaes.com/ohc/getAllTests',
         method: 'GET',
         onSuccess: function (response) {
-          if (response.result && Array.isArray(response.data)) {
-            originalTestsData = response.data;
-            filteredTestsData = [...response.data];
-            populateTestTable(filteredTestsData);
+          if (response.result === true) {
+            if (Array.isArray(response.data) && response.data.length > 0) {
+              originalTestsData = response.data;
+              filteredTestsData = [...response.data];
+              populateTestTable(filteredTestsData);
+            } else if (Array.isArray(response.data) && response.data.length === 0) {
+              originalTestsData = [];
+              filteredTestsData = [];
+              showErrorInTable('No tests found');
+            } else {
+              showErrorInTable('Invalid data format received');
+            }
+          } else if (response.result === false) {
+            const message = response.data || response.message || 'No data available';
+            originalTestsData = [];
+            filteredTestsData = [];
+            showErrorInTable(message);
           } else {
-            showErrorInTable('Invalid data format received');
-            console.warn('Error: ', response);
+            showErrorInTable('Unexpected response format');
           }
         },
         onError: function (error) {
-          showErrorInTable('Error loading data: ' + error.message);
+          showErrorInTable(error);
           showToast('error', "Failed to load tests: " + error);
         }
       });

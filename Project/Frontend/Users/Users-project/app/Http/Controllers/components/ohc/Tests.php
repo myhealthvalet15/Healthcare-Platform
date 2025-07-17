@@ -38,46 +38,31 @@ class Tests extends Controller
     {
         return view('content.components.ohc.test-details-templates', ['HeaderData' => 'Test Details']);
     }
-   
-   public function getAllTestsFromPrescribedTest(Request $request)
-{
-    //return $request;
-    try {
-        $corporateId = session('corporate_id');
-        $locationId = session('location_id');
-        $EmployeeuserId = session('master_user_user_id');
 
-        if (!$corporateId || !$locationId) {
-            return response()->json(['result' => false, 'message' => 'Invalid Request'], 404);
+    public function getAllTestsFromPrescribedTest(Request $request)
+    {
+        try {
+            $corporateId = session('corporate_id');
+            $locationId = session('location_id');
+            $EmployeeuserId = session('master_user_user_id');
+
+            if (!$corporateId || !$locationId) {
+                return response()->json(['result' => false, 'message' => 'Invalid Request'], 404);
+            }
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->get('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/getAllTestsFromPrescribedTest/'
+                . $corporateId . '/' . $locationId . '/' . $EmployeeuserId);
+            if ($response->successful()) {
+                return response()->json(['result' => true, 'data' => $response['data']]);
+            }
+            return response()->json(['result' => false, 'message' => $response['message']], $response->status());
+        } catch (\Exception $e) {
+            return response()->json(['result' => false, 'message' => 'Internal Server Error'], 500);
         }
-
-        $url = 'https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/getAllTestsFromPrescribedTest/' 
-            . $corporateId . '/' . $locationId. '/' . $EmployeeuserId;
-
-        // Prepare headers before making the request
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-        ];
-
-        if (!empty($EmployeeuserId)) {
-            $headers['X-Employee-ID'] = $EmployeeuserId;
-        }
-
-        // Send request with proper headers
-        $response = Http::withHeaders($headers)->get($url);
-
-        if ($response->successful()) {
-            return response()->json(['result' => true, 'data' => $response['data']]);
-        }
-
-        return response()->json(['result' => false, 'message' => 'Invalid Request'], $response->status());
-
-    } catch (\Exception $e) {
-        return response()->json(['result' => false, 'message' => 'Internal Server Error'], 500);
     }
-}
     public function saveTestResults(Request $request)
     {
         $corporateId = session('corporate_id');
@@ -119,15 +104,15 @@ class Tests extends Controller
             $apiData['document_filename'] = $fileData['filename'];
             $apiData['document_mime_type'] = $fileData['mime_type'];
             $apiData['document_size'] = $fileData['size'];
-        } 
+        }
         try {
             $response = Http::timeout(30)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                     'Authorization' => 'Bearer ' . request()->cookie('access_token'),
-                ])  
-                ->post('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/saveTestResults', $apiData); 
+                ])
+                ->post('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/saveTestResults', $apiData);
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => 'Test Results Saved Successfully']);
             }
@@ -144,7 +129,7 @@ class Tests extends Controller
     }
     /**
      * Validate and process file data
-     * 
+     *
      * @param array $validatedData
      * @return array|false|null
      */
@@ -193,7 +178,7 @@ class Tests extends Controller
     }
     /**
      * Check if string is valid base64
-     * 
+     *
      * @param string $data
      * @return bool
      */
@@ -203,7 +188,7 @@ class Tests extends Controller
     }
     /**
      * Get MIME type from file content and extension
-     * 
+     *
      * @param string $content
      * @param string $extension
      * @return string
@@ -226,7 +211,7 @@ class Tests extends Controller
     }
     /**
      * Validate file signature (magic bytes)
-     * 
+     *
      * @param string $content
      * @param string $extension
      * @return bool

@@ -1,9 +1,10 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'incidentType')
+@section('title', 'Incident types')
 
 @section('content')
 
+    <!-- Vendor Styles -->
 @section('vendor-style')
     @vite(['resources/assets/vendor/libs/animate-css/animate.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
 @endsection
@@ -18,49 +19,34 @@
     @vite(['resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
 
-
+<!-- Basic Bootstrap Table -->
 <div class="card">
     <div class="d-flex justify-content-between align-items-center card-header">
         <h5 class="mb-0">Incident Available</h5>
 
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFactor">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addincident">
             <i class="ti ti-plus me-1"></i> Add Incident
         </button>
         <!-- Add Modal -->
-        <div class="modal fade" id="addFactor" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="addincident" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel1">Add New Factor</h5>
+                        <h5 class="modal-title" id="exampleModalLabel1">Add Incident</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col mb-4">
-                                <label for="factor-name" class="form-label">Factor Name</label>
-                                <input type="text" id="factor-name" class="form-control" placeholder="Enter Name">
+                                <label for="incident-name" class="form-label">Incident Name</label>
+                                <input type="text" id="incident-name" class="form-control" placeholder="Enter Name">
                             </div>
                         </div>
-                        <div class="row g-4">
-                            <div class="col mb-0">
-                                <label for="emailBasic" class="form-label">Status</label>
-                                <div class="demo-vertical-spacing">
-                                    <label class="switch">
-                                        <input type="checkbox" class="switch-input is-valid" id="status-switch"
-                                            checked="true">
-                                        <span class="switch-toggle-slider">
-                                            <span class="switch-on"></span>
-                                            <span class="switch-off"></span>
-                                        </span>
-                                        <span class="switch-label" id="status-label">Active</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="add-new-factor">Save
+                        <button type="button" class="btn btn-primary" id="add-new-incident">Save
                             Changes</button>
                     </div>
                 </div>
@@ -68,18 +54,18 @@
         </div>
         <!-- Modal End -->
         <!-- Edit Modal -->
-        <div class="modal fade" id="editFactor" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="editincident" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel1">Edit Factor</h5>
+                        <h5 class="modal-title" id="exampleModalLabel1">Edit Incident</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col mb-4">
-                                <label for="factor-name" class="form-label">Factor Name</label>
-                                <input type="text" id="factor_name" class="form-control" placeholder="Edit Name">
+                                <label for="incident-name" class="form-label">Incident Name</label>
+                                <input type="text" id="incident_name" class="form-control" placeholder="Edit Name">
                             </div>
                         </div>
                         <div class="row g-4">
@@ -101,7 +87,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="edit-factor">Save
+                        <button type="button" class="btn btn-primary" id="edit-incident">Save
                             Changes</button>
                     </div>
                 </div>
@@ -110,27 +96,43 @@
         <!-- Modal Ends -->
     </div>
     <div class="table-responsive text-nowrap">
-        <div id="preloader" class="text-center py-4">
+       <div id="preloader" class="text-center py-4">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p>Fetching Factors...</p>
+         <p>Fetching Incident type...</p> 
         </div>
 
-        <table class="table" id="factors-table" style="display: none;">
+        <table class="table" id="incidenttable">
             <thead>
                 <tr>
-                    <th>Factor Name</th>
-                    <th>Status</th>
+                    <th>SNO</th>
+                    <th>Incident Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="factors-body" class="table-border-bottom-0"></tbody>
-        </table>
+   <tbody>
+        @foreach ($incident as $key => $item)
+            <tr>
+                <td>{{ $key + 1 }}</td>
+                <td>{{ $item['incident_type_name'] }}</td>
+                <td>
+    <button class="btn btn-sm btn-primary edit-btn" data-id="{{ $item['incident_type_id'] }}" data-name="{{ $item['incident_type_name'] }}">
+        Edit
+    </button>
+    <button class="btn btn-sm btn-danger delete-btn" data-id="{{ $item['incident_type_id'] }}">
+        Delete
+    </button>
+</td>
+            </tr>
+        @endforeach
+    </tbody>
+    </table>
     </div>
 </div>
 
 <hr class="my-12">
-<script src="/lib/js/page-scripts/show-factors.js"></script>
+<script src="/lib/js/page-scripts/show-incident.js"></script>
+
 </script>
 @endsection

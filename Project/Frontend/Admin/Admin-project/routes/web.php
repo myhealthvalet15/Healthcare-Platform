@@ -301,6 +301,7 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/corporate/updateCorporateHraLink', [link2hra::class, 'updateCorporateHraLink']);
     Route::get('/corporate/getCorporateOfHraTemplate', [link2hra::class, 'getCorporateOfHraTemplate']);
 
+    Route::get('/corporate/incident-types', [IncidentTypeController::class, 'index'])->name('incident-types.index');
     Route::get('/corporate/getAllIncidentTypes', [IncidentTypeController::class, 'getAllIncidentTypes']);
     Route::post('/corporate/addIncidentType', [IncidentTypeController::class, 'addIncidentType']);
     Route::post('/corporate/editIncidentType/{id}', [IncidentTypeController::class, 'editIncidentType']);

@@ -350,6 +350,7 @@ function openPrintModal(prescriptionId, groupType) {
                     body_part_names: prescription.body_part_names.join(', '),
                     type_of_incident:prescription.type_of_incident,
                     past_medical_history:prescription.past_medical_history,
+                    prescription_attachments: prescription.prescription_attachments,
                     registry_doctor_notes: prescription.doctor_notes,
                     registry_user_notes: prescription.user_notes,
                     registry_doctor_id:prescription.registry_doctor_id
@@ -488,16 +489,30 @@ function openPrintModal(prescriptionId, groupType) {
               : `<i class="fa fa-external-link" title="Type2 Prescription not available" alt="Print Prescription" style="color:${type2IconColor};"></i>`;
             var hospitalIconColor = rowData.op_registry_id > 0 ? '#000' : 'gray';
             
-                      // Determine doctor name or fallback to 'Self'
-var doctorName = (rowData.doctor_firstname && rowData.doctor_lastname)
+
+
+let attachments = [];
+try {
+  attachments = JSON.parse(rowData.prescription_attachments);
+} catch(e) {
+  console.error("Error parsing prescription_attachments:", e);
+}
+
+let firstAttachment = attachments.length > 0 ? attachments[0] : null;
+console.log("Raw prescription_attachments:", rowData.prescription_attachments);
+
+let doctorName = (rowData.doctor_firstname && rowData.doctor_lastname)
     ? `Dr. ${rowData.doctor_firstname} ${rowData.doctor_lastname}`
     : 'Self';
-    
 
+let attachmentHTML = '';
+if (firstAttachment) {
+  attachmentHTML = `<i class="fa-solid fa-paperclip"onclick="showAttachmentPopup('${firstAttachment}')" style="cursor:pointer;"></i>`;
+}
 var additionalRow = `<tr class="additional-info" style="line-height: 35px;background-color: rgb(107, 27, 199); color:#fff;">
   <td colspan="12" style="color:#fff; text-align:center;">
     <div style="display: flex; justify-content: space-between; align-items: center; position: relative;">
-      <span style="flex: 1; text-align: left;"> ${doctorName} </span>
+      <span style="flex: 1; text-align: left;"> ${doctorName}  ${attachmentHTML}</span>
       
       <span style="position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;">
         <span style="color: white;">${rowData.master_doctor_id}</span> 
@@ -672,6 +687,23 @@ $('#employee-info-display').html(employeeInfo);
   
   });
   
+function showAttachmentPopup(imageBase64) {
+    const win = window.open("", "_blank", "width=800,height=600");
+    win.document.write(`
+        <html>
+            <head>
+                <title>Attachment Image</title>
+                <style>
+                    body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
+                    img { max-width: 100%; max-height: 100%; }
+                </style>
+            </head>
+            <body>
+                <img src="${imageBase64}" alt="Attachment" />
+            </body>
+        </html>
+    `);
+}
 
     
 </script>

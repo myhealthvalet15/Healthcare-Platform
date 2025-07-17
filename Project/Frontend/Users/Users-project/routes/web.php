@@ -267,9 +267,7 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::delete('/mhc/events/delete/{id}', [EventsController::class, 'destroy']);
     Route::get('/mhc/events/edit-events/{id}', [EventsController::class, 'editEvents'])->name('edit-events');
     Route::get('/mhc/events/modify-events/{id}', [EventsController::class, 'getEventsById'])->name('modify-events');
-    Route::get('/ohc/add-test/{employee_id}', function () {
-        return "sample page";
-    });
+    Route::get('/ohc/add-test/{employee_id}', [health_registry::class, 'displayAddTestPage'])->name('health-registry-add-registry');
     Route::post('/ohc/add-test/{employee_id}', [health_registry::class, 'addTestForEmployee']);
     Route::get('/ohc/add-test', function () {
         return view('content.components.ohc.others.add-test');

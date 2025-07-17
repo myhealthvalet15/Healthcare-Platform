@@ -8,7 +8,16 @@ use Illuminate\Support\Facades\Http;
 
 class IncidentTypeController extends Controller
 {
-    public function getAllIncidentTypes(Request $request)
+ public function index(Request $request)
+    {
+        $incident = $this->getAllIncidentTypes($request);
+        //dd($incident);exit;
+        $incidentData = $incident->getData(true);
+        return view('content.incident.view-incident-type', ['incident' =>  $incidentData['data'] ?? []
+    ]);
+    }
+
+ public function getAllIncidentTypes(Request $request)
     {
         try {
             $response = Http::withHeaders([

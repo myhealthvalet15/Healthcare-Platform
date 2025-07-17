@@ -2123,7 +2123,7 @@ class corporateEmployees extends Controller
         }
         $prescribedTests = $this->getPrescribedTests($corporate_id, $location_id);
         if ($prescribedTests->isEmpty()) {
-            return response()->json(['result' => false, 'message' => 'No Prescribed Tests Found'], 404);
+            return response()->json(['result' => true, 'message' => 'No Prescribed Tests Found'], 422);
         }
         $prescribedTests = $this->enrichPrescribedTests($prescribedTests);
         return response()->json(['result' => true, 'data' => $prescribedTests]);
@@ -2138,7 +2138,7 @@ class corporateEmployees extends Controller
         }
         $prescribedTests = $this->getPrescribedTestsForEmployee($EmployeeuserId);
         if ($prescribedTests->isEmpty()) {
-            return response()->json(['result' => false, 'message' => 'No Prescribed Tests Found'], 404);
+            return response()->json(['result' => true, 'message' => 'No Prescribed Tests Found'], 422);
         }
         $prescribedTests = $this->enrichPrescribedTests($prescribedTests);
         return response()->json(['result' => true, 'data' => $prescribedTests]);

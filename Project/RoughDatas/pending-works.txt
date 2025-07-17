@@ -1,5 +1,6 @@
-type of incident shld be dynamic 
 hra questions in employee login
+backend api`s for assign incident type for corporate 
+type of incident shld be dynamic 
 
 test list page instead redirect show in popup 
 

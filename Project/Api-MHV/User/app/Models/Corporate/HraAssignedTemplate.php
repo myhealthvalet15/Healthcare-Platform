@@ -18,6 +18,7 @@ class HraAssignedTemplate extends Model
         'designation',
         'from_date',
         'to_date',
+        'next_assessment_date'
     ];
 
     protected $casts = [

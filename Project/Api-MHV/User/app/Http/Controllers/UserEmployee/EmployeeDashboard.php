@@ -104,6 +104,10 @@ class EmployeeDashboard extends Controller
     public function getTemplateQuestions(Request $request, $templateId)
     {
         try {
+            $userId = $request->user_id;
+            if ($userId === null) {
+                return response()->json(['result' => false, 'data' => 'Invalid Request'], 403);
+            }
             if (!is_numeric($templateId)) {
                 return response()->json(['result' => false, 'data' => 'Invalid Template'], 403);
             }
@@ -112,7 +116,6 @@ class EmployeeDashboard extends Controller
             if (!$data['result']) {
                 return response()->json(['result' => false, 'data' => 'Invalid Template'], 403);
             }
-            // TODO: send actual answers of partial questions answered by user
             $templateQuestions = DB::table('hra_template_questions as htq')
                 ->join('hra_question as hq', 'htq.question_id', '=', 'hq.question_id')
                 ->leftJoin('hra_factors as hf', 'htq.factor_id', '=', 'hf.factor_id')
@@ -173,14 +176,44 @@ class EmployeeDashboard extends Controller
                     }
                     return $item;
                 });
-
             if ($templateQuestions->isEmpty()) {
                 return response()->json(['result' => false, 'data' => 'No questions found for this template'], 404);
             }
-            return response()->json([
-                'result' => true,
-                'data' => $templateQuestions
-            ], 200);
+            $individualAnswers = DB::table('hra_induvidual_answers')
+                ->where('user_id', $userId)
+                ->where('template_id', $templateId)
+                ->select('question_id', 'answer', 'trigger_question_of')
+                ->get()
+                ->keyBy('question_id');
+            $mergedQuestions = $templateQuestions->map(function ($question) use ($individualAnswers) {
+                $questionId = $question->question_id;
+                if (isset($individualAnswers[$questionId])) {
+                    $individualAnswer = $individualAnswers[$questionId];
+                    if ($individualAnswer->trigger_question_of === null) {
+                        $question->answered = $individualAnswer->answer;
+                        $question->trigger_question_of = null;
+                    }
+                }
+                foreach (range(1, 8) as $i) {
+                    $triggerKey = "trigger_$i";
+                    if (!empty($question->$triggerKey) && is_array($question->$triggerKey)) {
+                        foreach ($question->$triggerKey as $triggerQuestionKey => $triggerQuestion) {
+                            if (is_array($triggerQuestion) && isset($triggerQuestion['question_id'])) {
+                                $triggerQuestionId = $triggerQuestion['question_id'];
+                                if (isset($individualAnswers[$triggerQuestionId])) {
+                                    $triggerIndividualAnswer = $individualAnswers[$triggerQuestionId];
+                                    if ($triggerIndividualAnswer->trigger_question_of == $questionId) {
+                                        $question->{$triggerKey}[$triggerQuestionKey]['answered'] = $triggerIndividualAnswer->answer;
+                                        $question->{$triggerKey}[$triggerQuestionKey]['trigger_question_of'] = $triggerIndividualAnswer->trigger_question_of;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return $question;
+            });
+            return response()->json(['result' => true, 'data' => $mergedQuestions], 200);
         } catch (\Exception $e) {
             return response()->json(['result' => false, 'data' => "Internal Server Error"], 500);
         }
@@ -193,6 +226,7 @@ class EmployeeDashboard extends Controller
             }
             $validated = $request->validate([
                 'template_id' => 'required|integer|in:' . $templateId,
+                'is_partial' => 'required|boolean',
                 'answers' => 'required|array|min:1|max:500',
                 'answers.*.question_id' => 'required|integer',
                 'answers.*.answer' => 'required',
@@ -200,6 +234,7 @@ class EmployeeDashboard extends Controller
                 'answers.*.triggers.*.question_id' => 'required_with:answers.*.triggers|integer',
                 'answers.*.triggers.*.answer' => 'required_with:answers.*.triggers',
             ]);
+            $is_partial = $validated['is_partial'];
             $submittedQuestionIds = collect($validated['answers'])->flatMap(function ($answer) {
                 $ids = [$answer['question_id']];
                 if (isset($answer['triggers'])) {
@@ -227,12 +262,8 @@ class EmployeeDashboard extends Controller
                 return response()->json([
                     'result' => false,
                     'message' => 'Invalid Request',
-                    'invalid_question_ids' => array_values($invalidIds),
                 ], 422);
-            }
-            // TODO: TO Check the answers before saving ...
-            // TODO: TO Check whether all the questions in this templates are answered or skipped ...
-            // TODO: To check is_partial if false check all the questions are answered or not else save partially by dont add reduntant rows
+            } 
             foreach ($validated['answers'] as $answer) {
                 $motherId = $answer['question_id'];
                 if (isset($answer['triggers'])) {
@@ -259,7 +290,7 @@ class EmployeeDashboard extends Controller
                             $decoded = json_decode($json, true);
                             return is_array($decoded) ? array_values($decoded) : [];
                         })
-                        ->map(fn ($id) => (int) $id)
+                        ->map(fn($id) => (int) $id)
                         ->values()
                         ->all();
                     foreach ($answer['triggers'] as $trigger) {
@@ -271,7 +302,12 @@ class EmployeeDashboard extends Controller
                         }
                     }
                 }
-                HraInduvidualAnswer::create([
+                $existingAnswer = HraInduvidualAnswer::where('template_id', $templateId)
+                    ->where('user_id', $request->user_id)
+                    ->where('question_id', $motherId)
+                    ->where('trigger_question_of', null)
+                    ->first();
+                $answerData = [
                     'template_id' => $templateId,
                     'user_id' => $request->user_id,
                     'question_id' => $motherId,
@@ -281,10 +317,20 @@ class EmployeeDashboard extends Controller
                     'test_results' => null,
                     'question_status' => 1,
                     'reference_question' => 0,
-                ]);
+                ];
+                if ($existingAnswer) {
+                    $existingAnswer->update(['answer' => $answerData['answer']]);
+                } else {
+                    HraInduvidualAnswer::create($answerData);
+                }
                 if (isset($answer['triggers'])) {
                     foreach ($answer['triggers'] as $trigger) {
-                        HraInduvidualAnswer::create([
+                        $existingTriggerAnswer = HraInduvidualAnswer::where('template_id', $templateId)
+                            ->where('user_id', $request->user_id)
+                            ->where('question_id', $trigger['question_id'])
+                            ->where('trigger_question_of', $motherId)
+                            ->first();
+                        $triggerAnswerData = [
                             'template_id' => $templateId,
                             'user_id' => $request->user_id,
                             'question_id' => $trigger['question_id'],
@@ -294,7 +340,12 @@ class EmployeeDashboard extends Controller
                             'test_results' => null,
                             'question_status' => 1,
                             'reference_question' => 0,
-                        ]);
+                        ];
+                        if ($existingTriggerAnswer) {
+                            $existingTriggerAnswer->update(['answer' => $triggerAnswerData['answer']]);
+                        } else {
+                            HraInduvidualAnswer::create($triggerAnswerData);
+                        }
                     }
                 }
             }

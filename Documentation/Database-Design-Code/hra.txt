@@ -73,11 +73,6 @@ Table hra_overall_result {
   factor_score enum (1,2)
   completed_date datetime
   result_text varchar(100)
-  next_assessment_date__ date
-  certified_date__ date
-  certified_status__ varchar(50)
-  certified_color__ varchar(50)
-  certified_description__ text
 }
 
 

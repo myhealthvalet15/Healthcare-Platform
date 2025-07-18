@@ -172,11 +172,6 @@ return new class () extends Migration {
             $table->integer('factor_score');
             $table->dateTime('completed_date');
             $table->string('result_text', 100);
-            $table->date('next_assessment_date__')->nullable();
-            $table->date('certified_date__')->nullable();
-            $table->string('certified_status__', 50)->nullable();
-            $table->string('certified_color__', 50)->nullable();
-            $table->text('certified_description__')->nullable();
             $table->timestamps();
         });
         Schema::create('corporate_template_assign', function (Blueprint $table) {

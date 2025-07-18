@@ -32,7 +32,7 @@ class EmployeeDashboard extends Controller
     public function displayHraQuestionaireTemplate(Request $request, $templateId)
     {
         $headerData = 'HRA Questionnaire Template';
-        $response = $this->checkTemplateAccess($request, $templateId); 
+        $response = $this->checkTemplateAccess($request, $templateId);
         if ($response['result']) {
             return view('content.UserEmployee.HRA.hra_questionaire_template', [
                 'templateDetails' => $response['data'],
@@ -62,7 +62,9 @@ class EmployeeDashboard extends Controller
         if (!is_numeric($templateId)) {
             return response()->json(['result' => false, 'data' => 'Invalid Request'], 403);
         }
+
         $validated = $request->validate([
+            'is_partial' => 'sometimes|boolean',
             'answers' => 'required|array|min:1|max:500',
             'answers.*.question_id' => 'required|integer',
             'answers.*.answer' => 'required',
@@ -70,6 +72,7 @@ class EmployeeDashboard extends Controller
             'answers.*.triggers.*.question_id' => 'required_with:answers.*.triggers|integer',
             'answers.*.triggers.*.answer' => 'required_with:answers.*.triggers',
         ]);
+        $isPartial = array_key_exists('is_partial', $validated) ? true : false;
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
@@ -77,7 +80,8 @@ class EmployeeDashboard extends Controller
         ])->post('https://api-user.hygeiaes.com/V1/master-user/masteruser/save-hra-template-questionnaire-answers/' . $templateId, [
             'template_id' => $templateId,
             'answers' => $validated['answers'],
-        ]);
+            'is_partial' => $isPartial,
+        ]); 
         if ($response->successful()) {
             return response()->json(['result' => true, 'data' => $response['data']]);
         }
@@ -86,4 +90,5 @@ class EmployeeDashboard extends Controller
             'data' => 'Failed to save answers',
         ], $response->status());
     }
+
 }

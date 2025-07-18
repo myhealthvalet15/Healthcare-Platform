@@ -11,6 +11,7 @@ use App\Models\Corporate\HraAssignedTemplate;
 use App\Models\EmployeeType;
 use App\Models\Department\CorporateHl1;
 use App\Models\Corporate\EmployeeUserMapping;
+use Carbon\Carbon;
 
 class TemplateController extends Controller
 {
@@ -25,13 +26,13 @@ class TemplateController extends Controller
                     return in_array(2, $subModuleIds);
                 })
                 ->pluck('hra_templates')
-                ->map(fn ($item) => json_decode($item, true))
+                ->map(fn($item) => json_decode($item, true))
                 ->flatten()
                 ->unique();
             return $hraTemplateIds->mapWithKeys(function ($templateId) {
                 $name = HraTemplate::where('template_id', $templateId)->value('template_name');
                 return $name ? [$templateId => $name] : [];
-            })->map(fn ($name, $id) => [
+            })->map(fn($name, $id) => [
                 'template_id' => $id,
                 'template_name' => $name
             ])->values()->all();
@@ -49,7 +50,7 @@ class TemplateController extends Controller
         return response()->json(['result' => true, 'data' => $hraTemplates]);
     }
     public function assignHRATemplate(Request $request)
-    {
+    { 
         $corporateId = $request->corporate_id;
         $locationId = $request->location_id;
         $validator = Validator::make($request->all(), [
@@ -67,7 +68,7 @@ class TemplateController extends Controller
         if ($validator->fails()) {
             return response()->json(['result' => false, 'errors' => $validator->errors()], 422);
         }
-        try { 
+        try {
             $hraAssignment = HraAssignedTemplate::create([
                 'template_id' => $request->template_id,
                 'corporate_id' => $corporateId,
@@ -78,6 +79,7 @@ class TemplateController extends Controller
                 'designation' => $request->designation ?? [],
                 'from_date' => $request->from_date,
                 'to_date' => $request->to_date,
+                'next_assessment_date' => Carbon::parse($request->from_date)->addYear(),
             ]);
             return response()->json([
                 'result' => true,
@@ -152,14 +154,14 @@ class TemplateController extends Controller
             $employeeTypeNames = (is_array($employeeTypes) && in_array('all', $employeeTypes))
                 ? EmployeeType::where('corporate_id', $corporateId)->pluck('employee_type_name')->toArray()
                 : EmployeeType::where('corporate_id', $corporateId)
-                    ->whereIn('employee_type_id', $employeeTypes)->pluck('employee_type_name')->toArray();
+                ->whereIn('employee_type_id', $employeeTypes)->pluck('employee_type_name')->toArray();
             $departmentNames = (is_array($departments) && in_array('all', $departments))
                 ? CorporateHl1::where('corporate_id', $corporateId)->pluck('hl1_name')->toArray()
                 : CorporateHl1::where('corporate_id', $corporateId)
-                    ->whereIn('hl1_id', $departments)->pluck('hl1_name')->toArray();
+                ->whereIn('hl1_id', $departments)->pluck('hl1_name')->toArray();
             $designationNames = (is_array($designation) && in_array('all', $designation))
                 ? EmployeeUserMapping::where("corporate_id", $corporateId)
-                    ->where("location_id", $locationId)->pluck('designation')->unique()->values()
+                ->where("location_id", $locationId)->pluck('designation')->unique()->values()
                 : $designation;
             return [
                 'template_id' => $template->template_id,

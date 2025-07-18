@@ -780,7 +780,8 @@
             this.tId = this.getTId();
             this.triggerQuestions = new Map();
             this.activeTriggers = new Map();
-            this.bind()
+            this.bind();
+            this.rawQuestions = [];
         }
         getTId() {
             const u = window.location.pathname,
@@ -831,12 +832,13 @@
                         onSuccess: (d) => {
                             if (!d.result) {
                                 reject(new Error(d.data || 'Failed to load questions'));
-                                return
+                                return;
                             }
                             if (!d.data || !Array.isArray(d.data) || d.data.length === 0) {
                                 reject(new Error('No questions found for this template'));
-                                return
+                                return;
                             }
+                            this.rawQuestions = d.data;
                             this.q = d.data.map((q, i) => ({
                                 id: q.question_id,
                                 question: q.question,
@@ -846,19 +848,125 @@
                                 factor_priority: q.factor_priority,
                                 sequentialNumber: i + 1,
                                 triggers: this.processTriggers(q),
-                                rawData: q
+                                rawData: q,
+                                answered: q.answered || null,
+                                isTriggerQuestion: !!q.trigger_question_of
                             })).sort((a, b) => a.factor_priority - b.factor_priority || a.priority - b.priority);
                             this.q.forEach((q, i) => q.sequentialNumber = i + 1);
                             this.tp = Math.ceil(this.q.length / this.qpp);
-                            resolve()
+                            this.processPreviousAnswers();
+                            resolve();
                         },
                         onError: (e) => {
-                            reject(new Error(e.message.includes('fetch') ? 'Network error. Please check your connection.' : e.message))
+                            reject(new Error(e.message.includes('fetch') ? 'Network error. Please check your connection.' : e.message));
                         }
-                    })
-                })
+                    });
+                });
             } catch (e) {
-                throw new Error(e.message)
+                throw new Error(e.message);
+            }
+        }
+        findTriggerKey(question, selectedValue) {
+            if (!question.options) return null;
+            if (question.rawData.comp_value) {
+                try {
+                    const compValues = JSON.parse(question.rawData.comp_value);
+                    for (let i = 1; i <= Object.keys(compValues).length; i++) {
+                        if (compValues[`key${i}`] === selectedValue) {
+                            return `key${i}`;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Error parsing comp_value:', e);
+                }
+            }
+            const optionIndex = question.options.findIndex(option => option === selectedValue);
+            return optionIndex !== -1 ? `key${optionIndex + 1}` : null;
+        }
+        processPreviousAnswers() {
+            this.rawQuestions.forEach(rawQuestion => {
+                if (rawQuestion.answered && !rawQuestion.trigger_question_of) {
+                    const question = this.q.find(q => q.id === rawQuestion.question_id);
+                    if (question) {
+                        this.r[question.id] = rawQuestion.answered;
+                        this.a.add(question.id);
+                        if (question.triggers) {
+                            const triggerKey = this.findTriggerKey(question, rawQuestion.answered);
+                            if (triggerKey && question.triggers[triggerKey]) {
+                                if (!this.activeTriggers.has(question.id)) {
+                                    this.activeTriggers.set(question.id, new Set());
+                                }
+                                this.activeTriggers.get(question.id).add(triggerKey);
+                            }
+                        }
+                    }
+                }
+            });
+            this.rawQuestions.forEach(rawQuestion => {
+                if (rawQuestion.trigger_question_of && rawQuestion.answered) {
+                    const parentQuestion = this.q.find(q => q.id === rawQuestion.trigger_question_of);
+                    if (parentQuestion && this.activeTriggers.has(parentQuestion.id)) {
+                        const activeTriggerKeys = this.activeTriggers.get(parentQuestion.id);
+                        activeTriggerKeys.forEach(triggerKey => {
+                            if (parentQuestion.triggers[triggerKey]) {
+                                const triggerQuestion = parentQuestion.triggers[triggerKey].find(tq =>
+                                    tq.originalId === rawQuestion.question_id
+                                );
+                                if (triggerQuestion) {
+                                    this.r[triggerQuestion.id] = rawQuestion.answered;
+                                    this.a.add(triggerQuestion.id);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        restoreAnswer(q, container) {
+            const sa = this.r[q.id];
+            if (sa) {
+                setTimeout(() => {
+                    const ins = container.querySelectorAll('input, select');
+                    if (q.type === 'checkbox' && Array.isArray(sa)) {
+                        ins.forEach(i => {
+                            if (i.type === 'checkbox' && sa.includes(i.value)) i.checked = true;
+                        });
+                    } else {
+                        ins.forEach(i => {
+                            if (i.type === 'radio' && i.value === sa) i.checked = true;
+                            else if (i.type !== 'radio' && i.type !== 'checkbox') i.value = sa;
+                        });
+                    }
+                }, 100);
+            }
+            else if (q.answered && !this.s.has(q.id)) {
+                this.r[q.id] = q.answered;
+                this.a.add(q.id);
+                setTimeout(() => {
+                    const ins = container.querySelectorAll('input, select');
+                    if (q.type === 'checkbox') {
+                        try {
+                            const answers = JSON.parse(q.answered);
+                            if (Array.isArray(answers)) {
+                                ins.forEach(i => {
+                                    if (i.type === 'checkbox' && answers.includes(i.value)) i.checked = true;
+                                });
+                            }
+                        } catch (e) {
+                            ins.forEach(i => {
+                                if (i.type === 'checkbox' && i.value === q.answered) i.checked = true;
+                            });
+                        }
+                    } else if (q.type === 'radio') {
+                        ins.forEach(i => {
+                            if (i.type === 'radio' && i.value === q.answered) i.checked = true;
+                        });
+                    } else {
+                        ins.forEach(i => {
+                            if (i.type !== 'radio' && i.type !== 'checkbox') i.value = q.answered;
+                        });
+                    }
+                }, 100);
             }
         }
         saveToServer() {
@@ -1095,7 +1203,8 @@
                             isTrigger: true,
                             triggerKey: triggerKey,
                             questionKey: questionKey,
-                            sequenceInTrigger: triggerQuestions.length + 1
+                            sequenceInTrigger: triggerQuestions.length + 1,
+                            answered: triggerQuestion.answered || null
                         })
                     });
                     triggers[`key${i}`] = triggerQuestions
@@ -1386,21 +1495,40 @@
             }
         }
         restoreAnswer(q, container) {
-            const sa = this.r[q.id];
+            const sa = this.r[q.id] || q.answered;
             if (sa) {
                 setTimeout(() => {
                     const ins = container.querySelectorAll('input, select');
-                    if (q.type === 'checkbox' && Array.isArray(sa)) {
+                    if (q.type === 'checkbox') {
+                        let answers = sa;
+                        if (typeof sa === 'string') {
+                            try {
+                                answers = JSON.parse(sa);
+                            } catch (e) {
+                                answers = [sa];
+                            }
+                        }
+                        if (Array.isArray(answers)) {
+                            ins.forEach(i => {
+                                if (i.type === 'checkbox' && answers.includes(i.value)) {
+                                    i.checked = true;
+                                }
+                            });
+                        }
+                    } else if (q.type === 'radio') {
                         ins.forEach(i => {
-                            if (i.type === 'checkbox' && sa.includes(i.value)) i.checked = true
-                        })
+                            if (i.type === 'radio' && i.value === sa) {
+                                i.checked = true;
+                            }
+                        });
                     } else {
                         ins.forEach(i => {
-                            if (i.type === 'radio' && i.value === sa) i.checked = true;
-                            else if (i.type !== 'radio' && i.type !== 'checkbox') i.value = sa
-                        })
+                            if (i.type !== 'radio' && i.type !== 'checkbox') {
+                                i.value = sa;
+                            }
+                        });
                     }
-                }, 100)
+                }, 100);
             }
         }
         upInfo() {

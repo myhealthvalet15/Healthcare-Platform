@@ -22,6 +22,7 @@ class CreateHraAssignedTemplatesTable extends Migration
             $table->json('designation')->nullable();
             $table->date('from_date');
             $table->date('to_date');
+            $table->date('next_assessment_date');
             $table->timestamps();
         });
     }

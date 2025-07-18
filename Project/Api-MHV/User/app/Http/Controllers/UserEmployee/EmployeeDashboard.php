@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\DB;
 
 class EmployeeDashboard extends Controller
 {
+    private function matches($value, $list)
+    {
+        if (is_null($list)) {
+            return true;
+        }
+        $array = is_array($list) ? $list : (array) $list;
+        return in_array($value, $array) || in_array('all', $array);
+    }
     public function getAllAssignedTemplates(Request $request)
     {
         try {
@@ -22,32 +30,30 @@ class EmployeeDashboard extends Controller
             $employeeTypeId = $request->employee_type_id;
             $departmentId = $request->department;
             $assignedTemplates = HraAssignedTemplate::where('corporate_id', $corporateId)
-                ->where(function ($query) use ($locationId) {
-                    $query->where('location', $locationId)
-                        ->orWhere('location', 'all');
+                ->where(function ($q) use ($locationId) {
+                    $q->where('location', $locationId)
+                      ->orWhere('location', 'all');
                 })
                 ->get();
             if ($assignedTemplates->isEmpty()) {
                 return response()->json(['result' => false, 'data' => 'No templates assigned'], 404);
             }
-            $validTemplates = [];
-            foreach ($assignedTemplates as $template) {
-                $designations = (array) $template->designation;
-                $employeeTypes = (array) $template->employee_type;
-                $departments = (array) $template->department;
-                $designationMatch = is_null($template->designation) || in_array($designation, $designations) || in_array('all', $designations);
-                $employeeTypeMatch = is_null($template->employee_type) || in_array($employeeTypeId, $employeeTypes) || in_array('all', $employeeTypes);
-                $departmentMatch = is_null($template->department) || in_array($departmentId, $departments) || in_array('all', $departments);
-                if ($designationMatch && $employeeTypeMatch && $departmentMatch) {
-                    $templateData = HraTemplate::where('template_id', $template->template_id)->first();
-                    if ($templateData) {
-                        $validTemplates[] = [
-                            'template_id' => $templateData->template_id,
-                            'template_name' => $templateData->template_name
-                        ];
-                    }
-                }
-            }
+            $templateIds = $assignedTemplates->pluck('template_id')->unique()->toArray();
+            $templateModels = HraTemplate::whereIn('template_id', $templateIds)
+                                ->get(['template_id', 'template_name'])
+                                ->keyBy('template_id');
+            $validTemplates = $assignedTemplates->filter(function ($t) use ($designation, $employeeTypeId, $departmentId) {
+                return
+                    $this->matches($designation, $t->designation) &&
+                    $this->matches($employeeTypeId, $t->employee_type) &&
+                    $this->matches($departmentId, $t->department);
+            })->map(function ($t) use ($templateModels) {
+                $template = $templateModels[$t->template_id] ?? null;
+                return $template ? [
+                    'template_id'   => $template->template_id,
+                    'template_name' => $template->template_name
+                ] : null;
+            })->filter()->values()->all();
             if (empty($validTemplates)) {
                 return response()->json(['result' => true, 'data' => 'No templates assigned'], 404);
             }
@@ -76,22 +82,20 @@ class EmployeeDashboard extends Controller
             $departmentId = $request->department;
             $assignedTemplates = $this->checkTemplate($request, $templateId);
             foreach ($assignedTemplates as $template) {
-                $designations = (array) $template->designation;
-                $employeeTypes = (array) $template->employee_type;
-                $departments = (array) $template->department;
-                $designationMatch = is_null($template->designation) || in_array($designation, $designations) || in_array('all', $designations);
-                $employeeTypeMatch = is_null($template->employee_type) || in_array($employeeTypeId, $employeeTypes) || in_array('all', $employeeTypes);
-                $departmentMatch = is_null($template->department) || in_array($departmentId, $departments) || in_array('all', $departments);
-                if ($designationMatch && $employeeTypeMatch && $departmentMatch) {
+                if (
+                    $this->matches($designation, $template->designation) &&
+                    $this->matches($employeeTypeId, $template->employee_type) &&
+                    $this->matches($departmentId, $template->department)
+                ) {
                     $templateData = HraTemplate::where('template_id', $template->template_id)->first();
                     if ($templateData) {
-                        $isQuestionsAvailableForThisTemplate = HraTemplateQuestions::where('template_id', $templateData->template_id)->exists();
+                        $isQuestionsAvailable = HraTemplateQuestions::where('template_id', $templateData->template_id)->exists();
                         return response()->json([
                             'result' => true,
                             'data' => [
                                 'template_id' => $templateData->template_id,
                                 'template_name' => $templateData->template_name,
-                                'is_questions_available' => $isQuestionsAvailableForThisTemplate,
+                                'is_questions_available' => $isQuestionsAvailable,
                             ]
                         ], 200);
                     }
@@ -106,18 +110,14 @@ class EmployeeDashboard extends Controller
     {
         try {
             $userId = $request->user_id;
-            if ($userId === null) {
+            if (!$userId || !is_numeric($templateId)) {
                 return response()->json(['result' => false, 'data' => 'Invalid Request'], 403);
             }
-            if (!is_numeric($templateId)) {
+            $access = $this->checkTemplateAccess($request, $templateId)->getData(true);
+            if (!$access['result']) {
                 return response()->json(['result' => false, 'data' => 'Invalid Template'], 403);
             }
-            $isTemplateAssigned = $this->checkTemplateAccess($request, $templateId);
-            $data = $isTemplateAssigned->getData(true);
-            if (!$data['result']) {
-                return response()->json(['result' => false, 'data' => 'Invalid Template'], 403);
-            }
-            $templateQuestions = DB::table('hra_template_questions as htq')
+            $questions = DB::table('hra_template_questions as htq')
                 ->join('hra_question as hq', 'htq.question_id', '=', 'hq.question_id')
                 ->leftJoin('hra_factors as hf', 'htq.factor_id', '=', 'hf.factor_id')
                 ->where('htq.template_id', $templateId)
@@ -127,86 +127,84 @@ class EmployeeDashboard extends Controller
                     'htq.factor_priority',
                     'htq.question_id',
                     'htq.question_priority',
-                    'htq.trigger_1',
-                    'htq.trigger_2',
-                    'htq.trigger_3',
-                    'htq.trigger_4',
-                    'htq.trigger_5',
-                    'htq.trigger_6',
-                    'htq.trigger_7',
-                    'htq.trigger_8',
-                    'hq.question',
-                    'hq.answer',
-                    'hq.formula',
-                    'hq.test_id',
-                    'hq.gender',
-                    'hq.comp_value',
-                    'hq.types',
-                ])
-                ->get()
-                ->map(function ($item) {
-                    foreach (range(1, 8) as $i) {
-                        $triggerKey = "trigger_$i";
-                        if (!empty($item->$triggerKey)) {
-                            $triggerDecoded = json_decode($item->$triggerKey, true);
-                            if (is_array($triggerDecoded)) {
-                                $newTriggerData = [];
-                                foreach ($triggerDecoded as $key => $val) {
-                                    if (is_numeric($val)) {
-                                        $questionData = DB::table('hra_question')
-                                            ->select('question_id', 'question', 'answer', 'types')
-                                            ->where('question_id', $val)
-                                            ->first();
-                                        if ($questionData) {
-                                            $newTriggerData[$key] = [
-                                                'question_id' => $questionData->question_id,
-                                                'question' => $questionData->question,
-                                                'answer' => json_decode($questionData->answer, true),
-                                                'types' => $questionData->types,
-                                            ];
-                                        } else {
-                                            $newTriggerData[$key] = null;
-                                        }
-                                    } else {
-                                        $newTriggerData[$key] = $val;
-                                    }
-                                }
-                                $item->$triggerKey = $newTriggerData;
-                            }
-                        }
-                    }
-                    return $item;
-                });
-            if ($templateQuestions->isEmpty()) {
+                    'htq.trigger_1', 'htq.trigger_2', 'htq.trigger_3', 'htq.trigger_4',
+                    'htq.trigger_5', 'htq.trigger_6', 'htq.trigger_7', 'htq.trigger_8',
+                    'hq.question', 'hq.answer', 'hq.formula', 'hq.test_id',
+                    'hq.gender', 'hq.comp_value', 'hq.types',
+                ])->get();
+            if ($questions->isEmpty()) {
                 return response()->json(['result' => false, 'data' => 'No questions found for this template'], 404);
             }
+            $triggerQuestionIds = [];
+            foreach ($questions as $item) {
+                foreach (range(1, 8) as $i) {
+                    $triggerKey = "trigger_$i";
+                    if (!empty($item->$triggerKey)) {
+                        $decoded = json_decode($item->$triggerKey, true);
+                        if ($decoded && is_array($decoded)) {
+                            $triggerQuestionIds = array_merge($triggerQuestionIds, array_values($decoded));
+                        }
+                    }
+                }
+            }
+            $triggerQuestionIds = array_unique(array_filter($triggerQuestionIds, 'is_numeric'));
+            $triggerQuestions = [];
+            if ($triggerQuestionIds) {
+                $triggerQuestions = DB::table('hra_question')
+                    ->whereIn('question_id', $triggerQuestionIds)
+                    ->select('question_id', 'question', 'answer', 'types')
+                    ->get()
+                    ->keyBy('question_id')->toArray();
+            }
+            $templateQuestions = $questions->map(function ($item) use ($triggerQuestions) {
+                foreach (range(1, 8) as $i) {
+                    $triggerKey = "trigger_$i";
+                    if (!empty($item->$triggerKey)) {
+                        $decoded = json_decode($item->$triggerKey, true);
+                        if (is_array($decoded)) {
+                            $item->$triggerKey = collect($decoded)->map(function ($val, $k) use ($triggerQuestions) {
+                                if (is_numeric($val) && isset($triggerQuestions[$val])) {
+                                    $q = $triggerQuestions[$val];
+                                    return [
+                                        'question_id' => $q->question_id,
+                                        'question' => $q->question,
+                                        'answer' => json_decode($q->answer, true),
+                                        'types' => $q->types,
+                                    ];
+                                }
+                                return $val;
+                            })->all();
+                        }
+                    }
+                }
+                return $item;
+            });
             $individualAnswers = DB::table('hra_induvidual_answers')
                 ->where('user_id', $userId)
                 ->where('template_id', $templateId)
                 ->select('question_id', 'answer', 'trigger_question_of')
                 ->get()
-                ->keyBy('question_id');
+                ->keyBy(function ($item) {
+                    return $item->question_id . '-' . ($item->trigger_question_of ?: 'main');
+                });
             $mergedQuestions = $templateQuestions->map(function ($question) use ($individualAnswers) {
-                $questionId = $question->question_id;
-                if (isset($individualAnswers[$questionId])) {
-                    $individualAnswer = $individualAnswers[$questionId];
-                    if ($individualAnswer->trigger_question_of === null) {
-                        $question->answered = $individualAnswer->answer;
-                        $question->trigger_question_of = null;
-                    }
+                $qid = $question->question_id;
+                $mainKey = $qid . '-main';
+                if (isset($individualAnswers[$mainKey])) {
+                    $ia = $individualAnswers[$mainKey];
+                    $question->answered = $ia->answer;
+                    $question->trigger_question_of = null;
                 }
                 foreach (range(1, 8) as $i) {
                     $triggerKey = "trigger_$i";
                     if (!empty($question->$triggerKey) && is_array($question->$triggerKey)) {
-                        foreach ($question->$triggerKey as $triggerQuestionKey => $triggerQuestion) {
+                        foreach ($question->$triggerKey as $k => $triggerQuestion) {
                             if (is_array($triggerQuestion) && isset($triggerQuestion['question_id'])) {
-                                $triggerQuestionId = $triggerQuestion['question_id'];
-                                if (isset($individualAnswers[$triggerQuestionId])) {
-                                    $triggerIndividualAnswer = $individualAnswers[$triggerQuestionId];
-                                    if ($triggerIndividualAnswer->trigger_question_of == $questionId) {
-                                        $question->{$triggerKey}[$triggerQuestionKey]['answered'] = $triggerIndividualAnswer->answer;
-                                        $question->{$triggerKey}[$triggerQuestionKey]['trigger_question_of'] = $triggerIndividualAnswer->trigger_question_of;
-                                    }
+                                $tk = $triggerQuestion['question_id'] . '-' . $qid;
+                                if (isset($individualAnswers[$tk])) {
+                                    $tAns = $individualAnswers[$tk];
+                                    $question->{$triggerKey}[$k]['answered'] = $tAns->answer;
+                                    $question->{$triggerKey}[$k]['trigger_question_of'] = $tAns->trigger_question_of;
                                 }
                             }
                         }
@@ -235,22 +233,14 @@ class EmployeeDashboard extends Controller
                 'answers.*.triggers.*.question_id' => 'required_with:answers.*.triggers|integer',
                 'answers.*.triggers.*.answer' => 'required_with:answers.*.triggers',
             ]);
-            $is_partial = $validated['is_partial'];
-            $submittedQuestionIds = collect($validated['answers'])->flatMap(function ($answer) {
-                $ids = [$answer['question_id']];
-                if (isset($answer['triggers'])) {
-                    $triggerIds = collect($answer['triggers'])->pluck('question_id')->filter()->all();
-                    $ids = array_merge($ids, $triggerIds);
-                }
-                return $ids;
-            })->unique()->values()->all();
+            $answers = collect($validated['answers']);
+            $userId = $request->user_id;
             $questions = HraTemplateQuestions::where('template_id', $templateId)->get();
             $validQuestionIds = $questions->flatMap(function ($q) {
-                $ids = [(int) $q->question_id];
+                $ids = [(int)$q->question_id];
                 for ($i = 1; $i <= 8; $i++) {
-                    $triggerField = $q->{"trigger_$i"};
-                    if ($triggerField) {
-                        $decoded = json_decode($triggerField, true);
+                    if ($q->{"trigger_$i"}) {
+                        $decoded = json_decode($q->{"trigger_$i"}, true);
                         if (is_array($decoded)) {
                             $ids = array_merge($ids, array_map('intval', array_values($decoded)));
                         }
@@ -258,128 +248,98 @@ class EmployeeDashboard extends Controller
                 }
                 return $ids;
             })->unique()->values()->all();
-            $invalidIds = array_diff($submittedQuestionIds, $validQuestionIds);
-            if (!empty($invalidIds)) {
-                return response()->json([
-                    'result' => false,
-                    'message' => 'Invalid Request',
-                ], 422);
+            $submittedIds = $answers->flatMap(function ($a) {
+                $ids = [$a['question_id']];
+                if (isset($a['triggers'])) {
+                    $ids = array_merge($ids, collect($a['triggers'])->pluck('question_id')->all());
+                }
+                return $ids;
+            })->unique()->values()->all();
+            $invalidIds = array_diff($submittedIds, $validQuestionIds);
+            if ($invalidIds) {
+                return response()->json(['result' => false, 'message' => 'Invalid Request'], 422);
             }
-            foreach ($validated['answers'] as $answer) {
+            $allNeededIds = $submittedIds;
+            $hraQuestions = HraQuestions::whereIn('question_id', $allNeededIds)
+                ->get(['question_id', 'answer', 'points'])
+                ->keyBy('question_id');
+            DB::beginTransaction();
+            foreach ($answers as $answer) {
                 $motherId = $answer['question_id'];
-                if (isset($answer['triggers'])) {
-                    $motherQuestion = $questions->firstWhere('question_id', $motherId);
-                    if (!$motherQuestion) {
-                        return response()->json([
-                            'result' => false,
-                            'message' => "Mother question ID $motherId not found in template.",
-                        ], 422);
-                    }
-                    $triggerFields = [
-                        $motherQuestion->trigger_1,
-                        $motherQuestion->trigger_2,
-                        $motherQuestion->trigger_3,
-                        $motherQuestion->trigger_4,
-                        $motherQuestion->trigger_5,
-                        $motherQuestion->trigger_6,
-                        $motherQuestion->trigger_7,
-                        $motherQuestion->trigger_8,
-                    ];
-                    $allTriggerValues = collect($triggerFields)
-                        ->filter()
-                        ->flatMap(function ($json) {
-                            $decoded = json_decode($json, true);
-                            return is_array($decoded) ? array_values($decoded) : [];
-                        })
-                        ->map(fn ($id) => (int) $id)
-                        ->values()
-                        ->all();
-                    foreach ($answer['triggers'] as $trigger) {
-                        if (!in_array((int) $trigger['question_id'], $allTriggerValues)) {
-                            return response()->json([
-                                'result' => false,
-                                'message' => "Trigger question ID {$trigger['question_id']} is not a valid child of mother question ID $motherId.",
-                            ], 422);
+                $mainHraQ = $hraQuestions[$motherId] ?? null;
+                $mainPts = null;
+                if ($mainHraQ) {
+                    $answerArr = json_decode($mainHraQ->answer, true);
+                    $pointsArr = json_decode($mainHraQ->points, true);
+                    if (is_array($answerArr) && is_array($pointsArr)) {
+                        $idx = array_search($answer['answer'], $answerArr, true);
+                        if ($idx !== false && isset($pointsArr[$idx])) {
+                            $mainPts = $pointsArr[$idx];
                         }
                     }
                 }
-                $hraQuestion = HraQuestions::where('question_id', $motherId)->first();
-                $calculatedPoints = null;
-                if ($hraQuestion && $hraQuestion->answer && $hraQuestion->points) {
-                    $questionAnswers = json_decode($hraQuestion->answer, true);
-                    $questionPoints = json_decode($hraQuestion->points, true);
-                    if (is_array($questionAnswers) && is_array($questionPoints)) {
-                        foreach ($questionAnswers as $key => $value) {
-                            if ($value === $answer['answer']) {
-                                $calculatedPoints = $questionPoints[$key] ?? null;
-                                break;
-                            }
-                        }
-                    }
-                }
-                $existingAnswer = HraInduvidualAnswer::where('template_id', $templateId)
-                    ->where('user_id', $request->user_id)
-                    ->where('question_id', $motherId)
-                    ->where('trigger_question_of', null)
-                    ->first();
-                $answerData = [
+                $mainRecord = [
                     'template_id' => $templateId,
-                    'user_id' => $request->user_id,
+                    'user_id' => $userId,
                     'question_id' => $motherId,
                     'trigger_question_of' => null,
                     'answer' => is_array($answer['answer']) ? json_encode($answer['answer']) : $answer['answer'],
-                    'points' => $calculatedPoints,
+                    'points' => $mainPts,
                     'test_results' => null,
                     'question_status' => 1,
                     'reference_question' => 0,
                 ];
-                if ($existingAnswer) {
-                    $existingAnswer->update(['answer' => $answerData['answer'], 'points' => $calculatedPoints]);
-                } else {
-                    HraInduvidualAnswer::create($answerData);
-                }
-                if (isset($answer['triggers'])) {
+                HraInduvidualAnswer::updateOrCreate(
+                    [
+                        'template_id' => $templateId,
+                        'user_id' => $userId,
+                        'question_id' => $motherId,
+                        'trigger_question_of' => null
+                    ],
+                    $mainRecord
+                );
+                if (!empty($answer['triggers'])) {
                     foreach ($answer['triggers'] as $trigger) {
-                        $triggerHraQuestion = HraQuestions::where('question_id', $trigger['question_id'])->first();
-                        $triggerCalculatedPoints = null;
-                        if ($triggerHraQuestion && $triggerHraQuestion->answer && $triggerHraQuestion->points) {
-                            $triggerQuestionAnswers = json_decode($triggerHraQuestion->answer, true);
-                            $triggerQuestionPoints = json_decode($triggerHraQuestion->points, true);
-                            if (is_array($triggerQuestionAnswers) && is_array($triggerQuestionPoints)) {
-                                foreach ($triggerQuestionAnswers as $key => $value) {
-                                    if ($value === $trigger['answer']) {
-                                        $triggerCalculatedPoints = $triggerQuestionPoints[$key] ?? null;
-                                        break;
-                                    }
+                        $triggerId = $trigger['question_id'];
+                        $triggerQ = $hraQuestions[$triggerId] ?? null;
+                        $triggerPts = null;
+                        if ($triggerQ) {
+                            $answerArr = json_decode($triggerQ->answer, true);
+                            $pointsArr = json_decode($triggerQ->points, true);
+                            if (is_array($answerArr) && is_array($pointsArr)) {
+                                $idx = array_search($trigger['answer'], $answerArr, true);
+                                if ($idx !== false && isset($pointsArr[$idx])) {
+                                    $triggerPts = $pointsArr[$idx];
                                 }
                             }
                         }
-                        $existingTriggerAnswer = HraInduvidualAnswer::where('template_id', $templateId)
-                            ->where('user_id', $request->user_id)
-                            ->where('question_id', $trigger['question_id'])
-                            ->where('trigger_question_of', $motherId)
-                            ->first();
-                        $triggerAnswerData = [
+                        $triggerRecord = [
                             'template_id' => $templateId,
-                            'user_id' => $request->user_id,
-                            'question_id' => $trigger['question_id'],
+                            'user_id' => $userId,
+                            'question_id' => $triggerId,
                             'trigger_question_of' => $motherId,
                             'answer' => is_array($trigger['answer']) ? json_encode($trigger['answer']) : $trigger['answer'],
-                            'points' => $triggerCalculatedPoints,
+                            'points' => $triggerPts,
                             'test_results' => null,
                             'question_status' => 1,
                             'reference_question' => 0,
                         ];
-                        if ($existingTriggerAnswer) {
-                            $existingTriggerAnswer->update(['answer' => $triggerAnswerData['answer'], 'points' => $triggerCalculatedPoints]);
-                        } else {
-                            HraInduvidualAnswer::create($triggerAnswerData);
-                        }
+                        HraInduvidualAnswer::updateOrCreate(
+                            [
+                                'template_id' => $templateId,
+                                'user_id' => $userId,
+                                'question_id' => $triggerId,
+                                'trigger_question_of' => $motherId
+                            ],
+                            $triggerRecord
+                        );
                     }
                 }
             }
+            DB::commit();
             return response()->json(['result' => true, 'data' => 'Answers saved successfully.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'result' => false,
                 'message' => 'Internal Server Error',

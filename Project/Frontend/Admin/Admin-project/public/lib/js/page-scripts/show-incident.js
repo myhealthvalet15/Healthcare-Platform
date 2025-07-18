@@ -1,0 +1,180 @@
+const preloader = document.getElementById('preloader');
+const table = document.getElementById('incidenttable');
+console.log("stop loading");
+const tbody = document.getElementById('incidentbody');
+window.onload = function () {
+    fetchFactors();
+};
+if (!table || !tbody) {
+    console.warn('Table or tbody not found');
+} else {
+}
+const addincidentButton = document.getElementById('add-new-incident');
+const incidentNameInput = document.getElementById('incident-name');
+incidentNameInput.addEventListener('input', () => {
+    let errorContainer = incidentNameInput.parentElement.querySelector('.fv-plugins-message-container');
+    if (errorContainer) {
+        errorContainer.remove();
+        incidentNameInput.classList.remove('is-invalid');
+    }
+});
+
+addincidentButton.addEventListener('click', () => {
+    console.log("save the button");
+    const incidentName = incidentNameInput.value.trim();
+    let errorContainer = incidentNameInput.parentElement.querySelector('.fv-plugins-message-container');
+    if (errorContainer) {
+        errorContainer.remove();
+    }
+    addincidentButton.disabled = true;
+    addincidentButton.innerHTML =
+        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+         &nbspSaving...`;
+    addNewincident(incidentName);
+});
+
+
+
+function addNewincident(incidentName) {
+    if (!incidentName || incidentName.trim().length === 0) {
+        addincidentButton.disabled = false;
+        addincidentButton.innerHTML = 'Save Changes';
+        incidentNameInput.classList.add('is-invalid');
+        const errorMessage = document.createElement('div');
+        errorMessage.classList.add('fv-plugins-message-container', 'fv-plugins-message-container--enabled', 'invalid-feedback');
+        errorMessage.innerHTML = '<div data-field="formValidationUsername" data-validator="notEmpty">The name is required</div>';
+        incidentNameInput.parentElement.appendChild(errorMessage);
+        showToast('error', 'Incident name is required');
+        return false;
+    }
+
+    apiRequest({
+        url: "/corporate/addIncidentType",
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        data: { incident_type_name: incidentName },
+        onSuccess: (responseData) => {
+            const modalElement = document.getElementById('addincident');
+            const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+            if (responseData.result === 'success') {
+                showToast(responseData.result, responseData.message);
+                fetchFactors();
+                bootstrapModal.hide();
+                incidentNameInput.value = '';
+                addincidentButton.disabled = false;
+                addincidentButton.innerHTML = 'Save Changes';
+            } else {
+                showToast(responseData.result, responseData.message || 'Error occurred while adding factor');
+                bootstrapModal.hide();
+                addincidentButton.disabled = false;
+                addincidentButton.innerHTML = 'Save Changes';
+            }
+        },
+        onError: (error) => {
+            showToast('error', error);
+            addincidentButton.disabled = false;
+            addincidentButton.innerHTML = 'Save Changes';
+        },
+        onComplete: () => {
+            addincidentButton.disabled = false;
+            addincidentButton.innerHTML = 'Save Changes';
+        }
+    });
+}
+
+function fetchFactors() {
+    console.log("checking the table");
+    tbody.innerHTML = '';
+    preloader.style.display = 'block';
+    apiRequest({
+        url: "/corporate/getAllIncidentTypes",
+        method: 'GET',
+        onSuccess: (data) => {
+            console.log("checking the source");
+            preloader.style.display = 'none';
+            if (!data || !Array.isArray(data) || data.length === 0) {
+                const noDataMessage = document.createElement('tr');
+                noDataMessage.innerHTML = `
+                    <td colspan="3" class="text-center">No incident available.</td>`;
+                tbody.appendChild(noDataMessage);
+                table.style.display = 'table';
+                return;
+            }
+            table.style.display = 'table';
+            data.forEach(incident => {
+                const row = document.createElement('tr');
+
+                const incidentNameCell = document.createElement('td');
+                incidentNameCell.textContent = incident.incident_name;
+                row.appendChild(incidentNameCell);
+
+                
+                const actionsCell = document.createElement('td');
+
+                const editIcon = document.createElement('i');
+                editIcon.classList.add('ti', 'ti-pencil', 'me-3', 'cursor-pointer');
+                editIcon.setAttribute('title', 'Edit');
+                editIcon.addEventListener('click', () => {
+                    editincident(incident.incident_name, incident.incident_id);
+                });
+                actionsCell.appendChild(editIcon);
+
+                const deleteIcon = document.createElement('i');
+                deleteIcon.classList.add('ti', 'ti-trash', 'cursor-pointer');
+                deleteIcon.setAttribute('title', 'Delete');
+                deleteIcon.addEventListener('click', () => {
+                    deleteFactor(incident.incident_id);
+                });
+                actionsCell.appendChild(deleteIcon);
+
+                row.appendChild(actionsCell);
+
+                tbody.appendChild(row);
+            });
+        },
+        onError: (error) => {
+            preloader.innerHTML = `<span>Error fetching data. <br>Status: ${error}.</span>`;
+        }
+    });
+}
+
+function editFactor(incidentName, incidentId) {
+    document.getElementById('incident_name').value = incidentName;
+
+
+    document.getElementById('edit-factor').setAttribute('data-factor-id', factorId);
+    const modalElement = document.getElementById('editincident');
+    const bootstrapModal = new bootstrap.Modal(modalElement);
+    bootstrapModal.show();
+
+    const editincidentButton = document.getElementById('edit-incident');
+    editincidentButton.replaceWith(editincidentButton.cloneNode(true));
+    const newEditincidentButton = document.getElementById('incident-factor');
+
+    newEditFactorButton.addEventListener('click', function () {
+        const incidentId = this.getAttribute('data-incident-id');
+        const incidentName = document.getElementById('incident_name').value;
+
+        apiRequest({
+            url: `/corporate/editincidenttype/${factorId}`,
+            method: 'PUT',
+            data: { factor_name: factorName, active_status: activeStatus },
+            onSuccess: (response) => {
+                showToast(response.result, response.message);
+                fetchFactors();
+                const modalElement = document.getElementById('editincident');
+                const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+                bootstrapModal.hide();
+            },
+            onError: (error) => {
+                showToast('error', error);
+            }
+        });
+
+
+    });
+
+}
+

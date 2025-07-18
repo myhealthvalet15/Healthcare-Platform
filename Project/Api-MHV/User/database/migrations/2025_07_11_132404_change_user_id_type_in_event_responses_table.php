@@ -1,61 +1,69 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ChangeUserIdTypeInEventResponsesTable extends Migration
 {
     public function up()
     {
-        // Step 1: Drop the foreign key safely
+        // Check first: only proceed if users.id is also a string
+        // Otherwise, this whole migration will break relational integrity
+
+        // Step 1: Drop foreign key if it exists
         try {
             Schema::table('event_responses', function (Blueprint $table) {
                 $table->dropForeign(['user_id']);
             });
         } catch (\Exception $e) {
-            logger()->warning('Foreign key event_responses_user_id_foreign not found or already dropped.');
+            Log::warning('Foreign key event_responses_user_id_foreign not found or already dropped.');
         }
 
-        // Step 2: Change column type to string
+        // Step 2: Change user_id to string
         Schema::table('event_responses', function (Blueprint $table) {
             $table->string('user_id', 255)->change();
         });
 
-        // Step 3: Re-add foreign key (ensure 'users.id' is string too)
+        // Step 3: Re-add foreign key constraint
         try {
             Schema::table('event_responses', function (Blueprint $table) {
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('user_id')
+                      ->references('id')
+                      ->on('users')
+                      ->onDelete('cascade');
             });
         } catch (\Exception $e) {
-            logger()->warning('Foreign key could not be added. Check if users.id is of type string.');
+            Log::warning('Could not re-add foreign key. Check that users.id is of type string.');
         }
     }
 
     public function down()
     {
-        // Drop foreign key
+        // Step 1: Drop the string FK
         try {
             Schema::table('event_responses', function (Blueprint $table) {
                 $table->dropForeign(['user_id']);
             });
         } catch (\Exception $e) {
-            logger()->warning('Foreign key event_responses_user_id_foreign not found during rollback.');
+            Log::warning('Foreign key not found during rollback.');
         }
 
-        // Revert user_id column to integer
+        // Step 2: Change column back to integer
         Schema::table('event_responses', function (Blueprint $table) {
             $table->integer('user_id')->change();
         });
 
-        // Re-add original foreign key (assuming users.id is integer)
+        // Step 3: Re-add original FK assuming users.id is integer
         try {
             Schema::table('event_responses', function (Blueprint $table) {
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('user_id')
+                      ->references('id')
+                      ->on('users')
+                      ->onDelete('cascade');
             });
         } catch (\Exception $e) {
-            logger()->warning('Could not re-add original foreign key in rollback.');
+            Log::warning('Could not re-add original foreign key in rollback.');
         }
     }
 }

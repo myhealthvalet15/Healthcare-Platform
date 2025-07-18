@@ -42,7 +42,9 @@
                                 <input type="text" id="incident-name" class="form-control" placeholder="Enter Name">
                             </div>
                         </div>
-                        
+                        <div class="row g-4">
+                           
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
@@ -102,37 +104,19 @@
             </div>
          <p>Fetching Incident type...</p> 
         </div>
-
-        <table class="table" id="incidenttable">
+          <table class="table" id="incidenttable" style="display: none;">
             <thead>
                 <tr>
-                    <th>SNO</th>
-                    <th>Incident Name</th>
+                    <th>Factor Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-   <tbody>
-        @foreach ($incident as $key => $item)
-            <tr>
-                <td>{{ $key + 1 }}</td>
-                <td>{{ $item['incident_type_name'] }}</td>
-                <td>
-    <button class="btn btn-sm btn-primary edit-btn" data-id="{{ $item['incident_type_id'] }}" data-name="{{ $item['incident_type_name'] }}">
-        Edit
-    </button>
-    <button class="btn btn-sm btn-danger delete-btn" data-id="{{ $item['incident_type_id'] }}">
-        Delete
-    </button>
-</td>
-            </tr>
-        @endforeach
-    </tbody>
-    </table>
+            <tbody id="incidentbody" class="table-border-bottom-0"></tbody>
+        </table>
     </div>
 </div>
 
 <hr class="my-12">
-<script src="/lib/js/page-scripts/show-incident.js"></script>
+<script src="/lib/js/page-scripts/show-incident.js?v=1"></script>
 
-</script>
 @endsection

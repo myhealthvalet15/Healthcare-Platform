@@ -12,9 +12,7 @@ class IncidentTypeController extends Controller
     {
         $incident = $this->getAllIncidentTypes($request);
         //dd($incident);exit;
-        $incidentData = $incident->getData(true);
-        return view('content.incident.view-incident-type', ['incident' =>  $incidentData['data'] ?? []
-    ]);
+        return view('content.incident.view-incident-type', ['incident' =>  $incident ]);
     }
 
  public function getAllIncidentTypes(Request $request)

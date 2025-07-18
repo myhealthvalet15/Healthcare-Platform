@@ -1,32 +1,19 @@
     const preloader = document.getElementById('preloader');
-    const table = document.getElementById('incident-table');
-    const tbody = document.getElementById('incident-body');
+    const table = document.getElementById('incidenttable');
+    const tbody = document.getElementById('incidentbody');
 
-    const statusSwitch = document.getElementById('status-switch');
-    const statusLabel = document.getElementById('status-label');
-    let activeStatus = '';
-    activeStatus = 'Active';
-    statusSwitch.addEventListener('change', function () {
-        if (statusSwitch.checked) {
-            statusLabel.textContent = 'Active';
-            statusSwitch.classList.add('is-valid');
-            statusSwitch.classList.remove('is-invalid');
-            activeStatus = 'Active';
-        } else {
-            statusLabel.textContent = 'Inactive';
-            statusSwitch.classList.add('is-invalid');
-            statusSwitch.classList.remove('is-valid');
-            activeStatus = 'Inactive';
-        }
-    });
-
-    if (!table || !tbody) {
-        // console.error('Table or tbody not found');
-        return;
-    }
+   if (!table || !tbody) {
+    console.warn('Table or tbody not found');
+    // Removed: return;
+} else {
+    // Place your code here that uses table and tbody
+}
 
     const addincidentButton = document.getElementById('add-new-incident');
+    console.log("checking 1",addincidentButton);
     const incidentNameInput = document.getElementById('incident-name');
+    console.log("checking 1",incidentNameInput);
+
     incidentNameInput.addEventListener('input', () => {
         let errorContainer = incidentNameInput.parentElement.querySelector('.fv-plugins-message-container');
         if (errorContainer) {
@@ -36,6 +23,7 @@
     });
 
     addincidentButton.addEventListener('click', () => {
+        console.log("save the button");
         const incidentName = incidentNameInput.value.trim();
         let errorContainer = incidentNameInput.parentElement.querySelector('.fv-plugins-message-container');
         if (errorContainer) {

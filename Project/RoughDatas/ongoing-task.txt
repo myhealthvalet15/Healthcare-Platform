@@ -1,0 +1,30 @@
+For Creating Single Module which has 4 API`s
+
+Client Side Works.
+1. Blade templating 
+    (Frontend/Client Side) which includes bootstrap, JS
+2. Frontend Server 
+    (Authentication & Authorization, Routes, Middleware Checks, Controller with validations, Making api request to Backend/API Server)
+3. Managing user sessions.
+
+Server Side Works.
+3. Backend/API Server 
+    (Authentication & Authorization, Routes, Middleware Checks, Controller with validations, Accessing Databases)
+4. Creating Migrations for tables
+5. Creating Database Model Source code which helps backend api to talk with database 
+6. Postman API Collection 
+    (Endpoint setup + testsing various scenerious)
+7. Creating Technical Documentations 
+8. Secure coding practices 
+    (data encryption, role-based access, Sanitizing input and following OWASP recommendations (e.g., CSRF, XSS prevention))
+
+
+Overall Security Configurations.
+Maintaining Proper Version Control with frequent git commits with github which helps for new developers to understand the project flow 
+Protection with Best in class cloudfare firewall. 
+Cron jobs, which takes backups daily 8 PM and saving it another server 
+
+Yet more to come
+websockets, External API Integrations
+
+

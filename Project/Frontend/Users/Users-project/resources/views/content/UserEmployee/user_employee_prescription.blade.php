@@ -23,6 +23,7 @@
 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
 @section('content')
+
 <style>
   .highlight-row {
     background-color: #ffeb3b !important;
@@ -257,6 +258,21 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="printModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: rgb(107, 27, 199); color: #fff;">
+        <h5 class="modal-title" id="printModalLabel">Prescription Image</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0 text-center">
+        <img id="prescriptionModalImage" src="" class="img-fluid w-100" style="object-fit: contain; max-height: 80vh;" />
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 
 
@@ -501,18 +517,47 @@ try {
 let firstAttachment = attachments.length > 0 ? attachments[0] : null;
 console.log("Raw prescription_attachments:", rowData.prescription_attachments);
 
-let doctorName = (rowData.doctor_firstname && rowData.doctor_lastname)
-    ? `Dr. ${rowData.doctor_firstname} ${rowData.doctor_lastname}`
-    : 'Self';
 
 let attachmentHTML = '';
 if (firstAttachment) {
   attachmentHTML = `<i class="fa-solid fa-paperclip"onclick="showAttachmentPopup('${firstAttachment}')" style="cursor:pointer;"></i>`;
 }
+let doctorName = (rowData.doctor_firstname && rowData.doctor_lastname)
+    ? `Dr. ${rowData.doctor_firstname} ${rowData.doctor_lastname}`
+    : 'Self';
+
+let hasDoctor = doctorName !== 'Self';
+
+let rightIconsHTML = '';
+if (hasDoctor) {
+  rightIconsHTML = `
+    <a style="color:${hospitalIconColor};cursor: pointer;" onclick="openHospitalPopup(
+      '${rowData.op_registry_id}',
+      '${rowData.body_part_names}',
+      '${rowData.type_of_incident}',
+      '${rowData.registry_doctor_notes}',
+      '${rowData.past_medical_history}',
+      '${rowData.employee_name}',
+      '${rowData.employee_gender}',
+      'Dr. ${rowData.doctor_firstname} ${rowData.doctor_lastname}'
+    )">
+      <i class="fa-solid fa-hospital-user" style="color:#fff;"></i>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a style="color:#000;cursor: pointer;" onclick="openTestPopup('${rowData.op_registry_id}', '${rowData.employee_id}')">
+      <i class="fa-solid fa-flask-vial" style="color:#fff;"></i>
+    </a>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  `;
+}
+
 var additionalRow = `<tr class="additional-info" style="line-height: 35px;background-color: rgb(107, 27, 199); color:#fff;">
   <td colspan="12" style="color:#fff; text-align:center;">
     <div style="display: flex; justify-content: space-between; align-items: center; position: relative;">
-      <span style="flex: 1; text-align: left;"> ${doctorName}  ${attachmentHTML}</span>
+      
+      <span style="flex: 1; text-align: left;"> 
+        ${doctorName} ${attachmentHTML}
+      </span>
       
       <span style="position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;">
         <span style="color: white;">${rowData.master_doctor_id}</span> 
@@ -520,30 +565,15 @@ var additionalRow = `<tr class="additional-info" style="line-height: 35px;backgr
       </span>
       
       <span style="flex: 1; text-align: right; color: white;">
-       <a style="color:${hospitalIconColor};cursor: pointer;" onclick="openHospitalPopup(
-  '${rowData.op_registry_id}',
-  '${rowData.body_part_names}',
-  '${rowData.type_of_incident}',
-  '${rowData.registry_doctor_notes}',
-  '${rowData.past_medical_history}',
-  '${rowData.employee_name}',
-  '${rowData.employee_gender}',
-  'Dr. ${rowData.doctor_firstname} ${rowData.doctor_lastname}'
-)">
- <i class="fa-solid fa-hospital-user" style="color:#fff;"></i></a>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
- <a style="color:#000;cursor: pointer;" onclick="openTestPopup('${rowData.op_registry_id}', '${rowData.employee_id}')">
-    <i class="fa-solid fa-flask-vial"style="color:#fff;" ></i>
-</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                               <a onclick="sendMailPrecription('873')"><i class="fa-solid fa-envelope" style="color:#fff;"></i></a>&nbsp;&nbsp;&nbsp;
-                               ${type1Link}&nbsp;&nbsp;&nbsp;
-                               ${type2Link}&nbsp;&nbsp;&nbsp;
-                         
+        ${rightIconsHTML}
+        <a onclick="sendMailPrecription('873')"><i class="fa-solid fa-envelope" style="color:#fff;"></i></a>&nbsp;&nbsp;&nbsp;
+        ${type1Link}&nbsp;&nbsp;&nbsp;
+        ${type2Link}&nbsp;&nbsp;&nbsp;
       </span>
+
     </div>
   </td>
 </tr>`;
-
 
             var newHeaderRow = `<tr class="new-header-row" style="background-color:rgb(240, 232, 232); color: #333;">
                                 <th>Drug Name - Strength (Type)</th>
@@ -687,23 +717,12 @@ $('#employee-info-display').html(employeeInfo);
   
   });
   
+
 function showAttachmentPopup(imageBase64) {
-    const win = window.open("", "_blank", "width=800,height=600");
-    win.document.write(`
-        <html>
-            <head>
-                <title>Attachment Image</title>
-                <style>
-                    body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
-                    img { max-width: 100%; max-height: 100%; }
-                </style>
-            </head>
-            <body>
-                <img src="${imageBase64}" alt="Attachment" />
-            </body>
-        </html>
-    `);
+  $('#prescriptionModalImage').attr('src', imageBase64);
+  $('#prescriptionModal').modal('show');
 }
+
 
     
 </script>

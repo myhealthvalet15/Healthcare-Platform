@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Hra\Templates\HraTemplate;
 use App\Models\Corporate\HraAssignedTemplate;
 use App\Models\Hra\Templates\HraTemplateQuestions;
+use App\Models\Hra\Questions\HraQuestions;
 use App\Models\Hra\Templates\HraInduvidualAnswer;
 use Illuminate\Support\Facades\DB;
 
@@ -263,7 +264,7 @@ class EmployeeDashboard extends Controller
                     'result' => false,
                     'message' => 'Invalid Request',
                 ], 422);
-            } 
+            }
             foreach ($validated['answers'] as $answer) {
                 $motherId = $answer['question_id'];
                 if (isset($answer['triggers'])) {
@@ -290,7 +291,7 @@ class EmployeeDashboard extends Controller
                             $decoded = json_decode($json, true);
                             return is_array($decoded) ? array_values($decoded) : [];
                         })
-                        ->map(fn($id) => (int) $id)
+                        ->map(fn ($id) => (int) $id)
                         ->values()
                         ->all();
                     foreach ($answer['triggers'] as $trigger) {
@@ -299,6 +300,20 @@ class EmployeeDashboard extends Controller
                                 'result' => false,
                                 'message' => "Trigger question ID {$trigger['question_id']} is not a valid child of mother question ID $motherId.",
                             ], 422);
+                        }
+                    }
+                }
+                $hraQuestion = HraQuestions::where('question_id', $motherId)->first();
+                $calculatedPoints = null;
+                if ($hraQuestion && $hraQuestion->answer && $hraQuestion->points) {
+                    $questionAnswers = json_decode($hraQuestion->answer, true);
+                    $questionPoints = json_decode($hraQuestion->points, true);
+                    if (is_array($questionAnswers) && is_array($questionPoints)) {
+                        foreach ($questionAnswers as $key => $value) {
+                            if ($value === $answer['answer']) {
+                                $calculatedPoints = $questionPoints[$key] ?? null;
+                                break;
+                            }
                         }
                     }
                 }
@@ -313,18 +328,32 @@ class EmployeeDashboard extends Controller
                     'question_id' => $motherId,
                     'trigger_question_of' => null,
                     'answer' => is_array($answer['answer']) ? json_encode($answer['answer']) : $answer['answer'],
-                    'points' => 0,
+                    'points' => $calculatedPoints,
                     'test_results' => null,
                     'question_status' => 1,
                     'reference_question' => 0,
                 ];
                 if ($existingAnswer) {
-                    $existingAnswer->update(['answer' => $answerData['answer']]);
+                    $existingAnswer->update(['answer' => $answerData['answer'], 'points' => $calculatedPoints]);
                 } else {
                     HraInduvidualAnswer::create($answerData);
                 }
                 if (isset($answer['triggers'])) {
                     foreach ($answer['triggers'] as $trigger) {
+                        $triggerHraQuestion = HraQuestions::where('question_id', $trigger['question_id'])->first();
+                        $triggerCalculatedPoints = null;
+                        if ($triggerHraQuestion && $triggerHraQuestion->answer && $triggerHraQuestion->points) {
+                            $triggerQuestionAnswers = json_decode($triggerHraQuestion->answer, true);
+                            $triggerQuestionPoints = json_decode($triggerHraQuestion->points, true);
+                            if (is_array($triggerQuestionAnswers) && is_array($triggerQuestionPoints)) {
+                                foreach ($triggerQuestionAnswers as $key => $value) {
+                                    if ($value === $trigger['answer']) {
+                                        $triggerCalculatedPoints = $triggerQuestionPoints[$key] ?? null;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                         $existingTriggerAnswer = HraInduvidualAnswer::where('template_id', $templateId)
                             ->where('user_id', $request->user_id)
                             ->where('question_id', $trigger['question_id'])
@@ -336,13 +365,13 @@ class EmployeeDashboard extends Controller
                             'question_id' => $trigger['question_id'],
                             'trigger_question_of' => $motherId,
                             'answer' => is_array($trigger['answer']) ? json_encode($trigger['answer']) : $trigger['answer'],
-                            'points' => 0,
+                            'points' => $triggerCalculatedPoints,
                             'test_results' => null,
                             'question_status' => 1,
                             'reference_question' => 0,
                         ];
                         if ($existingTriggerAnswer) {
-                            $existingTriggerAnswer->update(['answer' => $triggerAnswerData['answer']]);
+                            $existingTriggerAnswer->update(['answer' => $triggerAnswerData['answer'], 'points' => $triggerCalculatedPoints]);
                         } else {
                             HraInduvidualAnswer::create($triggerAnswerData);
                         }

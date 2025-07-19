@@ -676,10 +676,12 @@
         </div>
         <div class="hra-header-right">
             <div>
-                <div class="progress-info">Question <span id="progressQuestionCount">0</span> of <span
+                <div class="progress-info">Question <span
+                        id="progressQuestionCount">0</span> of <span
                         id="totalQuestions">0</span> completed</div>
                 <div class="progress">
-                    <div class="progress-bar" id="progressBar" role="progressbar" style="width:0%" aria-valuenow="0"
+                    <div class="progress-bar" id="progressBar"
+                        role="progressbar" style="width:0%" aria-valuenow="0"
                         aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
@@ -688,12 +690,13 @@
     <div class="hra-content">
         <div class="start-hra-container" id="startContainer">
             <h2 class="mb-4">Health Risk Assessment for
-                <?php echo htmlspecialchars($templateDetails['template_name']);
-                ?>
+                {{ htmlspecialchars($templateDetails['template_name']) }}
             </h2>
-            <?php if ($isQuestionsAvailableForThisTemplate == 0): ?>
-            <div class="no-questions-card p-4 text-center" style="background-color: #f8f9fa; border-radius: 12px;">
-                <i class="fas fa-info-circle text-warning mb-3" style="font-size: 2rem;"></i>
+            @if (!$templateDetails['is_questions_available'])
+            <div class="no-questions-card p-4 text-center"
+                style="background-color: #f8f9fa; border-radius: 12px;">
+                <i class="fas fa-info-circle text-warning mb-3"
+                    style="font-size: 2rem;"></i>
                 <h4 class="text-dark">No Questions Assigned</h4>
                 <p class="text-muted mb-0">
                     This assessment template currently has no questions
@@ -702,14 +705,28 @@
                     proceeding.
                 </p>
             </div>
-            <?php else: ?>
-            <p class="lead mb-4">Complete your comprehensive health assessment
-                to understand your health risks and get personalized
-                recommendations.</p>
+            @elseif ($templateDetails['is_hra_overall_results_exists'])
+            <div class="completed-card p-4 text-center"
+                style="background-color: #e2f0e9; border-radius: 12px;">
+                <i class="fas fa-check-circle text-success mb-3"
+                    style="font-size: 2rem;"></i>
+                <h4 class="text-success">Assessment Already Completed</h4>
+                <p class="text-muted mb-0">
+                    You have already completed all the questions for this
+                    template. <br>
+                    Thank you for participating in your health assessment.
+                </p>
+            </div>
+            @else
+            <p class="lead mb-4">
+                Complete your comprehensive health assessment to understand your
+                health risks and get personalized
+                recommendations.
+            </p>
             <button type="button" class="btn start-hra-btn" id="startHRABtn">
                 <i class="fas fa-heartbeat me-2"></i>Start Health Assessment
             </button>
-            <?php endif; ?>
+            @endif
         </div>
         <div class="hra-container position-relative d-none" id="hraContainer">
             <div class="preloader d-none" id="preloader">
@@ -727,7 +744,8 @@
                         <i class="fas fa-exclamation-triangle error-icon"></i>
                         <h4>Unable to Load Questions</h4>
                         <p id="errorMessage"></p>
-                        <button type="button" class="btn btn-primary mt-3" onclick="location.reload()">Try
+                        <button type="button" class="btn btn-primary mt-3"
+                            onclick="location.reload()">Try
                             Again</button>
                     </div>
                 </div>
@@ -742,15 +760,18 @@
                 </div>
             </div>
             <div class="nav-buttons" id="navigationButtons">
-                <button type="button" class="btn btn-outline-secondary" id="prevBtn" disabled><i
+                <button type="button" class="btn btn-outline-secondary"
+                    id="prevBtn" disabled><i
                         class="fas fa-chevron-left me-2"></i>Previous</button>
                 <div class="text-muted">Page <span id="navCurrentPage">1</span>
                     of <span id="navTotalPages">1</span>
                 </div>
                 <div class="nav-right">
-                    <button type="button" class="btn btn-primary" id="savePartiallyBtn"><i
+                    <button type="button" class="btn btn-primary"
+                        id="savePartiallyBtn"><i
                             class="fas fa-save me-2"></i>Save Partially</button>
-                    <button type="button" class="btn btn-primary" id="nextBtn">Next<i
+                    <button type="button" class="btn btn-primary"
+                        id="nextBtn">Next<i
                             class="fas fa-chevron-right ms-2"></i></button>
                 </div>
             </div>
@@ -762,7 +783,8 @@
         <div class="toast-header">
             <i class="fas fa-save text-success me-2"></i>
             <strong class="me-auto">Saved</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            <button type="button" class="btn-close"
+                data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body">Your progress has been saved successfully!</div>
     </div>

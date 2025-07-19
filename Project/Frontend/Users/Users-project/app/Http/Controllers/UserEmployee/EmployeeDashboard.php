@@ -5,6 +5,7 @@ namespace App\Http\Controllers\UserEmployee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeDashboard extends Controller
 {
@@ -81,7 +82,7 @@ class EmployeeDashboard extends Controller
             'template_id' => $templateId,
             'answers' => $validated['answers'],
             'is_partial' => $isPartial,
-        ]); 
+        ]);
         if ($response->successful()) {
             return response()->json(['result' => true, 'data' => $response['data']]);
         }

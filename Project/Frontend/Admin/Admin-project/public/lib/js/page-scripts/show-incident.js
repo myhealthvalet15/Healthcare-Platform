@@ -58,8 +58,10 @@ function addNewincident(incidentName) {
         onSuccess: (responseData) => {
             const modalElement = document.getElementById('addincident');
             const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
-            if (responseData.result === 'success') {
-                showToast(responseData.result, responseData.message);
+            if (responseData.result) {
+                const toastType = responseData.result === true ? 'success' : 'error';
+                const toastMessage = responseData.data || "Operation completed.";
+                showToast(toastType, "Add Incident completed", toastMessage);
                 fetchFactors();
                 bootstrapModal.hide();
                 incidentNameInput.value = '';
@@ -92,7 +94,8 @@ function fetchFactors() {
         url: "/corporate/getAllIncidentTypes",
         method: 'GET',
         onSuccess: (response) => {
-            preloader.style.display = 'none';
+                    preloader.style.display = 'none';
+
             const incidents = response.data;
             if (!Array.isArray(incidents) || incidents.length === 0) {
                 const noDataMessage = document.createElement('tr');
@@ -151,7 +154,9 @@ document.getElementById('edit-incident').addEventListener('click', function () {
     const incidentId = this.getAttribute('data-incident-id');
     const incidentName = document.getElementById('incident_name').value;
 
-    const activeStatus = true; 
+    const activeStatus = true;
+    console.log("Incident ID:", incidentId);
+    console.log("Incident Name:", incidentName);
 
     apiRequest({
         url: `/corporate/editIncidentType/${incidentId}`,
@@ -160,14 +165,20 @@ document.getElementById('edit-incident').addEventListener('click', function () {
                 incident_type_name: incidentName,      
                       },
             onSuccess: (response) => {
-            showToast(response.result, response.message);
+                console.log("toastresponse", response);
+                const toastType = response.result === true ? 'success' : 'error';
+              const toastMessage = response.data || "Operation completed.";
+
+            showToast(toastType, "Edit Incident", toastMessage);
             fetchFactors(); 
             const modalElement = document.getElementById('editincident');
             const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
             bootstrapModal.hide();
         },
         onError: (error) => {
-            showToast('error', error);
+            console.error("Edit error:", error);
+            const toastMessage = error?.data || error?.message || 'Something went wrong.';
+            showToast('error', "Edit Incident Failed", toastMessage);
         }
     });
 });
@@ -191,11 +202,14 @@ document.getElementById('edit-incident').addEventListener('click', function () {
                     url: `/corporate/deleteIncidentType/${incidentId}`,
                     method: 'DELETE',
                     onSuccess: (responseData) => {
-                        if (responseData.result === 'success') {
-                            showToast('success', responseData.message);
+                        console.log("checking the delete",responseData);
+                        if (responseData.result) {
+                             const toastType = responseData.result === true ? 'success' : 'error';
+                             const toastMessage = responseData.data || "Operation completed.";
+                             showToast(toastType, "Delete Incident completed", toastMessage);
                             fetchFactors();
                         } else {
-                            showToast('error', responseData.message || 'Failed to delete the factor.');
+                            showToast('error', responseData.message || 'Failed to delete the incident.');
                         }
                     },
                     onError: (error) => {

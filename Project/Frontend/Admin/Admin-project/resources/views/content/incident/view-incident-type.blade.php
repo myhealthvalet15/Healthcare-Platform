@@ -8,7 +8,6 @@
 @section('vendor-style')
     @vite(['resources/assets/vendor/libs/animate-css/animate.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
 @endsection
-
 <!-- Page Scripts -->
 @section('page-script')
     @vite(['resources/assets/js/ui-modals.js', 'resources/assets/js/questions.js', 'resources/assets/js/extended-ui-sweetalert2.js'])
@@ -73,8 +72,6 @@
                         <div class="row g-4">
                             <div class="col mb-0">
                                 <div class="demo-vertical-spacing">                                   
-                                        <span class="switch-label" id="status-label-edit">Active</span>
-                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -109,6 +106,6 @@
 </div>
 
 <hr class="my-12">
-<script src="/lib/js/page-scripts/show-incident.js?v=12"></script>
+<script src="/lib/js/page-scripts/show-incident.js?v=27"></script>
 
 @endsection

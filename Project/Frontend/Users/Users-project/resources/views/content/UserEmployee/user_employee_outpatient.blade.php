@@ -248,18 +248,14 @@
     border-radius: 0.5rem;
 }
 
-
-
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-CfG4vD60FqN8o8xDhYOYX0+0V+j0ZWB3mkzM5tPpnL3lmUg4x3fPjZblA4YHXmsZRYZFbZ9wQ6s8NlnUZtd4cw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script>
     const employeeId = @json(session('employee_id'));
     const employeeDetailsUrl = @json(route('employee-user-details'));
 </script>
-<script src="{{ asset('Bhava/JS/employee-details.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('Bhava/JS/out_patient.js') }}?v={{ time() }}"></script>
-
-
+<script src="/lib/js/page-scripts/employee-details.js"></script>
+<script src="/lib/js/page-scripts/out_patient.js"></script>
 @endsection
 
 @section('content')

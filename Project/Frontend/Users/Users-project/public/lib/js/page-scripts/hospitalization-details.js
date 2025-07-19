@@ -1,9 +1,4 @@
-  /**
-   * DataTables Basic
-   */
-
   'use strict';
-
   let fv, offCanvasEl;
   let dt_basic;
   document.addEventListener('DOMContentLoaded', function (e) {
@@ -16,12 +11,9 @@
     });
     (function () {
       const formAddNewRecord = document.getElementById('form-add-new-record');
-
       setTimeout(() => {
         const newRecord = document.querySelector('.create-new'),
           offCanvasElement = document.querySelector('#add-new-record');
-
-
         // To open offCanvas, to add new record
         if (newRecord) {
           newRecord.addEventListener('click', function () {
@@ -33,20 +25,17 @@
           });
         }
       }, 200);
-
-
     })();
   });
 
   // datatable (jquery)
   $(function () {
     var dt_basic_table = $('.datatables-basic'),
-      dt_basic;
-
+    dt_basic;
     if (dt_basic_table.length) {  
       dt_basic = dt_basic_table.DataTable({
         ajax: {
-          url: 'https://login-users.hygeiaes.com/UserEmployee/events/getHospitalizationDetails',
+          url: 'https://login-users.hygeiaes.com/UserEmployee/getHospitalizationDetails',
           data: function(d) {
                     // Add date range filters to the request
                     var fromDate = $('#fromDate').val();
@@ -76,7 +65,7 @@
         columns: [
           {
             data: 'invoice_date',
-            title: 'Invoice Date',
+            title: 'Hospitalization Date',
             render: function(data, type, row) {
         let date = new Date(row.invoice_date);
         
@@ -96,7 +85,7 @@
           },
           {
     data: 'vendor_name',
-    title: 'Vendor Name',
+    title: 'Condition',
     render: function(data, type, row) {
         // Check if vendor_name is empty
         if (!data || data.trim() === '') {
@@ -108,47 +97,16 @@
 
           {
             data: 'po_number',
-            title: 'PO Number'
+            title: 'Doctor Name',
           },
           {
             data: 'invoice_number',
-            title: 'Invoice Number'
+            title: 'Hospital Name',
           },
           {
             data: 'invoice_amount',
-            title: 'Invoice Value'
-          },
-          {
-    data: 'invoice_status',
-    title: 'Status',
-    render: function(data, type, row) {
-        switch (data) {
-            case 1:
-                return 'Invoice Received';
-            case 2:
-                return 'OHC Verified';
-            case 3:
-                return 'HR Verified';
-            case 4:
-                return 'SES Entered';
-            case 5:
-                return 'Dept Verified';
-            case 6:
-                return 'SES Released';
-            case 7:
-                return 'Bill Submitted';
-            case 8:
-                return 'Payment Done';
-            case 9:
-                return 'Cash Invoice';
-            case 11:
-                return 'Cash Invoice';  // Custom case for 11
-            default:
-                return data;  // If no match, return the original data
-        }
-    }
-}
-,
+            title: 'Attachments'
+          }, 
 {
     data: null,
     title: 'Actions',

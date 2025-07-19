@@ -19,6 +19,8 @@ use App\Models\OpRegistry;
 use App\Models\Hra\Master_Tests\MasterTest;
 use App\Models\Corporate\MasterUser;
 use App\Models\EventsResponse;
+use App\Models\HospitalizationDetails;
+
 
 
 class EmployeeUserController extends Controller
@@ -731,5 +733,56 @@ public function submitEventResponseByEmployeeId(Request $request)
         ], 500);
     }
 }
- 
+ public function getHospitalizationListByUserId($userId)
+{
+    try {
+        $hospitalizations = HospitalizationDetails::with(['createdBy:id,first_name,last_name'])
+            ->where('user_id', $userId)
+            ->get([
+                'hospitalization_id',
+                'user_id',
+                'hospital_name',
+                'admission_date',
+                'discharge_date',
+                'reason_for_admission',
+                'treatment_details',
+                'created_at',
+                'created_by'
+            ]);
+
+        // Transform result to include doctor's name
+        $hospitalizations = $hospitalizations->map(function ($item) {
+            return [
+                'hospitalization_id'     => $item->hospitalization_id,
+                'user_id'                => $item->user_id,
+                'hospital_name'          => $item->hospital_name,
+                'admission_date'         => $item->admission_date,
+                'discharge_date'         => $item->discharge_date,
+                'reason_for_admission'   => $item->reason_for_admission,
+                'treatment_details'      => $item->treatment_details,
+                'created_at'             => $item->created_at,
+                'doctor_first_name'      => optional($item->createdBy)->first_name,
+                'doctor_last_name'       => optional($item->createdBy)->last_name,
+            ];
+        });
+
+        if ($hospitalizations->isEmpty()) {
+            return response()->json([
+                'result' => false,
+                'message' => 'No hospitalization records found for this user.'
+            ], 404);
+        }
+
+        return response()->json([
+            'result' => true,
+            'data' => $hospitalizations
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'result' => false,
+            'message' => 'An error occurred while fetching hospitalization records.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 }

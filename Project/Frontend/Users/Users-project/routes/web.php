@@ -686,9 +686,10 @@ Route::middleware([Authcheck::class])->group(function () {
 
 
     //Hospitalization
-    Route::get('/UserEmployee/hospitalization/add', [EmployeeUserController::class, 'addHospitalization'])->name('employee-hospitalization-add');
-    Route::post('/UserEmployee/hospitalization/store', [EmployeeUserController::class, 'storeHospitalization'])->name('employee-hospitalization-store');
-    Route::get('/UserEmployee/hospitalization/list', [EmployeeUserController::class, 'hospitalization'])->name('hospitalization');   
+    Route::get('/UserEmployee/add', [EmployeeUserController::class, 'addHospitalization'])->name('employee-hospitalization-add');
+    Route::post('/UserEmployee/store', [EmployeeUserController::class, 'storeHospitalization'])->name('employee-hospitalization-store');
+    Route::get('/UserEmployee/list', [EmployeeUserController::class, 'hospitalization'])->name('hospitalization');   
+    Route::get('/UserEmployee/getHospitalizationDetails', [EmployeeUserController::class, 'getHospitalizationDetails'])->name('getHospitalizationDetails');   
 
 
     Route::get('/UserEmployee/dashboard/templates/getAllAssignedTemplates', [EmployeeDashboard::class, 'getAllAssignedTemplates']);

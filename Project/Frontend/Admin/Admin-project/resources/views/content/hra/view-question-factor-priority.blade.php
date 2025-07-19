@@ -232,20 +232,18 @@
             const maxValue = combinedQuestions.reduce((total, question) => {
                 if (!question.points) return total;
                 const points = JSON.parse(question.points.replace(/\\/g, ''));
-                const lastValue = Number(Object.values(points).at(-1) || 0);
-                return total + lastValue;
+                const pointValues = Object.values(points).map(p => Number(p));
+                const maxPositiveValue = Math.max(...pointValues.filter(value => value > 0), 0);
+                return total + maxPositiveValue;
             }, 0);
-            let highestNegative = 0;
             const factorAdjustValue = combinedQuestions.reduce((total, question) => {
                 if (!question.points) return total;
                 const points = JSON.parse(question.points.replace(/\\/g, ''));
-                const firstValue = Number(Object.values(points)[0] || 0);
-                if (firstValue < 0 && Math.abs(firstValue) > Math.abs(highestNegative)) {
-                    highestNegative = firstValue;
-                }
-                return firstValue > 0 ? total + firstValue : total;
-            }, 0) + Math.abs(highestNegative);
-            return { maxValue, factorAdjustValue };
+                const pointValues = Object.values(points).map(p => Number(p));
+                const minValue = Math.min(...pointValues);
+                return total + minValue;
+            }, 0);
+            return { maxValue, factorAdjustValue: Math.abs(factorAdjustValue) };
         }
         function createQuestionListItem(question, priority, templateId, factorData) {
             const listItem = document.createElement('div');

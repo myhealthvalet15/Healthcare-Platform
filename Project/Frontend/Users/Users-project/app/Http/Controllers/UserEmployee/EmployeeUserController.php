@@ -392,6 +392,26 @@ class EmployeeUserController extends Controller
         $headerData = 'Hospitalization List';
         return view('content.UserEmployee.user_hospitalization', ['HeaderData' => $headerData]);
     }
+    public function getHospitalizationDetails(Request $request)
+    {
+       // return 'Hi';
+        $user_id = session('master_user_user_id');
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getHospitalizationList/' . $user_id);
+            
+            if ($response->successful()) {
+                return response()->json(['result' => true, 'data' => $response['data']]);
+            } else {
+                return response()->json(['result' => false, 'message' => 'Failed to fetch hospitalization list'], $response->status());
+            }
+        } catch (\Exception $e) {
+            return response()->json(['result' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
 
    
 }

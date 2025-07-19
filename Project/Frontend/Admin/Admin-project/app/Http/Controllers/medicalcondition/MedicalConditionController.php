@@ -1,19 +1,18 @@
 <?php
 
 namespace App\Http\Controllers\medicalcondition;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
-
 class MedicalConditionController extends Controller
-{  
-     
+{
     public function medicalcondition(Request $request)
     {
         $medical_condition = $this->getAllMedicalCondition($request);
         return view('content.medicalcondition.medical_condition', ['medical_condition' => $medical_condition]);
-        
+
     }
     public function getAllMedicalCondition(Request $request)
     {
@@ -24,7 +23,7 @@ class MedicalConditionController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
                 ])->get('https://api-admin.hygeiaes.com/V1/medicalcondition-stubs/medicalcondition-stubs/getAllMedicalCondition');
-            
+
             if ($response->status() === 401) {
                 return response()->json(['result' => 'error', 'message' => 'Unauthenticated'], 401);
             }
@@ -51,14 +50,10 @@ class MedicalConditionController extends Controller
                 'condition_name' => $validated['condition_name'],
                 'status' => $validated['status'],
             ]);
-            if ($response->status() === 401) {
-                return response()->json(['result' => 'error','message' => 'Unauthenticated'], 401);
-            }
-            if ($response->successful()) {
-                return response()->json(['result' => 'success', 'message' => 'Medical condition added successfully']);
-            } else {
-                return response()->json(['result' => 'error', 'message' => 'error to medical condition', 'details' => $response->body()]);
-            }
+            return response()->json([
+                'result' => $response['result'],
+                'message' => $response['message']
+            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'result' => 'error',
@@ -80,27 +75,18 @@ class MedicalConditionController extends Controller
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                  'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-                 
-            ])->put("https://api-admin.hygeiaes.com/V1/medicalcondition-stubs/medicalcondition-stubs/editMedicalCondition/{$id}",
-             [
+
+            ])->put(
+                "https://api-admin.hygeiaes.com/V1/medicalcondition-stubs/medicalcondition-stubs/editMedicalCondition/{$id}",
+                [
                 'condition_name' => $validated['condition_name'],
                 'status' => $validated['status']
+            ]
+            );
+            return response()->json([
+                'result' => $response['result'],
+                'message' => $response['message']
             ]);
-            if ($response->status() === 401) {
-                return response()->json(['result' => 'error', 'message' => 'Unauthenticated'], 401);
-            }
-            if ($response->successful()) {
-                return response()->json([
-                    'result' => 'success',
-                    'message' => 'Medical Condition updated successfully'
-                ]);
-            } else {
-                return response()->json([
-                    'result' => 'error',
-                    'message' => 'error to update medical condition',
-                    'details' => $response->body()
-                ]);
-            }
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'result' => 'error',
@@ -136,5 +122,5 @@ class MedicalConditionController extends Controller
         }
     }
 
-   
+
 }

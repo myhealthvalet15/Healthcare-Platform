@@ -109,6 +109,6 @@
 </div>
 
 <hr class="my-12">
-<script src="/lib/js/page-scripts/show-incident.js?v=11"></script>
+<script src="/lib/js/page-scripts/show-incident.js?v=12"></script>
 
 @endsection

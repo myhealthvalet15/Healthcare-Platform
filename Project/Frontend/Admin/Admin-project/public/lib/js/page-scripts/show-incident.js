@@ -92,7 +92,7 @@ function fetchFactors() {
         url: "/corporate/getAllIncidentTypes",
         method: 'GET',
         onSuccess: (response) => {
-
+            preloader.style.display = 'none';
             const incidents = response.data;
             if (!Array.isArray(incidents) || incidents.length === 0) {
                 const noDataMessage = document.createElement('tr');
@@ -107,11 +107,8 @@ function fetchFactors() {
                 const row = document.createElement('tr');
                 const incidentNameCell = document.createElement('td');
                 incidentNameCell.textContent = incident.incident_type_name;
-                row.appendChild(incidentNameCell);
-
-                
+                row.appendChild(incidentNameCell);                
                 const actionsCell = document.createElement('td');
-
                 const editIcon = document.createElement('i');
                 editIcon.classList.add('ti', 'ti-pencil', 'me-3', 'cursor-pointer');
                 editIcon.setAttribute('title', 'Edit');

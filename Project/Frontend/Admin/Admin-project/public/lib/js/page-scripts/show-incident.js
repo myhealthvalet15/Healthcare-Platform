@@ -91,10 +91,10 @@ function fetchFactors() {
     apiRequest({
         url: "/corporate/getAllIncidentTypes",
         method: 'GET',
-        onSuccess: (data) => {
-            console.log("checking the source");
-            preloader.style.display = 'none';
-            if (!data || !Array.isArray(data) || data.length === 0) {
+        onSuccess: (response) => {
+
+            const incidents = response.data;
+            if (!Array.isArray(incidents) || incidents.length === 0) {
                 const noDataMessage = document.createElement('tr');
                 noDataMessage.innerHTML = `
                     <td colspan="3" class="text-center">No incident available.</td>`;
@@ -103,11 +103,10 @@ function fetchFactors() {
                 return;
             }
             table.style.display = 'table';
-            data.forEach(incident => {
+            incidents.forEach(incident => {
                 const row = document.createElement('tr');
-
                 const incidentNameCell = document.createElement('td');
-                incidentNameCell.textContent = incident.incident_name;
+                incidentNameCell.textContent = incident.incident_type_name;
                 row.appendChild(incidentNameCell);
 
                 
@@ -117,7 +116,7 @@ function fetchFactors() {
                 editIcon.classList.add('ti', 'ti-pencil', 'me-3', 'cursor-pointer');
                 editIcon.setAttribute('title', 'Edit');
                 editIcon.addEventListener('click', () => {
-                    editincident(incident.incident_name, incident.incident_id);
+                    editincident(incident.incident_type_name, incident.incident_type_id);
                 });
                 actionsCell.appendChild(editIcon);
 
@@ -125,7 +124,7 @@ function fetchFactors() {
                 deleteIcon.classList.add('ti', 'ti-trash', 'cursor-pointer');
                 deleteIcon.setAttribute('title', 'Delete');
                 deleteIcon.addEventListener('click', () => {
-                    deleteFactor(incident.incident_id);
+                    deleteincident(incident.incident_type_id);
                 });
                 actionsCell.appendChild(deleteIcon);
 
@@ -140,41 +139,77 @@ function fetchFactors() {
     });
 }
 
-function editFactor(incidentName, incidentId) {
+function editincident(incidentName, incidentId) {
     document.getElementById('incident_name').value = incidentName;
 
+    const saveButton = document.getElementById('edit-incident');
+    saveButton.setAttribute('data-incident-id', incidentId);
 
-    document.getElementById('edit-factor').setAttribute('data-factor-id', factorId);
     const modalElement = document.getElementById('editincident');
     const bootstrapModal = new bootstrap.Modal(modalElement);
     bootstrapModal.show();
+}
 
-    const editincidentButton = document.getElementById('edit-incident');
-    editincidentButton.replaceWith(editincidentButton.cloneNode(true));
-    const newEditincidentButton = document.getElementById('incident-factor');
+document.getElementById('edit-incident').addEventListener('click', function () {
+    const incidentId = this.getAttribute('data-incident-id');
+    const incidentName = document.getElementById('incident_name').value;
 
-    newEditFactorButton.addEventListener('click', function () {
-        const incidentId = this.getAttribute('data-incident-id');
-        const incidentName = document.getElementById('incident_name').value;
+    const activeStatus = true; 
 
-        apiRequest({
-            url: `/corporate/editincidenttype/${factorId}`,
-            method: 'PUT',
-            data: { factor_name: factorName, active_status: activeStatus },
+    apiRequest({
+        url: `/corporate/editIncidentType/${incidentId}`,
+        method: 'POST',
+        data: {
+                incident_type_name: incidentName,      
+                      },
             onSuccess: (response) => {
-                showToast(response.result, response.message);
-                fetchFactors();
-                const modalElement = document.getElementById('editincident');
-                const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
-                bootstrapModal.hide();
+            showToast(response.result, response.message);
+            fetchFactors(); 
+            const modalElement = document.getElementById('editincident');
+            const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+            bootstrapModal.hide();
+        },
+        onError: (error) => {
+            showToast('error', error);
+        }
+    });
+});
+    function deleteincident(incidentId) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you really want to delete this factor? This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'btn btn-primary me-3',
+                cancelButton: 'btn btn-secondary'
             },
-            onError: (error) => {
-                showToast('error', error);
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                apiRequest({
+                    url: `/corporate/deleteIncidentType/${incidentId}`,
+                    method: 'DELETE',
+                    onSuccess: (responseData) => {
+                        if (responseData.result === 'success') {
+                            showToast('success', responseData.message);
+                            fetchFactors();
+                        } else {
+                            showToast('error', responseData.message || 'Failed to delete the factor.');
+                        }
+                    },
+                    onError: (error) => {
+                        showToast('error', error || 'Something went wrong. Please try again later.');
+                    }
+                });
             }
         });
+    }
+   
 
+       
 
-    });
-
-}
 

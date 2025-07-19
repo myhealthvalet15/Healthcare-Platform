@@ -684,6 +684,13 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/UserEmployee/events/submitResponse', [EmployeeUserController::class, 'submitResponse'])->name('submitResponse');
     Route::get('/UserEmployee/events/getEventFromEmail', [EmployeeUserController::class, 'getEventFromEmail'])->name('getEventFromEmail');
 
+
+    //Hospitalization
+    Route::get('/UserEmployee/hospitalization/add', [EmployeeUserController::class, 'addHospitalization'])->name('employee-hospitalization-add');
+    Route::post('/UserEmployee/hospitalization/store', [EmployeeUserController::class, 'storeHospitalization'])->name('employee-hospitalization-store');
+    Route::get('/UserEmployee/hospitalization/list', [EmployeeUserController::class, 'hospitalization'])->name('hospitalization');   
+
+
     Route::get('/UserEmployee/dashboard/templates/getAllAssignedTemplates', [EmployeeDashboard::class, 'getAllAssignedTemplates']);
     Route::get('/UserEmployee/dashboard/templates/hra-questionaire/template/{template_id}', [EmployeeDashboard::class, 'displayHraQuestionaireTemplate'])->name('hra-questionaire-template');
     Route::get('/UserEmployee/dashboard/templates/getTemplateQuestions/{templateId}', [EmployeeDashboard::class, 'getTemplateQuestions']);

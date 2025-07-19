@@ -72,15 +72,7 @@
                         </div>
                         <div class="row g-4">
                             <div class="col mb-0">
-                                <label for="emailBasic" class="form-label">Status</label>
-                                <div class="demo-vertical-spacing">
-                                    <label class="switch">
-                                        <input type="checkbox" class="switch-input" id="status_switch_edit"
-                                            checked="true">
-                                        <span class="switch-toggle-slider">
-                                            <span class="switch-on"></span>
-                                            <span class="switch-off"></span>
-                                        </span>
+                                <div class="demo-vertical-spacing">                                   
                                         <span class="switch-label" id="status-label-edit">Active</span>
                                     </label>
                                 </div>
@@ -107,7 +99,7 @@
           <table class="table" id="incidenttable" style="display: none;">
             <thead>
                 <tr>
-                    <th>Factor Name</th>
+                    <th>Incident Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -117,6 +109,6 @@
 </div>
 
 <hr class="my-12">
-<script src="/lib/js/page-scripts/show-incident.js?v=1"></script>
+<script src="/lib/js/page-scripts/show-incident.js?v=11"></script>
 
 @endsection

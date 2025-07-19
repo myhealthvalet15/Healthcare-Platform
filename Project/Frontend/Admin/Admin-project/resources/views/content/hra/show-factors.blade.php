@@ -1,33 +1,23 @@
 @extends('layouts/layoutMaster')
-
 @section('title', 'HRA - Factors')
-
 @section('content')
-
-    <!-- Vendor Styles -->
 @section('vendor-style')
-    @vite(['resources/assets/vendor/libs/animate-css/animate.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
+@vite(['resources/assets/vendor/libs/animate-css/animate.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
 @endsection
-
-<!-- Page Scripts -->
 @section('page-script')
-    @vite(['resources/assets/js/ui-modals.js', 'resources/assets/js/questions.js', 'resources/assets/js/extended-ui-sweetalert2.js'])
+@vite(['resources/assets/js/ui-modals.js', 'resources/assets/js/questions.js',
+'resources/assets/js/extended-ui-sweetalert2.js'])
 @endsection
-
-<!-- Vendor Script -->
 @section('vendor-script')
-    @vite(['resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
+@vite(['resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
-
-<!-- Basic Bootstrap Table -->
 <div class="card">
     <div class="d-flex justify-content-between align-items-center card-header">
         <h5 class="mb-0">Factors Available</h5>
-
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFactor">
             <i class="ti ti-plus me-1"></i> Add Factor
         </button>
-        <!-- Add Modal -->
         <div class="modal fade" id="addFactor" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -67,8 +57,6 @@
                 </div>
             </div>
         </div>
-        <!-- Modal End -->
-        <!-- Edit Modal -->
         <div class="modal fade" id="editFactor" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -108,7 +96,6 @@
                 </div>
             </div>
         </div>
-        <!-- Modal Ends -->
     </div>
     <div class="table-responsive text-nowrap">
         <div id="preloader" class="text-center py-4">
@@ -117,7 +104,6 @@
             </div>
             <p>Fetching Factors...</p>
         </div>
-
         <table class="table" id="factors-table" style="display: none;">
             <thead>
                 <tr>
@@ -130,7 +116,6 @@
         </table>
     </div>
 </div>
-
 <hr class="my-12">
 <script src="/lib/js/page-scripts/show-factors.js"></script>
 </script>

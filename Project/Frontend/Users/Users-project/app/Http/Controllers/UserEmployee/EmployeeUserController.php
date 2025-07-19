@@ -388,5 +388,10 @@ class EmployeeUserController extends Controller
     return view('content.UserEmployee.user_employee_event_response', compact('eventId', 'userId'));
         }
 
+    public function hospitalization(){
+        $headerData = 'Hospitalization List';
+        return view('content.UserEmployee.user_hospitalization', ['HeaderData' => $headerData]);
+    }
+
    
 }

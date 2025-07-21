@@ -53,7 +53,7 @@ class EmployeeDashboard extends Controller
             })->map(function ($t) use ($templateModels) {
                 $template = $templateModels[$t->template_id] ?? null;
                 return $template ? [
-                    'template_id'   => $template->template_id,
+                    'template_id' => $template->template_id,
                     'template_name' => $template->template_name
                 ] : null;
             })->filter()->values()->all();
@@ -255,146 +255,95 @@ class EmployeeDashboard extends Controller
             $userId = $request->user_id;
             $questions = HraTemplateQuestions::where('template_id', $templateId)->get();
             $validQuestionIds = $questions->flatMap(function ($q) {
-                $ids = [(int)$q->question_id];
+                $ids = [(int) $q->question_id];
                 for ($i = 1; $i <= 8; $i++) {
-                    if ($q->{"trigger_$i"}) {
-                        $decoded = json_decode($q->{"trigger_$i"}, true);
-                        if (is_array($decoded)) {
-                            $ids = array_merge($ids, array_map('intval', array_values($decoded)));
-                        }
+                    $trigger = $q->{"trigger_$i"};
+                    if ($trigger && is_array($decoded = json_decode($trigger, true))) {
+                        $ids = array_merge($ids, array_map('intval', $decoded));
                     }
                 }
                 return $ids;
             })->unique()->values()->all();
-            $submittedIds = $answers->flatMap(function ($a) {
-                $ids = [$a['question_id']];
-                if (isset($a['triggers'])) {
-                    $ids = array_merge($ids, collect($a['triggers'])->pluck('question_id')->all());
+            $submittedIds = $answers->flatMap(function ($answer) {
+                $ids = [$answer['question_id']];
+                if (!empty($answer['triggers'])) {
+                    $ids = array_merge($ids, collect($answer['triggers'])->pluck('question_id')->all());
                 }
                 return $ids;
             })->unique()->values()->all();
             $invalidIds = array_diff($submittedIds, $validQuestionIds);
-            if ($invalidIds) {
+            if (!empty($invalidIds)) {
                 return response()->json(['result' => false, 'data' => 'Invalid Request'], 422);
             }
-            $allNeededIds = $submittedIds;
-            $hraQuestions = HraQuestions::whereIn('question_id', $allNeededIds)
+            $hraQuestions = HraQuestions::whereIn('question_id', $submittedIds)
                 ->get(['question_id', 'answer', 'points'])
                 ->keyBy('question_id');
+            $templateQuestionFactors = HraTemplateQuestions::where('template_id', $templateId)
+                ->pluck('factor_id', 'question_id');
             DB::beginTransaction();
-            if (! $validated['is_partial']) {
-                $actualPoints = 0;
-                $factorAdjustmentValue = [];
-                $corporateTemplateId = 0; // TODO:
-                $hraTemplateId = $templateId;
+            $actualPoints = 0;
+            if (!$validated['is_partial']) {
                 $corporateId = $request->corporate_id;
                 $locationId = $request->location_id;
+                $designation = $request->designation;
                 $hl1 = EmployeeUserMapping::where('user_id', $userId)
                     ->where('corporate_id', $corporateId)
                     ->where('location_id', $locationId)
                     ->value('hl1_id');
-                $designation = $request->designation;
-                $completedDate = now(); // TODO:
-                $resultText = 'Answers saved successfully.'; // TODO:
+                $completedDate = now();
+                $resultText = 'Answers saved successfully.';
             }
             foreach ($answers as $answer) {
                 $motherId = $answer['question_id'];
-                $mainHraQ = $hraQuestions[$motherId] ?? null;
-                $mainPts = null;
-                if ($mainHraQ) {
-                    $answerArr = json_decode($mainHraQ->answer, true);
-                    $pointsArr = json_decode($mainHraQ->points, true);
-                    if (is_array($answerArr) && is_array($pointsArr)) {
-                        $idx = array_search($answer['answer'], $answerArr, true);
-                        if ($idx !== false && isset($pointsArr[$idx])) {
-                            $mainPts = $pointsArr[$idx];
-                        }
-                    }
-                }
-                $actualPoints += $mainPts ?? 0;
-                $mainRecord = [
-                    'template_id' => $templateId,
-                    'user_id' => $userId,
-                    'question_id' => $motherId,
-                    'trigger_question_of' => null,
-                    'answer' => is_array($answer['answer']) ? json_encode($answer['answer']) : $answer['answer'],
-                    'points' => $mainPts,
-                    'test_results' => null,
-                    'question_status' => 1,
-                    'reference_question' => 0,
-                ];
-                HraInduvidualAnswer::updateOrCreate(
-                    [
-                        'template_id' => $templateId,
-                        'user_id' => $userId,
-                        'question_id' => $motherId,
-                        'trigger_question_of' => null
-                    ],
-                    $mainRecord
+                $mainPoints = $this->getAnswerPoints($hraQuestions[$motherId] ?? null, $answer['answer']);
+                $actualPoints += $mainPoints;
+                $this->saveAnswerRecord(
+                    $templateId,
+                    $userId,
+                    $motherId,
+                    null,
+                    $answer['answer'],
+                    $mainPoints,
+                    $templateQuestionFactors[$motherId] ?? 0
                 );
                 if (!empty($answer['triggers'])) {
                     foreach ($answer['triggers'] as $trigger) {
                         $triggerId = $trigger['question_id'];
-                        $triggerQ = $hraQuestions[$triggerId] ?? null;
-                        $triggerPts = null;
-                        if ($triggerQ) {
-                            $answerArr = json_decode($triggerQ->answer, true);
-                            $pointsArr = json_decode($triggerQ->points, true);
-                            if (is_array($answerArr) && is_array($pointsArr)) {
-                                $idx = array_search($trigger['answer'], $answerArr, true);
-                                if ($idx !== false && isset($pointsArr[$idx])) {
-                                    $triggerPts = $pointsArr[$idx];
-                                }
-                            }
-                        }
-                        $actualPoints += $triggerPts ?? 0;
-                        $triggerRecord = [
-                            'template_id' => $templateId,
-                            'user_id' => $userId,
-                            'question_id' => $triggerId,
-                            'trigger_question_of' => $motherId,
-                            'answer' => is_array($trigger['answer']) ? json_encode($trigger['answer']) : $trigger['answer'],
-                            'points' => $triggerPts,
-                            'test_results' => null,
-                            'question_status' => 1,
-                            'reference_question' => 0,
-                        ];
-                        HraInduvidualAnswer::updateOrCreate(
-                            [
-                                'template_id' => $templateId,
-                                'user_id' => $userId,
-                                'question_id' => $triggerId,
-                                'trigger_question_of' => $motherId
-                            ],
-                            $triggerRecord
+                        $triggerPoints = $this->getAnswerPoints($hraQuestions[$triggerId] ?? null, $trigger['answer']);
+                        $actualPoints += $triggerPoints;
+                        $this->saveAnswerRecord(
+                            $templateId,
+                            $userId,
+                            $triggerId,
+                            $motherId,
+                            $trigger['answer'],
+                            $triggerPoints,
+                            $templateQuestionFactors[$triggerId] ?? 0
                         );
                     }
                 }
             }
-            if (! $validated['is_partial'] && $actualPoints !== 0) {
-                $templateAdjustmentValue = $this->findTotalAdjustmentValue($templateId);
-                $maximumValue = $this->findMaximumValue($templateId);
-                if ($templateAdjustmentValue === null) {
-                    $obtainedPoints = $actualPoints;
-                } else {
-                    $obtainedPoints = $actualPoints + $templateAdjustmentValue;
-                }
-                $healthIndex = round(($obtainedPoints / ($maximumValue + $templateAdjustmentValue)) * 100, 2);
-                $factorScore = 0;
-                $isHraOverallResultsExists = HraOverallResult::where('user_id', $userId)
-                    ->where('hra_template_id', $hraTemplateId)
-                    ->exists();
-                if ($isHraOverallResultsExists) {
+            if (!$validated['is_partial'] && $actualPoints !== 0) {
+                $adjustment = $this->findAdjustmentValue($templateId);
+                $maxValue = $this->findMaximumValue($templateId);
+                $obtainedPoints = $actualPoints + ($adjustment ?? 0);
+                $healthIndex = round(($obtainedPoints / ($maxValue + $adjustment)) * 100, 2);
+                $factorScore = $this->getFactorWiseScore($templateId, $userId);
+                $exists = HraOverallResult::where([
+                    'user_id' => $userId,
+                    'hra_template_id' => $templateId,
+                ])->exists();
+                if ($exists) {
                     return response()->json([
                         'result' => false,
-                        'data' => 'HRA result already exists for this user and template.'
+                        'data' => 'HRA result already exists for this user and template.',
                     ], 422);
                 }
-                $hraOverallResult = HraOverallResult::updateOrCreate(
+                HraOverallResult::updateOrCreate(
                     [
                         'user_id' => $userId,
                         'corporate_template_id' => 0,
-                        'hra_template_id' => $hraTemplateId,
+                        'hra_template_id' => $templateId,
                         'corporate_id' => $corporateId,
                         'location_id' => $locationId,
                         'hl1' => $hl1,
@@ -405,7 +354,7 @@ class EmployeeDashboard extends Controller
                         'obtained_points' => $obtainedPoints,
                         'actual_points' => $actualPoints,
                         'health_index' => $healthIndex,
-                        'factor_score' => $factorScore,
+                        'factor_score' => json_encode($factorScore),
                         'result_text' => $resultText,
                     ]
                 );
@@ -417,17 +366,57 @@ class EmployeeDashboard extends Controller
             return response()->json([
                 'result' => false,
                 'data' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
-    private function findTotalAdjustmentValue($templateId)
+    private function getAnswerPoints($question, $userAnswer)
     {
-        $points = HraTemplateQuestions::where('hra_template_questions.template_id', $templateId)
+        if (!$question) {
+            return 0;
+        }
+        $answerArr = json_decode($question->answer, true);
+        $pointsArr = json_decode($question->points, true);
+        if (is_array($answerArr) && is_array($pointsArr)) {
+            $index = array_search($userAnswer, $answerArr, true);
+            if ($index !== false && isset($pointsArr[$index])) {
+                return $pointsArr[$index];
+            }
+        }
+        return 0;
+    }
+    private function saveAnswerRecord($templateId, $userId, $questionId, $triggerOf, $answer, $points, $factorId = 0)
+    {
+        HraInduvidualAnswer::updateOrCreate(
+            [
+                'template_id' => $templateId,
+                'user_id' => $userId,
+                'question_id' => $questionId,
+                'trigger_question_of' => $triggerOf,
+            ],
+            [
+                'factor_id' => $factorId,
+                'template_id' => $templateId,
+                'user_id' => $userId,
+                'question_id' => $questionId,
+                'trigger_question_of' => $triggerOf,
+                'answer' => is_array($answer) ? json_encode($answer) : $answer,
+                'points' => $points,
+                'test_results' => null,
+                'question_status' => 1,
+                'reference_question' => 0,
+            ]
+        );
+    }
+    private function findAdjustmentValue($templateId, $factorId = null)
+    {
+        $query = HraTemplateQuestions::where('hra_template_questions.template_id', $templateId)
             ->join('hra_question', 'hra_template_questions.question_id', '=', 'hra_question.question_id')
-            ->whereNotNull('hra_question.points')
-            ->pluck('hra_question.points')
-            ->toArray();
+            ->whereNotNull('hra_question.points');
+        if (!is_null($factorId)) {
+            $query->whereIn('hra_template_questions.factor_id', (array) $factorId);
+        }
+        $points = $query->pluck('hra_question.points')->toArray();
         if (empty($points)) {
             return 0;
         }
@@ -449,32 +438,71 @@ class EmployeeDashboard extends Controller
         $total = array_sum($minValues);
         return abs((int) $total);
     }
-    private function findMaximumValue($templateId)
+    private function findMaximumValue($templateId, $factorId = null)
     {
-        $points = HraTemplateQuestions::where('hra_template_questions.template_id', $templateId)
+        $query = HraTemplateQuestions::where('hra_template_questions.template_id', $templateId)
             ->join('hra_question', 'hra_template_questions.question_id', '=', 'hra_question.question_id')
-            ->whereNotNull('hra_question.points')
-            ->pluck('hra_question.points')
-            ->toArray();
+            ->whereNotNull('hra_question.points');
+        if (!is_null($factorId)) {
+            $query->whereIn('hra_template_questions.factor_id', (array) $factorId);
+        }
+        $points = $query->pluck('hra_question.points')->toArray();
         if (empty($points)) {
             return 0;
         }
-        $minValues = [];
+        $maxValues = [];
         foreach ($points as $point) {
             if (is_string($point)) {
                 $decoded = json_decode($point, true);
                 if (is_array($decoded)) {
-                    $minFromQuestion = max(array_values($decoded));
-                    $minValues[] = $minFromQuestion;
+                    $maxFromQuestion = max(array_values($decoded));
+                    $maxValues[] = $maxFromQuestion;
                 }
             } elseif (is_numeric($point)) {
-                $minValues[] = $point;
+                $maxValues[] = $point;
             }
         }
-        if (empty($minValues)) {
+        if (empty($maxValues)) {
             return 0;
         }
-        $total = array_sum($minValues);
+        $total = array_sum($maxValues);
         return abs((int) $total);
+    }
+    private function getFactorWiseScore($templateId = null, $userId = null)
+    {
+        $factorData = $this->getFactorWiseTotalPoints($templateId, $userId);
+        $factorPointsArray = $factorData['factorPoints'];
+        $factorIds = $factorData['factorIds'];
+        $scores = [];
+        foreach ($factorIds as $factorId) {
+            $totalPoints = $factorPointsArray[$factorId];
+            $factorMax = $this->findMaximumValue($templateId, $factorId);
+            $factorAdjustment = $this->findAdjustmentValue($templateId, $factorId);
+            $adjustedPoints = $totalPoints + $factorAdjustment;
+            $denominator = $factorMax + $factorAdjustment;
+            $score = $denominator > 0 ? round(($adjustedPoints / $denominator) * 100, 2) : 0;
+            $scores[$factorId] = $score;
+        }
+        return $scores;
+    }
+    private function getFactorWiseTotalPoints($templateId, $userId)
+    {
+        $factorWiseTotalPoints = HraInduvidualAnswer::where('template_id', $templateId)
+            ->where('user_id', $userId)
+            ->get()
+            ->groupBy('factor_id');
+        $factorPoints = [];
+        $factorIds = [];
+        foreach ($factorWiseTotalPoints as $factorId => $questions) {
+            $sum = $questions->sum(function ($q) {
+                return is_numeric($q->points) ? $q->points : 0;
+            });
+            $factorPoints[$factorId] = $sum;
+            $factorIds[] = $factorId;
+        }
+        return [
+            'factorPoints' => $factorPoints,
+            'factorIds' => $factorIds,
+        ];
     }
 }

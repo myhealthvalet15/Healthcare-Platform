@@ -1196,6 +1196,7 @@ row.appendChild(createCell(bodySystemCell));
         document.body.appendChild(modalContainer);
     }
     function populateReferralModal(entry) {
+        console.log(entry);
         document.getElementById('outsideReferralModalLabel').textContent = 'Outside Referral Details';
         document.getElementById('employeeName').textContent = entry.employee_name || 'N/A';
         const referral = entry.outside_referral || {};

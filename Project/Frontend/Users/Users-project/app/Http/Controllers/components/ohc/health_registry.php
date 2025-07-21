@@ -571,4 +571,39 @@ class health_registry extends Controller
             return response()->json(['result' => false, 'message' => 'Internal Server Error'], 500);
         }
     }
+   public function updateHospitalizationDetails(Request $request)
+{
+    $headerData = 'Hospitalization Details';
+
+    return view('content.components.ohc.health-registry.hospitalization-details', [
+        'HeaderData' => $headerData,
+        'employee_id' => $request->employee_id,
+        'hospital_name' => $request->hospital_name
+    ]);
+}
+ public function getemployeeDetailsByEmployeeId(Request $request)
+    {
+     // return $request;
+
+      $employeeId = $request->employee_id; 
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getEmployeesDetailById/' . $employeeId);
+            return $response; 
+            if ($response->successful()) {
+                $employee_details = $response->json();
+                return response()->json($employee_details);
+            } else {
+                return response()->json(['error' => 'An error occurred while fetching data'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
 }

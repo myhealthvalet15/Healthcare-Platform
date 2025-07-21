@@ -1611,39 +1611,75 @@
         modalFooter.appendChild(viewButton);
         document.body.appendChild(modalContainer);
     }
-    function populateReferralModal(entry) {
-        document.getElementById('outsideReferralModalLabel').textContent = 'Outside Referral Details';
-        document.getElementById('employeeName').textContent = entry.employee_name || 'N/A';
-        const referral = entry.outside_referral || {};
-        document.getElementById('hospitalName').textContent = referral.hospital_name || 'N/A';
-        document.getElementById('accompaniedBy').textContent = referral.accompanied_by || 'N/A';
-        document.getElementById('vehicleType').textContent = referral.vehicle_type || 'N/A';
-        const ambulanceSection = document.getElementById('ambulanceDetailsSection');
-        if (referral.vehicle_type === 'ambulance') {
-            ambulanceSection.classList.remove('d-none');
-            document.getElementById('ambulanceDriver').textContent = referral.ambulance_driver || 'N/A';
-            document.getElementById('ambulanceNumber').textContent = referral.ambulance_number || 'N/A';
-            let outTime = 'N/A';
-            let inTime = 'N/A';
-            if (referral.ambulance_outtime) {
-                const outDateTime = new Date(referral.ambulance_outtime);
-                outTime = outDateTime.toLocaleString();
-            }
-            if (referral.ambulance_intime) {
-                const inDateTime = new Date(referral.ambulance_intime);
-                inTime = inDateTime.toLocaleString();
-            }
-            document.getElementById('ambulanceOutTime').textContent = outTime;
-            document.getElementById('ambulanceInTime').textContent = inTime;
-            document.getElementById('meterOut').textContent = referral.meter_out || 'N/A';
-            document.getElementById('meterIn').textContent = referral.meter_in || 'N/A';
-        } else {
-            ambulanceSection.classList.add('d-none');
-        }
-        document.getElementById('employeeESI').textContent = referral.employee_esi === 1 ? 'Yes' : 'No';
-        document.getElementById('mrNumber').textContent = referral.mr_number || 'N/A';
+   function populateReferralModal(entry) {
+    document.getElementById('outsideReferralModalLabel').textContent = 'Outside Referral Details';
+
+    const employeeId = entry.employee_id?.toLowerCase();
+    document.getElementById('hiddenEmployeeId').value = employeeId;
+
+    const referral = entry.outside_referral || {};
+    document.getElementById('hospitalName').textContent = referral.hospital_name || 'N/A';
+    document.getElementById('accompaniedBy').textContent = referral.accompanied_by || 'N/A';
+    document.getElementById('vehicleType').textContent = referral.vehicle_type || 'N/A';
+
+    const ambulanceSection = document.getElementById('ambulanceDetailsSection');
+    if (referral.vehicle_type === 'ambulance') {
+        ambulanceSection.classList.remove('d-none');
+        document.getElementById('ambulanceDriver').textContent = referral.ambulance_driver || 'N/A';
+        document.getElementById('ambulanceNumber').textContent = referral.ambulance_number || 'N/A';
+
+        const formatDateTime = (dateStr) => {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleString();
+        };
+
+        document.getElementById('ambulanceOutTime').textContent = formatDateTime(referral.ambulance_outtime);
+        document.getElementById('ambulanceInTime').textContent = formatDateTime(referral.ambulance_intime);
+
+        document.getElementById('meterOut').textContent = referral.meter_out || 'N/A';
+        document.getElementById('meterIn').textContent = referral.meter_in || 'N/A';
+    } else {
+        ambulanceSection.classList.add('d-none');
     }
-    function populatePrescriptionModal(entry) {
+
+    document.getElementById('employeeESI').textContent = referral.employee_esi === 1 ? 'Yes' : 'No';
+    document.getElementById('mrNumber').textContent = referral.mr_number || 'N/A';
+
+    // 🔄 Fetch full employee details by employee ID
+    if (employeeId) {
+        fetch(`/ohc/health-registry/get-employee?employee_id=${encodeURIComponent(employeeId)}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Failed to fetch employee details');
+            return res.json();
+        })
+        .then(employeeData => {
+            console.log('Fetched Employee Data:', employeeData);
+
+            // Update employee name if available
+            document.getElementById('employeeName').textContent = employeeData.name || 'N/A';
+
+            // You can also display more info dynamically if needed:
+            // e.g., employee department, email, etc.
+            if (employeeData.department) {
+                const deptElem = document.getElementById('employeeDepartment');
+                if (deptElem) deptElem.textContent = employeeData.department;
+            }
+        })
+        .catch(err => {
+            console.error('Error fetching employee info:', err);
+            document.getElementById('employeeName').textContent = 'Unknown';
+        });
+    }
+}
+ function populatePrescriptionModal(entry) {
         if (!entry.prescriptionsForRegistry ||
             !entry.prescriptionsForRegistry.prescription ||
             !entry.prescriptionsForRegistry.prescription_details) {
@@ -1734,7 +1770,91 @@
             });
         }
     }
+    
+
+document.addEventListener('DOMContentLoaded', function () {
+    const updateBtn = document.getElementById('updateHospitalizationBtn');
+    if (!updateBtn) {
+        console.warn('Update button not found!');
+        return;
+    }
+
+    updateBtn.addEventListener('click', function () {
+        const employeeId = document.getElementById('hiddenEmployeeId')?.value;
+        const hospitalName = document.getElementById('hospitalName')?.textContent.trim();
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        if (!employeeId) {
+            alert('Employee ID is missing.');
+            return;
+        }
+
+        // Fetch employee details via GET API
+        fetch(`/ohc/health-registry/get-employee?employee_id=${encodeURIComponent(employeeId)}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch employee details');
+            return response.json();
+        })
+        .then(employeeData => {
+            // Create a form dynamically
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://login-users.hygeiaes.com/ohc/health-registry/update-hospitalization';
+
+            // CSRF Token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+
+            // Employee ID
+            form.appendChild(createHiddenInput('employee_id', employeeId));
+
+            // Hospital Name
+            form.appendChild(createHiddenInput('hospital_name', hospitalName));
+
+            // Pass employee name, email, etc. from API if available
+            if (employeeData.name) {
+                form.appendChild(createHiddenInput('employee_name', employeeData.name));
+            }
+            if (employeeData.email) {
+                form.appendChild(createHiddenInput('employee_email', employeeData.email));
+            }
+            if (employeeData.department) {
+                form.appendChild(createHiddenInput('employee_department', employeeData.department));
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        })
+        .catch(error => {
+            console.error('Error fetching employee details:', error);
+            alert('Unable to fetch employee details.');
+        });
+
+        // Helper function
+        function createHiddenInput(name, value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            return input;
+        }
+    });
+});
+
+
+
+
 </script>
+
 <div class="col-lg-4 col-md-6">
     <div class="mt-4">
         <div class="modal fade" id="outsideReferralModal" tabindex="-1" aria-hidden="true">
@@ -1748,6 +1868,7 @@
                         <div class="mb-3">
                             <h6 class="fw-semibold">Employee Name</h6>
                             <p id="employeeName" class="mb-1"></p>
+                            <input type="hidden" id="hiddenEmployeeId">
                         </div>
                         <div class="mb-3">
                             <h6 class="fw-semibold">Hospital
@@ -1804,7 +1925,9 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
+                     <button type="button" class="btn btn-primary" id="updateHospitalizationBtn">
+            Update Hospitalization Details
+          </button> </div>
                 </div>
             </div>
         </div>

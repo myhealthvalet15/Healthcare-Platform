@@ -1,4 +1,5 @@
-  'use strict';
+ 
+ 'use strict';
   let fv, offCanvasEl;
   let dt_basic;
   document.addEventListener('DOMContentLoaded', function (e) {
@@ -214,7 +215,7 @@ var buttonRow = `
 <div class="row mb-2" style="margin-top:-36px;margin-bottom:5px;margin-right:82px;">
     <div class="col-md-12" style="display: flex; justify-content: flex-end; margin-left: 18px;">
             
-    <a href="/others/add-invoice" class="btn btn-secondary add-new btn-primary waves-effect waves-light">
+    <a href="/UserEmployee/add" class="btn btn-secondary add-new btn-primary waves-effect waves-light">
         <span><i class="ti ti-plus me-0 me-sm-1 ti-xs" style="color:#fff;"></i><span style="color:#fff;">Add Hospitalization Details</span></span>
     </a>
 
@@ -289,4 +290,69 @@ $('#exportExcelBtn').on('click', function () {
         dateFormat: "d/m/Y", // Set format to DD/MM/YYYY
     });
   });
-  
+
+  $('#hospital_id').on('change', function () {
+    if ($(this).val() === 'other') {
+        $('#hospital_name_div').show();
+    } else {
+        $('#hospital_name_div').hide();
+    }
+});
+$(document).ready(function () {
+    // Show/hide hospital name
+    $('#hospital_id').on('change', function () {
+        $('#hospital_name_div').toggle($(this).val() === 'other');
+    });
+
+    // Show/hide doctor name
+    $('#doctor_id').on('change', function () {
+        $('#doctor_name_div').toggle($(this).val() === 'other');
+    });
+
+    // Submit form
+loadMedicalCondition();
+
+});
+function loadMedicalCondition() {
+    const $conditionSelect = $('#conditionSelect');
+
+    // Destroy Select2 if already initialized (optional but safe)
+    if ($conditionSelect.hasClass("select2-hidden-accessible")) {
+        $conditionSelect.select2('destroy');
+    }
+
+    // Show loading placeholder
+    $conditionSelect.html('<option disabled selected>Loading...</option>');
+
+    apiRequest({
+        url: '/UserEmployee/getMedicalCondition',
+        method: 'GET',
+        dataType: 'json',
+        onSuccess: function (response) {
+            if (response.result && Array.isArray(response.data)) {
+                // Add a placeholder as the first option
+                let options = '<option disabled selected value="">Select condition</option>';
+                
+                response.data.forEach(function (condition) {
+                    options += `<option value="${condition.condition_id}">${condition.condition_name}</option>`;
+                });
+
+                $conditionSelect.html(options);
+
+                // Initialize Select2 with placeholder
+                $conditionSelect.select2({
+                    placeholder: 'Select condition',
+                    width: '100%'
+                });
+            } else {
+                showToast('info', 'Notice', response.message || 'No conditions found.');
+                $conditionSelect.html('<option disabled>No conditions found</option>');
+            }
+        },
+        onError: function (error) {
+            showToast('error', 'Error', 'Failed to load medical conditions');
+            $conditionSelect.html('<option disabled>Error loading conditions</option>');
+        }
+    });
+}
+

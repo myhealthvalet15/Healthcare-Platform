@@ -3,7 +3,7 @@ const table = document.getElementById('incidenttable');
 console.log("stop loading");
 const tbody = document.getElementById('incidentbody');
 window.onload = function () {
-    fetchFactors();
+    fetchincidentTypes();
 };
 if (!table || !tbody) {
     console.warn('Table or tbody not found');
@@ -18,7 +18,6 @@ incidentNameInput.addEventListener('input', () => {
         incidentNameInput.classList.remove('is-invalid');
     }
 });
-
 addincidentButton.addEventListener('click', () => {
     console.log("save the button");
     const incidentName = incidentNameInput.value.trim();
@@ -62,20 +61,23 @@ function addNewincident(incidentName) {
                 const toastType = responseData.result === true ? 'success' : 'error';
                 const toastMessage = responseData.data || "Operation completed.";
                 showToast(toastType, "Add Incident completed", toastMessage);
-                fetchFactors();
+                fetchincidentTypes();
                 bootstrapModal.hide();
                 incidentNameInput.value = '';
                 addincidentButton.disabled = false;
                 addincidentButton.innerHTML = 'Save Changes';
             } else {
-                showToast(responseData.result, responseData.message || 'Error occurred while adding factor');
+                const toastType = responseData.result === false ? 'success' : 'error';
+                const toastMessage = responseData.data || "The incident type name has already been taken.";
+                showToast(toastType, "Add Incident Not completed", toastMessage);
                 bootstrapModal.hide();
                 addincidentButton.disabled = false;
                 addincidentButton.innerHTML = 'Save Changes';
             }
         },
-        onError: (error) => {
-            showToast('error', error);
+            onError: (error) => {
+            const toastMessage = error?.data || 'The incident type name has already been taken.';
+            showToast('error', "Add Incident Not completed", toastMessage);
             addincidentButton.disabled = false;
             addincidentButton.innerHTML = 'Save Changes';
         },
@@ -86,7 +88,7 @@ function addNewincident(incidentName) {
     });
 }
 
-function fetchFactors() {
+function fetchincidentTypes() {
     console.log("checking the table");
     tbody.innerHTML = '';
     preloader.style.display = 'block';
@@ -94,7 +96,7 @@ function fetchFactors() {
         url: "/corporate/getAllIncidentTypes",
         method: 'GET',
         onSuccess: (response) => {
-                    preloader.style.display = 'none';
+            preloader.style.display = 'none';
 
             const incidents = response.data;
             if (!Array.isArray(incidents) || incidents.length === 0) {
@@ -110,7 +112,7 @@ function fetchFactors() {
                 const row = document.createElement('tr');
                 const incidentNameCell = document.createElement('td');
                 incidentNameCell.textContent = incident.incident_type_name;
-                row.appendChild(incidentNameCell);                
+                row.appendChild(incidentNameCell);
                 const actionsCell = document.createElement('td');
                 const editIcon = document.createElement('i');
                 editIcon.classList.add('ti', 'ti-pencil', 'me-3', 'cursor-pointer');
@@ -141,10 +143,8 @@ function fetchFactors() {
 
 function editincident(incidentName, incidentId) {
     document.getElementById('incident_name').value = incidentName;
-
     const saveButton = document.getElementById('edit-incident');
     saveButton.setAttribute('data-incident-id', incidentId);
-
     const modalElement = document.getElementById('editincident');
     const bootstrapModal = new bootstrap.Modal(modalElement);
     bootstrapModal.show();
@@ -162,65 +162,63 @@ document.getElementById('edit-incident').addEventListener('click', function () {
         url: `/corporate/editIncidentType/${incidentId}`,
         method: 'POST',
         data: {
-                incident_type_name: incidentName,      
-                      },
-            onSuccess: (response) => {
-                console.log("toastresponse", response);
-                const toastType = response.result === true ? 'success' : 'error';
-              const toastMessage = response.data || "Operation completed.";
-
+            incident_type_name: incidentName,
+        },
+        onSuccess: (response) => {
+            console.log("toastresponse", response);
+            const toastType = response.result === true ? 'success' : 'error';
+            const toastMessage = response.data || "Operation completed.";
             showToast(toastType, "Edit Incident", toastMessage);
-            fetchFactors(); 
+            fetchincidentTypes();
             const modalElement = document.getElementById('editincident');
             const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
-            bootstrapModal.hide();
+            bootstrapModal.hide();                    
         },
-        onError: (error) => {
-            console.error("Edit error:", error);
-            const toastMessage = error?.data || error?.message || 'Something went wrong.';
-            showToast('error', "Edit Incident Failed", toastMessage);
-        }
+    onError: (error) => {
+        const toastMessage = error?.data || 'The incident type name has already been taken.';
+        showToast('error', "Edit Incident", toastMessage);
+    }
     });
 });
-    function deleteincident(incidentId) {
-        event.preventDefault();
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'Do you really want to delete this factor? This action cannot be undone.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
-            customClass: {
-                confirmButton: 'btn btn-primary me-3',
-                cancelButton: 'btn btn-secondary'
-            },
-            buttonsStyling: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                apiRequest({
-                    url: `/corporate/deleteIncidentType/${incidentId}`,
-                    method: 'DELETE',
-                    onSuccess: (responseData) => {
-                        console.log("checking the delete",responseData);
-                        if (responseData.result) {
-                             const toastType = responseData.result === true ? 'success' : 'error';
-                             const toastMessage = responseData.data || "Operation completed.";
-                             showToast(toastType, "Delete Incident completed", toastMessage);
-                            fetchFactors();
-                        } else {
-                            showToast('error', responseData.message || 'Failed to delete the incident.');
-                        }
-                    },
-                    onError: (error) => {
-                        showToast('error', error || 'Something went wrong. Please try again later.');
+function deleteincident(incidentId) {
+    event.preventDefault();
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you really want to delete this incident types? This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        customClass: {
+            confirmButton: 'btn btn-primary me-3',
+            cancelButton: 'btn btn-secondary'
+        },
+        buttonsStyling: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            apiRequest({
+                url: `/corporate/deleteIncidentType/${incidentId}`,
+                method: 'DELETE',
+                onSuccess: (responseData) => {
+                    console.log("checking the delete", responseData);
+                    if (responseData.result) {
+                        const toastType = responseData.result === true ? 'success' : 'error';
+                        const toastMessage = responseData.data || "Operation completed.";
+                        showToast(toastType, "Delete Incident completed", toastMessage);
+                        fetchincidentTypes();
+                    } else {
+                        showToast('error', responseData.message || 'Failed to delete the incident.');
                     }
-                });
-            }
-        });
-    }
-   
+                },
+                onError: (error) => {
+                    showToast('error', error || 'Something went wrong. Please try again later.');
+                }
+            });
+        }
+    });
+}
 
-       
+
+
 
 

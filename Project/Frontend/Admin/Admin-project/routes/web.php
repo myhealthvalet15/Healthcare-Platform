@@ -1,4 +1,5 @@
 <?php
+
 // use App\Http\Controllers\V1Controllers\HraController\Factors\FactorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\hra\factorController;
@@ -184,6 +185,7 @@ use App\Http\Controllers\drug\drug_types\DrugTypeController;
 use App\Http\Controllers\medicalcondition\MedicalConditionController;
 use App\Http\Controllers\forms\CorporateFormController;
 use App\Http\Controllers\corporate\IncidentTypeController;
+
 // icons
 Route::get('/icons/tabler', [Tabler::class, 'index'])->name('icons-tabler');
 Route::get('/icons/font-awesome', [FontAwesome::class, 'index'])->name('icons-font-awesome');
@@ -270,10 +272,10 @@ Route::middleware([Authcheck::class])->group(function () {
         Route::get('/corporate/getUploadedExcelFileContent/{id}', [addCorporateUsers::class, 'getUploadedExcelFileContent']);
         Route::get('/corporate/getAllCorporates', [addCorporateUsers::class, 'getAllCorporates']);
         Route::get('/corporate/getAllLocations/{corporate_id}', [addCorporateUsers::class, 'getAllLocations']);
-        
-      Route::get('/corporate/search-user', [addCorporateUsers::class, 'displaySearchUsers'])->name('corporate-search-user');
-     Route::get('/getEmployeeData/{keyword}', [addCorporateUsers::class, 'searchEmployegetDataByKeyword']);
-   
+
+        Route::get('/corporate/search-user', [addCorporateUsers::class, 'displaySearchUsers'])->name('corporate-search-user');
+        Route::get('/getEmployeeData/{keyword}', [addCorporateUsers::class, 'searchEmployegetDataByKeyword']);
+
     });
     // Test Groups
     Route::get('/test-group/tests', [Tests::class, 'showMasterTestsPage'])->name('group-test');
@@ -301,7 +303,7 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/corporate/updateCorporateHraLink', [link2hra::class, 'updateCorporateHraLink']);
     Route::get('/corporate/getCorporateOfHraTemplate', [link2hra::class, 'getCorporateOfHraTemplate']);
 
-    Route::get('/corporate/incident-types', [IncidentTypeController::class, 'index'])->name('incident-types.index');
+    Route::get('/corporate/incident-types', [IncidentTypeController::class, 'displayIncidentTypePage'])->name('corporate-incident-types');
     Route::get('/corporate/getAllIncidentTypes', [IncidentTypeController::class, 'getAllIncidentTypes']);
     Route::post('/corporate/addIncidentType', [IncidentTypeController::class, 'addIncidentType']);
     Route::post('/corporate/editIncidentType/{id}', [IncidentTypeController::class, 'editIncidentType']);
@@ -345,18 +347,19 @@ Route::middleware([Authcheck::class])->group(function () {
         Route::get('/edit-employeetypes/{id}/{corporate_id}', [EditCorporateController::class, 'editEmployeeTypes'])->name('corporate.editEmployeeTypes');
         Route::post('/updateEmployeeTypes', [EditCorporateController::class, 'updateEmployeeTypes'])->name('corporate.updateemptype');
         Route::get('/edit-components/{id}/{corporate_id}', [ComponentController::class, 'editComponents'])->name('corporate.editComponents');
-        //Added By Bhava for Forms     
+        //Added By Bhava for Forms
         Route::get('/assign-forms/{corporate_id}/{location_id}', [ComponentController::class, 'assignForms'])->name('corporate.assignForms');
         Route::get('/corporate/module4-submodules', [ComponentController::class, 'getModule4Submodules'])
         ->name('corporate.module4.submodules');
         Route::post('/corporate/module4-assignSubmodules', [ComponentController::class, 'assignFormForLocation'])
         ->name('corporate.module4.assignSubmodules');
-         Route::get('/getassign-forms/{corporate_id}/{location_id}', [ComponentController::class, 'getassignedFormForLocation'])->name('corporate.getAssignedForms');
-       
-      
-      
-    
-    Route::post('/updatecomponents', [ComponentController::class, 'updateComponents'])->name('corporate_updatecomponents');
+        Route::get('/getassign-forms/{corporate_id}/{location_id}', [ComponentController::class, 'getassignedFormForLocation'])->name('corporate.getAssignedForms');
+
+        //add route for incident by shankari
+        Route::get('/assign-incident-types/{corporate_id}', [IncidentTypeController::class, 'editforms'])
+        ->name('corporate.editIncidentTypes');
+
+        Route::post('/updatecomponents', [ComponentController::class, 'updateComponents'])->name('corporate_updatecomponents');
         //Route::get('/edit-financials/{id}', [EditCorporateController::class, 'editFinancials'])->name('corporate.editFinancials');
         Route::get('/edit-admin-users/{id}/{corporate_id}', [EditCorporateController::class, 'editAdminUsers'])->name('corporate.editAdminUsers');
         Route::post('/update-admin-users/{id}', [EditCorporateController::class, 'updateAdminUsers'])->name('corporate.adminuser_update');
@@ -402,16 +405,16 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/drugs/add-drugtype', [DrugTypeController::class, 'addDrugtype'])->name('drug.addDrugtype');
     Route::put('/drugs/edit-drugtype/{id}', [DrugTypeController::class, 'editDrugtype'])->name('drug.editDrugtype');
     Route::delete('/drugs/delete-drugtype/{id}', [DrugTypeController::class, 'deleteDrugtype'])->name('drug.deleteDrugtype');
-   
+
     //Forms
-   Route::get('/forms/list-forms', [CorporateFormController::class, 'listCorporateForms'])->name('list-forms');
-   Route::get('/forms/fetch-forms', [CorporateFormController::class, 'getAllForms'])->name('list-forms');
-   Route::get('/forms/get-states', [CorporateFormController::class, 'getAllStates'])->name('list-forms');
-   Route::post('/forms/add-forms', [CorporateFormController::class, 'addNewForm'])->name('list-forms');
-   Route::put('/forms/edit-forms/{id}', [CorporateFormController::class, 'editForm'])->name('list-forms');
-   Route::delete('/forms/form-delete/{id}', [CorporateFormController::class, 'deleteForms'])->name('list-forms');
-   
-   
+    Route::get('/forms/list-forms', [CorporateFormController::class, 'listCorporateForms'])->name('list-forms');
+    Route::get('/forms/fetch-forms', [CorporateFormController::class, 'getAllForms'])->name('list-forms');
+    Route::get('/forms/get-states', [CorporateFormController::class, 'getAllStates'])->name('list-forms');
+    Route::post('/forms/add-forms', [CorporateFormController::class, 'addNewForm'])->name('list-forms');
+    Route::put('/forms/edit-forms/{id}', [CorporateFormController::class, 'editForm'])->name('list-forms');
+    Route::delete('/forms/form-delete/{id}', [CorporateFormController::class, 'deleteForms'])->name('list-forms');
+
+
     // Medical Condition
     Route::get('/others/medical-condition/', [MedicalConditionController::class, 'medicalcondition'])->name('others-medical-qualification');
     Route::get('/others/medical-condition/fetch-medicalcondition', [MedicalConditionController::class, 'getAllMedicalCondition'])->name('medicalcondition.fetchMedicalCondition');

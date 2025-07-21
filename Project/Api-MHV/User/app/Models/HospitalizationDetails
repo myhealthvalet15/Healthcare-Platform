@@ -23,10 +23,12 @@ class HospitalizationDetails extends Model
 
     // Fillable fields
     protected $fillable = [
-        'ohc_id',
+        'op_registry_id',
         'master_user_id',
         'hospital_id',
         'hospital_name',
+        'doctor_id',
+        'doctor_name',
         'from_datetime',
         'to_datetime',
         'description',

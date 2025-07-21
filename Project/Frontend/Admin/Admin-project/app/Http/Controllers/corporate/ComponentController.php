@@ -142,7 +142,7 @@ class ComponentController extends Controller
     }
     public function updateSubModule(Request $request, $id)
     {
-        // TODO: Module Cant be updated in the dropdown, this to be fix that 
+        // TODO: Module Cant be updated in the dropdown, this to be fix that
         if (!is_numeric($id)) {
             return back()->with('error', 'Invalid module ID');
         }
@@ -228,62 +228,62 @@ class ComponentController extends Controller
         }
     }
     public function editComponents(Request $request, $id, $corporate_id)
-{
-    $request->session()->put('component_edit_id', $corporate_id);
-    $componentEditId = Session::get('component_edit_id');
+    {
+        $request->session()->put('component_edit_id', $corporate_id);
+        $componentEditId = Session::get('component_edit_id');
 
-    try {
-        // ✅ Get selected components for this corporate
-        $response = $this->httpClient->request('GET', "V1/corporate/corporate-components/getAllComponent/corpId/{$corporate_id}", [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-            ],
-        ]);
+        try {
+            // ✅ Get selected components for this corporate
+            $response = $this->httpClient->request('GET', "V1/corporate/corporate-components/getAllComponent/corpId/{$corporate_id}", [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+                ],
+            ]);
 
-        $modulesData = $response['data'];
-        $components = $modulesData['data'] ?? [];
-        $corporate_name = $modulesData['corpName'];
+            $modulesData = $response['data'];
+            $components = $modulesData['data'] ?? [];
+            $corporate_name = $modulesData['corpName'];
 
-        // ✅ Get all available modules/submodules
-        $response2 = $this->httpClient->request('GET', 'V1/corporate/corporate-components/getAllComponents', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-            ],
-        ]);
+            // ✅ Get all available modules/submodules
+            $response2 = $this->httpClient->request('GET', 'V1/corporate/corporate-components/getAllComponents', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+                ],
+            ]);
 
-        $data = $response2['data'];
-        $modules = $data['data'] ?? [];
+            $data = $response2['data'];
+            $modules = $data['data'] ?? [];
 
-        // ✅ Log modules for debugging
-        Log::info('Response from editComponents:', ['response' => $modules]);
+            // ✅ Log modules for debugging
+            Log::info('Response from editComponents:', ['response' => $modules]);
 
-        // ✅ Extract forms for module_id = 4 from static list of modules
-        $corporateForms = [];
-        foreach ($modules as $mod) {
-            if ($mod['module_id'] == 4 && !empty($mod['sub_modules'])) {
-                $corporateForms = $mod['sub_modules'];
-                break;
+            // ✅ Extract forms for module_id = 4 from static list of modules
+            $corporateForms = [];
+            foreach ($modules as $mod) {
+                if ($mod['module_id'] == 4 && !empty($mod['sub_modules'])) {
+                    $corporateForms = $mod['sub_modules'];
+                    break;
+                }
             }
+
+            // ✅ Optional: Log actual selected components
+            Log::info('Components for corporate ID ' . $corporate_id, $components);
+
+            return view('content.corporate_list.corporate.components.edit', compact(
+                'id',
+                'corporate_name',
+                'corporate_id',
+                'components',
+                'modules',
+                'componentEditId',
+                'corporateForms'
+            ));
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching component data: ' . $e->getMessage());
+            return redirect()->route('corporate-list')->with('error', 'Failed to fetch component data.');
         }
-
-        // ✅ Optional: Log actual selected components
-        Log::info('Components for corporate ID ' . $corporate_id, $components);
-
-        return view('content.corporate_list.corporate.components.edit', compact(
-            'id',
-            'corporate_name',
-            'corporate_id',
-            'components',
-            'modules',
-            'componentEditId',
-            'corporateForms'
-        ));
-
-    } catch (\Exception $e) {
-        Log::error('Error fetching component data: ' . $e->getMessage());
-        return redirect()->route('corporate-list')->with('error', 'Failed to fetch component data.');
     }
-}
 
     public function updateComponents(Request $request)
     {
@@ -326,131 +326,137 @@ class ComponentController extends Controller
             return redirect()->route('corporate-list')->with('error', 'Failed to update components.');
         }
     }
-     public function assignForms($corporate_id,$location_id)
+    public function assignForms($corporate_id, $location_id)
     {
-       
-       return view('content.corporate_list.corporate.forms.edit', [
-        'corporate_id' => $corporate_id,
-        'location_id' => $location_id
+
+        return view('content.corporate_list.corporate.forms.edit', [
+         'corporate_id' => $corporate_id,
+         'location_id' => $location_id
     ]);
 
     }
     public function getassignedFormForLocation(Request $request, $corporate_id, $location_id)
-{
-    //return 'Hi';
+    {
+        //return 'Hi';
         try {
-                $response = Http::withHeaders([
+            $response = Http::withHeaders([
             'Content-Type'  => 'application/json',
             'Accept'        => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
         ])->get("https://api-admin.hygeiaes.com/V1/corporate/corporate-components/getAssignedForms/{$corporate_id}/{$location_id}");
-        //return $response;
-         //return $response;
-        if ($response->status() === 401) {
+            //return $response;
+            //return $response;
+            if ($response->status() === 401) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated',
+                ], 401);
+            }
+
+            if ($response->successful()) {
+                $responseData = $response->json(); // Decode as array
+                return response()->json([
+                    'success' => true,
+                    'data'    => $responseData['data'] ?? [],
+                ], 200);
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthenticated',
-            ], 401);
-        }
+                'message' => $response->json()['message'] ?? 'Unexpected error',
+            ], $response->status());
 
-        if ($response->successful()) {
-            $responseData = $response->json(); // Decode as array
+        } catch (\Exception $e) {
             return response()->json([
-                'success' => true,
-                'data'    => $responseData['data'] ?? [],
-            ], 200);
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'success' => false,
-            'message' => $response->json()['message'] ?? 'Unexpected error',
-        ], $response->status());
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Server error: ' . $e->getMessage(),
-        ], 500);
     }
-}
 
     public function getModule4Submodules(Request $request)
-{
-    
-    try {
-        $response = Http::withHeaders([
-            'Content-Type'  => 'application/json',
-            'Accept'        => 'application/json',
-            'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-        ])->get('https://api-admin.hygeiaes.com/V1/corporate/corporate-components/getModule4Submodules');
-       // return $response;
-        if ($response->status() === 401) {
+    {
+
+        try {
+            $response = Http::withHeaders([
+                'Content-Type'  => 'application/json',
+                'Accept'        => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->get('https://api-admin.hygeiaes.com/V1/corporate/corporate-components/getModule4Submodules');
+            // return $response;
+            if ($response->status() === 401) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated',
+                ], 401);
+            }
+
+            if ($response->successful()) {
+                $responseData = $response->json(); // Decode as array
+                return response()->json([
+                    'success' => true,
+                    'data'    => $responseData['data'] ?? [],
+                ], 200);
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthenticated',
-            ], 401);
-        }
+                'message' => $response->json()['message'] ?? 'Unexpected error',
+            ], $response->status());
 
-        if ($response->successful()) {
-            $responseData = $response->json(); // Decode as array
+        } catch (\Exception $e) {
             return response()->json([
-                'success' => true,
-                'data'    => $responseData['data'] ?? [],
-            ], 200);
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'success' => false,
-            'message' => $response->json()['message'] ?? 'Unexpected error',
-        ], $response->status());
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Server error: ' . $e->getMessage(),
-        ], 500);
-    }
-}
-
-public function assignFormForLocation(Request $request)
-{
-    
-    // Validate the incoming request
-    $validator = Validator::make($request->all(), [
-        'corporate_id' => 'required|string|max:255',
-        'location_id' => 'required|string|max:255',
-        'form_ids' => 'required|array|min:1',
-        'form_ids.*' => 'numeric', // Each form ID must be numeric
-    ]);
-
-    if ($validator->fails()) {
-        return back()->withErrors($validator)->withInput();
     }
 
-    // At this point, validation passed, so you can now send the API request
-    try {
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-        ])->post('https://api-admin.hygeiaes.com/V1/corporate/corporate-components/assignFormForLocation', [
-            'corporate_id' => $request->input('corporate_id'),
-            'location_id' => $request->input('location_id'),
-            'form_ids' => $request->input('form_ids'),
+    public function assignFormForLocation(Request $request)
+    {
+
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'corporate_id' => 'required|string|max:255',
+            'location_id' => 'required|string|max:255',
+            'form_ids' => 'required|array|min:1',
+            'form_ids.*' => 'numeric', // Each form ID must be numeric
         ]);
-        return $response;
-        if ($response->successful()) {
-            $data = $response->json();
-            if ($data['success'] ?? false) {
-                return back()->with('success', 'Form Assigned successfully!');
-            }
-            return back()->with('error', $data['message'] ?? 'Failed to assign forms');
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
         }
 
-        return back()->with('error', 'Failed to connect to the server');
-    } catch (\Exception $e) {
-        return back()->with('error', 'An error occurred while assigning the form');
+        // At this point, validation passed, so you can now send the API request
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->post('https://api-admin.hygeiaes.com/V1/corporate/corporate-components/assignFormForLocation', [
+                'corporate_id' => $request->input('corporate_id'),
+                'location_id' => $request->input('location_id'),
+                'form_ids' => $request->input('form_ids'),
+            ]);
+            return $response;
+            if ($response->successful()) {
+                $data = $response->json();
+                if ($data['success'] ?? false) {
+                    return back()->with('success', 'Form Assigned successfully!');
+                }
+                return back()->with('error', $data['message'] ?? 'Failed to assign forms');
+            }
+
+            return back()->with('error', 'Failed to connect to the server');
+        } catch (\Exception $e) {
+            return back()->with('error', 'An error occurred while assigning the form');
+        }
     }
-}
+     public function editforms($corporate_id,)
+    {
+       
+       return view('content.corporate_list.corporate.forms.edit');
+
+    }
 
 }

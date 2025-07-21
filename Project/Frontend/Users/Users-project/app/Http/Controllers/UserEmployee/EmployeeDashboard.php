@@ -81,8 +81,8 @@ class EmployeeDashboard extends Controller
         ])->post('https://api-user.hygeiaes.com/V1/master-user/masteruser/save-hra-template-questionnaire-answers/' . $templateId, [
             'template_id' => $templateId,
             'answers' => $validated['answers'],
-            'is_partial' => $isPartial,
-        ]);
+            'is_partial' => $isPartial, 
+        ]); return $response;
         if ($response->successful()) {
             return response()->json(['result' => true, 'data' => $response['data']]);
         }

@@ -287,7 +287,11 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/ohc/health-registry/edit-registry/edit-outpatient/{employee_id}/op/{op_registry_id}', [health_registry::class, 'displayRegistryOutpatientPage'])->name('health-registry-list-registry');
     Route::get('/ohc/health-registry/view-registry/view-outpatient/{employee_id}/op/{op_registry_id}', [health_registry::class, 'displayRegistryOutpatientPage'])->name('health-registry-list-registry');
     Route::get('/ohc/health-registry/add-follow-up-registry/add-follow-up-outpatient/{employeeId}/op/{opRegistryId}', [health_registry::class, 'displayFollowUpAddRegistryPage'])->name('health-registry-add-registry');
-
+    Route::post('/ohc/health-registry/update-hospitalization', [health_registry::class, 'updateHospitalizationDetails'])->name('health-registry-update-hospitalization');
+    Route::get('/ohc/health-registry/get-employee', [health_registry::class, 'getemployeeDetailsByEmployeeId'])->name('get-employee');
+   
+    
+    
     Route::get('/ohc/test-list', [Tests::class, 'displayTestListPage'])->name('ohc-tests');
     Route::get('/ohc/test-details/{testCode}', [Tests::class, 'displayTestDetailsPage'])->name('ohc-tests');
     Route::get('/ohc/test-details', [Tests::class, 'displayTestDetailsPageDummy'])->name('ohc-tests');
@@ -690,7 +694,8 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/UserEmployee/store', [EmployeeUserController::class, 'storeHospitalization'])->name('employee-hospitalization-store');
     Route::get('/UserEmployee/list', [EmployeeUserController::class, 'hospitalization'])->name('hospitalization');   
     Route::get('/UserEmployee/getHospitalizationDetails', [EmployeeUserController::class, 'getHospitalizationDetails'])->name('getHospitalizationDetails');   
-
+    Route::get('/UserEmployee/getMedicalCondition', [EmployeeUserController::class, 'getMedicalCondition'])->name('getMedicalCondition');   
+  
 
     Route::get('/UserEmployee/dashboard/templates/getAllAssignedTemplates', [EmployeeDashboard::class, 'getAllAssignedTemplates']);
     Route::get('/UserEmployee/dashboard/templates/hra-questionaire/template/{template_id}', [EmployeeDashboard::class, 'displayHraQuestionaireTemplate'])->name('hra-questionaire-template');

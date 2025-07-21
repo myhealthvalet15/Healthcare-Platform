@@ -11,6 +11,7 @@ class HraInduvidualAnswer extends Model
     protected $fillable = [
         'template_id',
         'user_id',
+        'factor_id',
         'question_id',
         'trigger_question_of',
         'answer',
@@ -22,6 +23,8 @@ class HraInduvidualAnswer extends Model
     protected $casts = [
         'template_id' => 'integer',
         'question_id' => 'integer',
+        'user_id' => 'integer',
+        'factor_id' => 'integer',
         'trigger_question_of' => 'integer',
         'points' => 'integer',
         'test_results' => 'integer',

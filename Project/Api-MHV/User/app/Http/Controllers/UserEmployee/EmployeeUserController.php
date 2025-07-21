@@ -220,11 +220,12 @@ class EmployeeUserController extends Controller
     }
     public function getEmployeesDetailById($userId)
 {
-    $employee = EmployeeUserMapping::with(['masterUser'])->where('employee_id', $userId)->first();
+   return 'hello';
+       $employee = EmployeeUserMapping::with(['masterUser'])->where('employee_id', $userId)->first();
     if (!$employee) {
         return null;
     }
-
+    return $employee ;
     $masterUser = $employee->masterUser;
     $employeeFirstname = $this->aes256DecryptData($masterUser->first_name ?? '');
     $employeeLastname = $this->aes256DecryptData($masterUser->last_name ?? '');
@@ -739,15 +740,17 @@ public function submitEventResponseByEmployeeId(Request $request)
         $hospitalizations = HospitalizationDetails::with(['createdBy:id,first_name,last_name'])
             ->where('user_id', $userId)
             ->get([
-                'hospitalization_id',
-                'user_id',
+                'master_user_id',
+                'hospital_id',
                 'hospital_name',
-                'admission_date',
-                'discharge_date',
-                'reason_for_admission',
-                'treatment_details',
-                'created_at',
-                'created_by'
+                'from_datetime',
+                'to_datetime',
+                'description',
+                'condition_id',
+                'other_condition_name',
+                'role_id',
+                'attachment_discharge',
+                'attachment_test_reports',
             ]);
 
         // Transform result to include doctor's name
@@ -781,6 +784,32 @@ public function submitEventResponseByEmployeeId(Request $request)
         return response()->json([
             'result' => false,
             'message' => 'An error occurred while fetching hospitalization records.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+public function getMedicalCondition()
+{
+    try {  
+        $conditions = DB::table('medical_condition')
+            ->select('condition_id', 'condition_name')
+            ->get();
+
+        if ($conditions->isEmpty()) {
+            return response()->json([
+                'result' => false,
+                'message' => 'No medical conditions found.'
+            ], 404);
+        }
+
+        return response()->json([
+            'result' => true,
+            'data' => $conditions
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'result' => false,
+            'message' => 'An error occurred while fetching medical conditions.',
             'error' => $e->getMessage()
         ], 500);
     }

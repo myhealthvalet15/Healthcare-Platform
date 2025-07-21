@@ -8,10 +8,9 @@ use Illuminate\Support\Facades\Http;
 
 class IncidentTypeController extends Controller
 {
- public function index(Request $request)
+ public function displayIncidentTypePage(Request $request)
     {
         $incident = $this->getAllIncidentTypes($request);
-        //dd($incident);exit;
         return view('content.incident.view-incident-type', ['incident' =>  $incident ]);
     }
 
@@ -87,5 +86,10 @@ class IncidentTypeController extends Controller
         } catch (\Exception $e) {
             return response()->json(['result' => false, 'data' => 'Internal Server Error'], 500);
         }
+    }
+
+    function editforms()
+    {
+        echo "Edit incident ";
     }
 }

@@ -143,6 +143,7 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getEmployeesDetailById/' . $employeeId);
+               // return $response;
             if ($response->successful()) {
                 $employee_details = $response->json();
                 return response()->json($employee_details);
@@ -412,6 +413,52 @@ class EmployeeUserController extends Controller
             return response()->json(['result' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
+public function addHospitalization(){
+        $headerData = 'Add New Hospitalization';
+        return view('content.UserEmployee.user_add_hospitalization', ['HeaderData' => $headerData]);
+    }
+public function getMedicalCondition(Request $request)
+{
+    try {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+        ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getMedicalCondition');
+        return $response;
+        if ($response->successful()) {
+            return response()->json(['result' => true, 'data' => $response['data']]);
+        } else {
+            return response()->json(['result' => false, 'message' => 'Failed to fetch medical conditions'], $response->status());
+        }
+    } catch (\Exception $e) {
+        return response()->json(['result' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+}   
+}
+public function storeHospitalization(Request $request)
+{
+    $validated = $request->validate([
+        'hospital_name' => 'required|string|max:255',
+        'admission_date' => 'required|date',
+        'discharge_date' => 'nullable|date|after_or_equal:admission_date',
+        'reason_for_admission' => 'required|string|max:500',
+        'treatment_details' => 'nullable|string|max:1000',
+    ]);
 
-   
+    try {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+        ])->post('https://api-user.hygeiaes.com/V1/master-user/masteruser/storeHospitalization', $validated);
+
+        if ($response->successful()) {
+            return response()->json(['result' => true, 'message' => 'Hospitalization details stored successfully']);
+        } else {
+            return response()->json(['result' => false, 'message' => 'Failed to store hospitalization details'], $response->status());
+        }
+    } catch (\Exception $e) {
+        return response()->json(['result' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+    }
+}
 }

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('corporate_id');
             $table->string('location_id');
+            $table->int('incident_type_id');
             $table->json('injury_color_types');
             $table->foreign('corporate_id')->references('corporate_id')->on('master_corporate');
             $table->foreign('location_id')->references('location_id')->on('master_corporate');

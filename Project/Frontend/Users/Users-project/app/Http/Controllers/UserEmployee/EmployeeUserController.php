@@ -4,7 +4,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 class EmployeeUserController extends Controller
 {
     public function index()
@@ -136,6 +137,30 @@ class EmployeeUserController extends Controller
     }
     public function getemployeeDetails(Request $request)
     {
+
+       // return 'hi';
+        $employeeId = session('employee_id');
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getEmployeesDetailById/' . $employeeId);
+         return $response;
+            if ($response->successful()) {
+                $employee_details = $response->json();
+                return response()->json($employee_details);
+            } else {
+                return response()->json(['error' => 'An error occurred while fetching data'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
+ public function getCorporateEmployeeDetails(Request $request)
+    {
+
+       // return 'hi'
         $employeeId = session('employee_id');
         try {
             $response = Http::withHeaders([
@@ -403,7 +428,7 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getHospitalizationList/' . $user_id);
-            
+            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             } else {
@@ -437,28 +462,95 @@ public function getMedicalCondition(Request $request)
 }
 public function storeHospitalization(Request $request)
 {
-    $validated = $request->validate([
-        'hospital_name' => 'required|string|max:255',
-        'admission_date' => 'required|date',
-        'discharge_date' => 'nullable|date|after_or_equal:admission_date',
-        'reason_for_admission' => 'required|string|max:500',
-        'treatment_details' => 'nullable|string|max:1000',
-    ]);
+    $validator = Validator::make($request->all(), [
+        'hospital_name' => 'nullable|string',
+        'doctor_name' => 'nullable|string',
+        'hospital_id' => 'nullable|integer',
+        'doctor_id' => 'nullable|integer',
+        'from_date' => 'required|date',
+        'to_date' => 'required|date|after_or_equal:from_date',
+        'description' => 'nullable|string',
+        'condition' => 'nullable|array',
+        'condition.*' => 'string',
+        'discharge_summary' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+        'summary_reports.*' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+        'employee_user_id'=> 'string|alpha_num'
+        ]);
 
-    try {
-        $response = Http::withHeaders([
+    if ($validator->fails()) {
+        return response()->json([
+            'result' => false,
+            'message' => 'Validation failed',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $validated = $validator->validated();
+
+
+        try {
+        // Convert discharge_summary to Base64
+        $dischargeSummaryBase64 = null;
+        if ($request->hasFile('discharge_summary')) {
+            $file = $request->file('discharge_summary');
+            $dischargeSummaryBase64 = 'data:' . $file->getMimeType() . ';base64,' .
+                base64_encode(file_get_contents($file->getRealPath()));
+        }
+
+        // Convert summary_reports to Base64 array
+        $summaryReportsBase64 = [];
+        if ($request->hasFile('summary_reports')) {
+            foreach ($request->file('summary_reports') as $file) {
+                $summaryReportsBase64[] = 'data:' . $file->getMimeType() . ';base64,' .
+                    base64_encode(file_get_contents($file->getRealPath()));
+            }
+        }
+
+        // Final payload
+        $payload = [
+           
+             'employee_user_id' => $validated['employee_user_id'],
+            'hospital_name' => $request->input('hospital_name'),
+            'doctor_name' => $request->input('doctor_name'),
+            'hospital_id' => $request->input('hospital_id'),
+            'doctor_id' => $request->input('doctor_id'),
+            'from_date' => $validated['from_date'],
+            'to_date' => $validated['to_date'],
+            'description' => $request->input('description'),
+            'condition' => $request->input('condition', []),
+            'discharge_summary_base64' => $dischargeSummaryBase64,
+            'summary_reports_base64' => $summaryReportsBase64,
+        ];
+
+        // Send to external API
+        $apiResponse = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-        ])->post('https://api-user.hygeiaes.com/V1/master-user/masteruser/storeHospitalization', $validated);
-
-        if ($response->successful()) {
-            return response()->json(['result' => true, 'message' => 'Hospitalization details stored successfully']);
-        } else {
-            return response()->json(['result' => false, 'message' => 'Failed to store hospitalization details'], $response->status());
+        ])->put(
+            'https://api-user.hygeiaes.com/V1/master-user/masteruser/storeEmployeeHospitalization',
+            $payload
+        );
+        if ($apiResponse->successful()) {
+            return response()->json([
+                'result' => true,
+                'message' => $apiResponse['message'] ?? 'Hospitalization updated successfully',
+            ]);
         }
+
+        return response()->json([
+            'result' => false,
+            'message' => $apiResponse['message'] ?? 'API call failed',
+        ], $apiResponse->status());
+
     } catch (\Exception $e) {
-        return response()->json(['result' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        Log::error('Hospitalization update failed', ['error' => $e->getMessage()]);
+        return response()->json([
+            'result' => false,
+            'message' => 'Something went wrong: ' . $e->getMessage()
+        ], 500);
     }
+
+
 }
 }

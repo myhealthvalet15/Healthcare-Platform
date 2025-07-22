@@ -41,59 +41,44 @@
 <script src="{{ asset('lib/js/page-scripts/hospitalization-details.js') }}?v={{ time() }}"></script>
 <script>
     const bladeEmployeeId = "{{ $employee_id }}";
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('Document is ready. Fetching employee details...');
-    const employeeId = document.getElementById('bladeEmployeeId')?.value || bladeEmployeeId;
-console.log('Employee ID:', employeeId);
-    if (!employeeId) {
-        console.warn('No employee ID provided.');
-        return;
-    }
-
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-    apiRequest({
-        url: `/ohc/health-registry/get-employee?employee_id=${encodeURIComponent(employeeId)}`,
-        method: 'GET',
-        headers: {
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
-        },
-        onSuccess: function (data) {
-            console.log('Employee details loaded:', data);
-
-            // Example: fill form fields or display info
-            if (data.name) {
-                document.querySelector('#employeeNameDisplay')?.innerText = data.name;
-            }
-
-            // ...you can update other fields as needed
-        },
-        onError: function (err) {
-            console.error('Failed to fetch employee details:', err);
-        }
-    });
-});
+    const bladeEmployeeUserId = "{{ $employee_user_id }}";
 </script>
 
 @section('content')
 <div class="container mt-4">
     <div class="card shadow-sm">
-        <div class="card-header">
-            <h5 class="mb-0">Add Hospitalization</h5>
-        </div>
+       
 @if(isset($employee_id) && isset($hospital_name))
-    <div class="alert alert-info">
-        <strong>Employee ID:</strong> {{ $employee_id }} <br>
-        <strong>Hospital Name:</strong> {{ $hospital_name }}
+    <div class="card mb-3 border-0 shadow-sm" style="background-color: #4444e5;">
+        <div class="card-body d-flex align-items-center gap-3 flex-wrap" style="color: #ffffff;">
+            <div class="d-flex align-items-center fs-5">
+                👨‍💼 <strong class="ms-2">{{ $employee_name }}</strong>
+                <span class="ms-2">( {{ $employee_id }})</span>
+            </div>
+            <div class="d-flex align-items-center fs-6">
+                🎂 <span class="ms-1">Age: <strong class="ms-1">{{ $employee_gender }}</strong></span>
+            </div>
+            <div class="d-flex align-items-center fs-6">
+                @php
+                    $genderIcon = match(strtolower($employee_gender)) {
+                        'male' => '🚹',
+                        'female' => '🚺',
+                        default => '⚧️'
+                    };
+                @endphp
+                {{ $genderIcon }} <span class="ms-1"><strong>{{ ucfirst($employee_gender) }}</strong></span>
+            </div>
+        </div>
     </div>
 @endif
+
+
+
         <div class="card-body">
             <form id="hospitalizationForm" enctype="multipart/form-data">
                 @csrf
-
+<input type="hidden" name="employee_id" value="{{ $employee_id }}">
+<input type="hidden" name="employee_user_id" value="{{ $employee_user_id }}">
                 <!-- Row 1: Hospital + Hospital Name (if other) + Doctor + Doctor Name (if other) -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-3">
@@ -111,7 +96,7 @@ console.log('Employee ID:', employeeId);
                     </div>
                     <div class="col-md-3">
                         <label for="doctor_id" class="form-label">Doctor</label>
-                        <select name="doctor_id" id="doctor_id" class="form-select" required>
+                        <select name="doctor_id" id="doctor_id" class="form-select">
                             <option value="">-- Select Doctor --</option>
                             <option value="101">Dr. Aditi Verma</option>
                             <option value="102">Dr. Rajeev Kumar</option>
@@ -124,43 +109,48 @@ console.log('Employee ID:', employeeId);
                         <input type="text" name="doctor_name" class="form-control" placeholder="Enter Doctor Name">
                     </div>
                 </div>
+<!-- Row 2: From Date & To Date (side-by-side, compact) + Condition (right) -->
+<div class="row g-3 mb-3 align-items-end">
+    <!-- From & To Dates (compact, side-by-side) -->
+    <div class="col-md-6">
+        <div class="row g-2">
+            <div class="col-md-6">
+                <label for="from_date" class="form-label">From Date & Time</label>
+                <input type="datetime-local" name="from_date" class="form-control form-control-sm" required style="height: 38px;" >
+            </div>
+            <div class="col-md-6">
+                <label for="to_date" class="form-label">To Date & Time</label>
+                <input type="datetime-local" name="to_date" class="form-control form-control-sm" required style="height: 38px;">
+            </div>
+        </div>
+    </div>
 
-                <!-- Row 2: From & To Date/Time -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label for="from_date" class="form-label">From Date & Time</label>
-                        <input type="datetime-local" name="from_date" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="to_date" class="form-label">To Date & Time</label>
-                        <input type="datetime-local" name="to_date" class="form-control" required>
-                    </div>
-                </div>
+    <!-- Condition (full height on the right) -->
+    <div class="col-md-6">
+        <label for="conditionSelect" class="form-label">Condition</label>
+        <select id="conditionSelect" name="condition[]" class="form-select" multiple>
+            <!-- Options will be loaded dynamically -->
+        </select>
+    </div>
+</div>
 
-                <!-- Row 3: Description + Condition -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="2" required></textarea>
-                    </div>
-                  <div class="col-md-6">
-                    <label for="conditionSelect" class="form-label">Condition</label>
-                    <select id="conditionSelect" name="condition[]" class="form-select">
-                        <!-- Options will be loaded dynamically -->
-                    </select>
-                </div>
+<!-- Row 3: Full-width Description -->
+<div class="row g-3 mb-3">
+    <div class="col-12">
+        <label for="description" class="form-label">Description</label>
+        <textarea name="description" class="form-control" rows="3" placeholder="Enter description here..."></textarea>
+    </div>
+</div>
 
-
-                </div>
 
                 <!-- Row 4: File Uploads -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label class="form-label">Discharge Summary (1 file)</label>
-                        <input type="file" name="discharge_summary" class="form-control" accept=".pdf,.jpg,.png" required>
+                        <input type="file" name="discharge_summary" class="form-control" accept=".pdf,.jpg,.png">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Summary Reports (up to 3 files)</label>
+                        <label class="form-label">Test Reports (up to 3 files)</label>
                         <input type="file" name="summary_reports[]" class="form-control" multiple accept=".pdf,.jpg,.png">
                     </div>
                 </div>

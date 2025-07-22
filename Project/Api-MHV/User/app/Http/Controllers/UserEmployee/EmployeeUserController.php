@@ -220,13 +220,14 @@ class EmployeeUserController extends Controller
     }
     public function getEmployeesDetailById($userId)
 {
-   return 'hello';
+  //return 'hello';
        $employee = EmployeeUserMapping::with(['masterUser'])->where('employee_id', $userId)->first();
     if (!$employee) {
         return null;
     }
-    return $employee ;
+    //return $employee ;
     $masterUser = $employee->masterUser;
+    return $masterUser;
     $employeeFirstname = $this->aes256DecryptData($masterUser->first_name ?? '');
     $employeeLastname = $this->aes256DecryptData($masterUser->last_name ?? '');
     $employeeGender = $this->aes256DecryptData($masterUser->gender ?? '');
@@ -734,15 +735,24 @@ public function submitEventResponseByEmployeeId(Request $request)
         ], 500);
     }
 }
- public function getHospitalizationListByUserId($userId)
+public function getHospitalizationListByUserId($userId)
 {
     try {
-        $hospitalizations = HospitalizationDetails::with(['createdBy:id,first_name,last_name'])
-            ->where('user_id', $userId)
+        // Step 1: Fetch all conditions in advance
+        $allConditions = DB::table('medical_condition')
+            ->pluck('condition_name', 'condition_id')
+            ->toArray(); // ['51' => 'Diabetes', '52' => 'Hypertension', ...]
+
+        // Step 2: Fetch hospitalization records
+        $hospitalizations = DB::table('hospitalization_details')
+            ->where('master_user_id', $userId)
             ->get([
+                'hospitalization_details_id',
                 'master_user_id',
                 'hospital_id',
                 'hospital_name',
+                'doctor_id',
+                'doctor_name',
                 'from_datetime',
                 'to_datetime',
                 'description',
@@ -753,41 +763,62 @@ public function submitEventResponseByEmployeeId(Request $request)
                 'attachment_test_reports',
             ]);
 
-        // Transform result to include doctor's name
-        $hospitalizations = $hospitalizations->map(function ($item) {
+        // Step 3: Transform records
+        $hospitalizations = $hospitalizations->map(function ($item) use ($allConditions) {
+            $conditionNames = [];
+
+            if (!empty($item->condition_id)) {
+                // Decode condition_id JSON safely
+                $conditionIds = json_decode($item->condition_id, true);
+                if (is_array($conditionIds)) {
+                    foreach ($conditionIds as $id) {
+                        if (isset($allConditions[$id])) {
+                            $conditionNames[] = $allConditions[$id];
+                        }
+                    }
+                }
+            }
+
             return [
-                'hospitalization_id'     => $item->hospitalization_id,
-                'user_id'                => $item->user_id,
-                'hospital_name'          => $item->hospital_name,
-                'admission_date'         => $item->admission_date,
-                'discharge_date'         => $item->discharge_date,
-                'reason_for_admission'   => $item->reason_for_admission,
-                'treatment_details'      => $item->treatment_details,
-                'created_at'             => $item->created_at,
-                'doctor_first_name'      => optional($item->createdBy)->first_name,
-                'doctor_last_name'       => optional($item->createdBy)->last_name,
+                'hospitalization_id'      => $item->hospitalization_details_id,
+                'master_user_id'          => $item->master_user_id,
+                'hospital_name'           => $item->hospital_name,
+                'hospital_id'             => $item->hospital_id,
+                'doctor_id'               => $item->doctor_id,
+                'doctor_name'             => $item->doctor_name,
+                'from_datetime'           => $item->from_datetime,
+                'to_datetime'             => $item->to_datetime,
+                'description'             => $item->description,
+                'condition_names'         => $conditionNames,
+                'other_condition_name'    => $item->other_condition_name,
+                'role_id'                 => $item->role_id,
+                'attachment_discharge'    => $item->attachment_discharge,
+                'attachment_test_reports' => $item->attachment_test_reports,
             ];
         });
 
         if ($hospitalizations->isEmpty()) {
             return response()->json([
                 'result' => false,
-                'message' => 'No hospitalization records found for this user.'
+                'message' => 'No hospitalization records found for this user.',
             ], 404);
         }
 
         return response()->json([
             'result' => true,
-            'data' => $hospitalizations
+            'data' => $hospitalizations,
         ], 200);
+
     } catch (\Exception $e) {
         return response()->json([
             'result' => false,
             'message' => 'An error occurred while fetching hospitalization records.',
-            'error' => $e->getMessage()
+            'error' => $e->getMessage(),
         ], 500);
     }
 }
+
+
 public function getMedicalCondition()
 {
     try {  

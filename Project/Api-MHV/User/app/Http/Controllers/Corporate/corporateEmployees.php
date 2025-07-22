@@ -871,7 +871,7 @@ class corporateEmployees extends Controller
             $showWhiteStrip = false;
         }
         $basicInfo['incidentTypeColorCodes'] = OhcComponents::where('corporate_id', $corporateId)
-            ->where('location_id', $locationId)
+            // TODO: ->where('location_id', $location_id)  @Not Needed as per Developer: Praveen
             ->value('injury_color_types');
         $basicInfo['incidentTypeColorCodesAdded'] = $opRegistry->injury_color_text ?? null;
         $basicInfo['showWhiteStrip'] = $showWhiteStrip;
@@ -1588,9 +1588,10 @@ class corporateEmployees extends Controller
                     return response()->json(['result' => false, 'message' => 'Invalid Prescription'], 422);
                 }
             }
-            if ($isOpRegistry === null && $isPrescription === null && $employee_id) {
-                return response()->json(['result' => false, 'message' => 'Request praveen to unlock the access to this api ...'], 422);
-            }
+            // TODO:
+            // if ($isOpRegistry === null && $isPrescription === null && $employee_id) {
+            //     return response()->json(['result' => false, 'message' => 'Request praveen to unlock the access to this api ...'], 422);
+            // }
             $employee = EmployeeUserMapping::where('corporate_id', $validatedData['corporateId'])
                 ->where('location_id', $locationId)
                 ->where('employee_id', $validatedData['employeeId'])
@@ -2942,7 +2943,7 @@ class corporateEmployees extends Controller
             return response()->json(['result' => false, 'message' => 'Invalid Request'], 400);
         }
         $incidentTypeColorCodes = OhcComponents::where('corporate_id', $corporate_id)
-            ->where('location_id', $location_id)
+            // TODO: ->where('location_id', $location_id)  @Not Needed as per Developer: Praveen
             ->value('injury_color_types');
         return response()->json([
             'result' => true,
@@ -3093,4 +3094,133 @@ class corporateEmployees extends Controller
             'data' => $colorCodes
         ], 200);
     }
+    public function getEmployeesDetailById ($userId){
+//return 'hello';
+       $employee = EmployeeUserMapping::with(['masterUser'])->where('employee_id', $userId)->first();
+    if (!$employee) {
+        return null;
+    }
+    //return $employee ;
+    $masterUser = $employee->masterUser;
+    $employeeFirstname = $this->aes256DecryptData($masterUser->first_name ?? '');
+    $employeeLastname = $this->aes256DecryptData($masterUser->last_name ?? '');
+   
+    $employeeGender = $this->aes256DecryptData($masterUser->gender ?? '');
+     
+    $dob = $this->aes256DecryptData($masterUser->dob ?? '');
+    
+    $employeeAge = $this->calculateAge($dob);
+    
+    $employeeEmail = $this->aes256DecryptData($masterUser->email ?? '');
+   
+    $employeeMobile = $this->aes256DecryptData($masterUser->mob_num ?? '');
+   
+   // $employeeAadharId = $this->aes256DecryptData($masterUser->aadhar_id ?? '');
+     //return $employeeAadharId;
+    $employeeAbhaId = isset($masterUser->abha_id) ? $this->aes256DecryptData($masterUser->abha_id) : null;
+    $employeeArea = isset($masterUser->area) ? $this->aes256DecryptData($masterUser->area) : null;
+    $employeeZipcode = isset($masterUser->zipcode) ? $this->aes256DecryptData($masterUser->zipcode) : null;
+    $employeeAlternativeEmail = isset($masterUser->alternative_email) ? $this->aes256DecryptData($masterUser->alternative_email) : null;
+
+    $dateOfJoining = optional($employee->from_date)
+        ? \Carbon\Carbon::parse($employee->from_date)->format('d-m-Y')
+        : null;
+
+    $employeeCorporateName = MasterCorporate::where('corporate_id', $employee->corporate_id)->value('corporate_name');
+    $employeeLocationName = MasterCorporate::where('corporate_id', $employee->corporate_id)
+        ->where('location_id', $employee->location_id)->value('display_name');
+    $employeeDepartmentId = $employee->hl1_id;
+    $employeeDepartmentName = CorporateHl1::where('hl1_id', $employeeDepartmentId)->value('hl1_name');
+
+    $employeeTypeId = $employee->employee_type_id;
+    $employeeTypeName = DB::table('employee_type')->where('employee_type_id', $employeeTypeId)->value('employee_type_name');
+    $employee_userId = $employee->user_id;
+    return [
+        'employee_id'               => $employee->employee_id,
+        'employee_firstname'        => $employeeFirstname,
+        'employee_lastname'         => $employeeLastname,
+        'employee_email'            => $employeeEmail,
+        'employee_contact_number'   => $employeeMobile,
+        'employee_corporate_name'   => $employeeCorporateName,
+        'employee_location_name'    => $employeeLocationName,
+        'employee_designation'      => $employee->designation,
+        'employee_department_id'    => $employeeDepartmentId,
+        'employee_department_name'  => $employeeDepartmentName,
+        'employee_type_id'          => $employeeTypeId,
+        'employee_type_name'        => $employeeTypeName,
+        'employee_gender'           => $employeeGender,
+        'employee_age'              => $employeeAge,
+        'employee_dob'              => $dob,
+        'dateOfJoining'             => $dateOfJoining,
+        'profile_pic'               => $masterUser->user_profile_img ?? null,
+        'banner'                    => $masterUser->user_banner_img ?? null,
+       // 'aadhar_id'                 => $employeeAadharId,
+        'abha_id'                   => $employeeAbhaId,
+        'area'                      => $employeeArea,
+        'zipcode'                   => $employeeZipcode,
+        'alternative_email'         => $employeeAlternativeEmail,
+        'employee_user_id'          => $employee_userId
+    ];
+
+    }
+
+
+public function updateHospitalizationDetailsByEmpId(Request $request)
+{
+    //return $request;
+    $request->validate([
+        'employee_id' => 'required|string',
+        'from_date' => 'required|date',
+        'to_date' => 'required|date|after_or_equal:from_date',
+        'description' => 'nullable|string',
+        'doctor_id' => 'nullable|integer',
+        'doctor_name' => 'nullable|string',
+        'hospital_id' => 'nullable|integer',
+        'hospital_name' => 'nullable|string',
+        'condition' => 'nullable|array',
+        'discharge_summary_base64' => 'nullable|string',
+        'summary_reports_base64' => 'nullable|array',
+        'employee_user_id' => 'string|alpha_num', // Ensure this is present
+    ]);
+
+    try {
+  
+        $insertData = [
+            'op_registry_id' => 1, // Fixed value
+            'doctor_id' => $request->doctor_id,
+            'doctor_name' => $request->doctor_name,
+            'master_user_id' => $request->employee_user_id, // Only if role_id == 4
+            'hospital_id' => $request->hospital_id,
+            'hospital_name' => $request->hospital_name,
+            'from_datetime' => $request->from_date,
+            'to_datetime' => $request->to_date,
+            'description' => $request->description,
+           // 'condition_id' => '1',
+            'condition_id' => json_encode($request->condition),
+
+            'other_condition_name' => null, // Extend logic if needed
+            'role_id' => '4',
+            'created_by' => auth('api')->id(),
+            'attachment_discharge' => $request->discharge_summary_base64,
+            'attachment_test_reports' => json_encode($request->summary_reports_base64),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        DB::table('hospitalization_details')->insert($insertData);
+
+        return response()->json([
+            'result' => true,
+            'message' => 'Hospitalization details saved successfully.',
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Failed to insert hospitalization details', ['error' => $e->getMessage()]);
+        return response()->json([
+            'result' => false,
+            'message' => 'Failed to save hospitalization details: ' . $e->getMessage(),
+        ], 500);
+    }
+}
+
+    
 }

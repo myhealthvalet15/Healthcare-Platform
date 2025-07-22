@@ -44,7 +44,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/saveTestResults', [corporateEmployees::class, 'saveTestResults']);
     Route::get('/getincidentTypeColorCodes/{corporate_id}/{location_id}', [corporateEmployees::class, 'getincidentTypeColorCodes']);
     Route::get('/getAllLocations', [corporateEmployees::class, 'getAllLocations']);
-
+    //Added By Bhava
+    Route::get('/getEmployeesDetailById/{employee_id}', [corporateEmployees::class, 'getEmployeesDetailById']);
+    Route::put('/updateHospitalizationDetailsById', [corporateEmployees::class, 'updateHospitalizationDetailsByEmpId']);
+    
 
     //Events
     Route::get('/getAllEventsByCorporate/{corporate_id}', [EventsController::class, 'getAllEventsByCorporate']);

@@ -288,7 +288,8 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/ohc/health-registry/view-registry/view-outpatient/{employee_id}/op/{op_registry_id}', [health_registry::class, 'displayRegistryOutpatientPage'])->name('health-registry-list-registry');
     Route::get('/ohc/health-registry/add-follow-up-registry/add-follow-up-outpatient/{employeeId}/op/{opRegistryId}', [health_registry::class, 'displayFollowUpAddRegistryPage'])->name('health-registry-add-registry');
     Route::post('/ohc/health-registry/update-hospitalization', [health_registry::class, 'updateHospitalizationDetails'])->name('health-registry-update-hospitalization');
-    Route::get('/ohc/health-registry/get-employee', [health_registry::class, 'getemployeeDetailsByEmployeeId'])->name('get-employee');
+    Route::get('/ohc/health-registry/get-employee', [health_registry::class, 'getemployeeDetailsByEmployeeId'])->name('health-registry-get-employee');
+    Route::post('/ohc/health-registry/update-hospitalization-by-id', [health_registry::class, 'updateHospitalizationDetailsById'])->name('health-registry-update-hospitalization-by-id');
    
     
     

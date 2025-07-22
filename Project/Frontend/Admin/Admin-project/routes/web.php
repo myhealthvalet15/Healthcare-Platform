@@ -308,6 +308,10 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/corporate/addIncidentType', [IncidentTypeController::class, 'addIncidentType']);
     Route::post('/corporate/editIncidentType/{id}', [IncidentTypeController::class, 'editIncidentType']);
     Route::delete('/corporate/deleteIncidentType/{id}', [IncidentTypeController::class, 'deleteIncidentType']);
+
+    Route::get('/corporate/assign-incident-types/{corporate_id}', [IncidentTypeController::class, 'displayAssignIncidentTypePage']);
+    Route::get('/corporate/getAllAssignedIncidentTypes/{corporate_id}', [IncidentTypeController::class, 'getAllAssignedIncidentTypes']);
+    Route::post('/corporate/assignIncidentTypes/{corporate_id}', [IncidentTypeController::class, 'assignIncidentTypes']);
     // ------------------------------------------------------------------------------------------------------------------------------
     Route::group(['prefix' => 'location'], function () {
         Route::get('/country', [AddressController::class, 'countryindex'])->name('location.country');
@@ -354,11 +358,6 @@ Route::middleware([Authcheck::class])->group(function () {
         Route::post('/corporate/module4-assignSubmodules', [ComponentController::class, 'assignFormForLocation'])
         ->name('corporate.module4.assignSubmodules');
         Route::get('/getassign-forms/{corporate_id}/{location_id}', [ComponentController::class, 'getassignedFormForLocation'])->name('corporate.getAssignedForms');
-
-        //add route for incident by shankari
-        Route::get('/assign-incident-types/{corporate_id}', [IncidentTypeController::class, 'editforms'])
-        ->name('corporate.editIncidentTypes');
-
         Route::post('/updatecomponents', [ComponentController::class, 'updateComponents'])->name('corporate_updatecomponents');
         //Route::get('/edit-financials/{id}', [EditCorporateController::class, 'editFinancials'])->name('corporate.editFinancials');
         Route::get('/edit-admin-users/{id}/{corporate_id}', [EditCorporateController::class, 'editAdminUsers'])->name('corporate.editAdminUsers');

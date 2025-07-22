@@ -438,7 +438,6 @@ class ComponentController extends Controller
                 'location_id' => $request->input('location_id'),
                 'form_ids' => $request->input('form_ids'),
             ]);
-            return $response;
             if ($response->successful()) {
                 $data = $response->json();
                 if ($data['success'] ?? false) {
@@ -451,12 +450,6 @@ class ComponentController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'An error occurred while assigning the form');
         }
-    }
-     public function editforms($corporate_id,)
-    {
-       
-       return view('content.corporate_list.corporate.forms.edit');
-
     }
 
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\IncidentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\OhcComponents;
 
 class IncidentTypeController extends Controller
 {
@@ -64,20 +65,76 @@ class IncidentTypeController extends Controller
     public function deleteIncidentType($incident_type_id)
     {
         $incidentType = IncidentType::find($incident_type_id);
-
         if (!$incidentType) {
             return response()->json([
                 'result' => false,
                 'data' => 'Incident type not found.'
             ], 404);
         }
-
         $incidentType->delete();
-
         return response()->json([
             'result' => true,
             'data' => 'Incident type deleted successfully.'
         ]);
     }
-
+    public function getAllAssignedIncidentTypes(Request $request, $corporate_id)
+    {
+        if (!$corporate_id) {
+            return response()->json([
+                'result' => false,
+                'data' => 'Corporate ID is required.'
+            ], 400);
+        }
+        $incidentTypes = OhcComponents::where('corporate_id', $corporate_id)->get();
+        if ($incidentTypes->isEmpty()) {
+            return response()->json([
+                'result' => false,
+                'data' => 'No assigned incident types found.'
+            ], 404);
+        }
+        $filteredData = $incidentTypes->map(function ($item) {
+            return [
+                'corporate_id' => $item->corporate_id,
+                'incident_type_id' => $item->incident_type_id,
+                'injury_color_types' => $item->injury_color_types,
+            ];
+        });
+        return response()->json([
+            'result' => true,
+            'data' => $filteredData
+        ]);
+    }
+    public function assignIncidentTypes(Request $request, $corporate_id)
+    {
+        if (!$corporate_id) {
+            return response()->json([
+                'result' => false,
+                'data' => 'Corporate ID is required.'
+            ], 400);
+        }
+        $validator = Validator::make($request->all(), [
+            'incident_types' => 'required|array',
+            'incident_types.*.id' => 'required|integer|exists:incident_types,incident_type_id',
+            'incident_types.*.injury_color_types' => 'required|array',
+            'incident_types.*.injury_color_types.*' => ['regex:/^#[0-9A-Fa-f]{6}$/']
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'result' => false,
+                'data' => "Invalid Request"
+            ], 422);
+        }
+        OhcComponents::where('corporate_id', $corporate_id)->delete();
+        foreach ($request->incident_types as $incidentType) {
+            OhcComponents::create([
+                'corporate_id' => $corporate_id,
+                'incident_type_id' => $incidentType['id'],
+                'injury_color_types' => $incidentType['injury_color_types']
+            ]);
+        }
+        return response()->json([
+            'result' => true,
+            'data' => 'Incident types synced successfully.'
+        ]);
+    }
 }

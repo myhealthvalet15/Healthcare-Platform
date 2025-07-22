@@ -1648,7 +1648,7 @@
 
     // 🔄 Fetch full employee details by employee ID
     if (employeeId) {
-        fetch(`/ohc/health-registry/get-employee?employee_id=${encodeURIComponent(employeeId)}`, {
+        fetch(`/ohc/health-registry/get-employee?employee_id=${employeeId}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -1663,14 +1663,36 @@
         .then(employeeData => {
             console.log('Fetched Employee Data:', employeeData);
 
-            // Update employee name if available
-            document.getElementById('employeeName').textContent = employeeData.name || 'N/A';
+            // Update visible employee info
+            document.getElementById('employeeName').textContent = `${employeeData.employee_firstname || ''} ${employeeData.employee_lastname || ''}`.trim() || 'N/A';
+            const deptElem = document.getElementById('employeeDepartment');
+            if (deptElem) deptElem.textContent = employeeData.employee_department_name || 'N/A';
 
-            // You can also display more info dynamically if needed:
-            // e.g., employee department, email, etc.
-            if (employeeData.department) {
-                const deptElem = document.getElementById('employeeDepartment');
-                if (deptElem) deptElem.textContent = employeeData.department;
+            // Set hidden fields dynamically
+            const hiddenFields = {
+                hiddenEmployeeName: `${employeeData.employee_firstname || ''} ${employeeData.employee_lastname || ''}`.trim(),
+                hiddenEmployeeEmail: employeeData.employee_email || '',
+                hiddenEmployeeDepartment: employeeData.employee_department_name || '',
+                hiddenEmployeeDOB: employeeData.employee_dob || '',
+                hiddenEmployeeGender: employeeData.employee_gender || '',
+                hiddenEmployeeContact: employeeData.employee_contact_number || '',
+                hiddenEmployeeDesignation: employeeData.employee_designation || '',
+                hiddenEmployeeUserId: employeeData.employee_user_id || '',
+                hiddenEmployeeCorporate: employeeData.employee_corporate_name || '',
+                hiddenEmployeeAge: employeeData.employee_age || '',
+            };
+
+            for (const [key, value] of Object.entries(hiddenFields)) {
+                let input = document.getElementById(key);
+                if (!input) {
+                    // If the hidden field doesn't exist, create it
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.id = key;
+                    input.name = key;
+                    document.getElementById('outsideReferralModal').appendChild(input);
+                }
+                input.value = value;
             }
         })
         .catch(err => {
@@ -1679,7 +1701,8 @@
         });
     }
 }
- function populatePrescriptionModal(entry) {
+
+    function populatePrescriptionModal(entry) {
         if (!entry.prescriptionsForRegistry ||
             !entry.prescriptionsForRegistry.prescription ||
             !entry.prescriptionsForRegistry.prescription_details) {
@@ -1771,8 +1794,7 @@
         }
     }
     
-
-document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const updateBtn = document.getElementById('updateHospitalizationBtn');
     if (!updateBtn) {
         console.warn('Update button not found!');
@@ -1780,78 +1802,46 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     updateBtn.addEventListener('click', function () {
-        const employeeId = document.getElementById('hiddenEmployeeId')?.value;
-        const hospitalName = document.getElementById('hospitalName')?.textContent.trim();
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/ohc/health-registry/update-hospitalization';
 
-        if (!employeeId) {
-            alert('Employee ID is missing.');
-            return;
-        }
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        // Fetch employee details via GET API
-        fetch(`/ohc/health-registry/get-employee?employee_id=${encodeURIComponent(employeeId)}`, {
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch employee details');
-            return response.json();
-        })
-        .then(employeeData => {
-            // Create a form dynamically
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'https://login-users.hygeiaes.com/ohc/health-registry/update-hospitalization';
+        // Add CSRF token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
 
-            // CSRF Token
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
+        // Append all data as hidden inputs
+        const fields = {
+            employee_id: document.getElementById('hiddenEmployeeId')?.value || '',
+            hospital_name: document.getElementById('hospitalName')?.textContent.trim() || '',
+            employee_name: document.getElementById('hiddenEmployeeName')?.value || '',
+            employee_email: document.getElementById('hiddenEmployeeEmail')?.value || '',
+            employee_department: document.getElementById('hiddenEmployeeDepartment')?.value || '',
+            employee_dob: document.getElementById('hiddenEmployeeDOB')?.value || '',
+            employee_gender: document.getElementById('hiddenEmployeeGender')?.value || '',
+            employee_contact: document.getElementById('hiddenEmployeeContact')?.value || '',
+            employee_designation: document.getElementById('hiddenEmployeeDesignation')?.value || '',
+            employee_user_id: document.getElementById('hiddenEmployeeUserId')?.value || '',
+            employee_corporate: document.getElementById('hiddenEmployeeCorporate')?.value || ''
+        };
 
-            // Employee ID
-            form.appendChild(createHiddenInput('employee_id', employeeId));
-
-            // Hospital Name
-            form.appendChild(createHiddenInput('hospital_name', hospitalName));
-
-            // Pass employee name, email, etc. from API if available
-            if (employeeData.name) {
-                form.appendChild(createHiddenInput('employee_name', employeeData.name));
-            }
-            if (employeeData.email) {
-                form.appendChild(createHiddenInput('employee_email', employeeData.email));
-            }
-            if (employeeData.department) {
-                form.appendChild(createHiddenInput('employee_department', employeeData.department));
-            }
-
-            document.body.appendChild(form);
-            form.submit();
-        })
-        .catch(error => {
-            console.error('Error fetching employee details:', error);
-            alert('Unable to fetch employee details.');
-        });
-
-        // Helper function
-        function createHiddenInput(name, value) {
+        for (const key in fields) {
             const input = document.createElement('input');
             input.type = 'hidden';
-            input.name = name;
-            input.value = value;
-            return input;
+            input.name = key;
+            input.value = fields[key];
+            form.appendChild(input);
         }
+
+        document.body.appendChild(form);
+        form.submit(); // 🚀 Redirect via POST
     });
 });
-
-
-
 
 </script>
 
@@ -1866,9 +1856,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <h6 class="fw-semibold">Employee Name</h6>
+                          
+                        <h6 class="fw-semibold">Employee Name</h6>
                             <p id="employeeName" class="mb-1"></p>
-                            <input type="hidden" id="hiddenEmployeeId">
+<input type="hidden" id="hiddenEmployeeId"><input type="hidden" id="hiddenEmployeeId" name="employee_id">
+<input type="hidden" id="hiddenEmployeeName" name="employee_name">
+<input type="hidden" id="hiddenEmployeeEmail" name="employee_email">
+<input type="hidden" id="hiddenEmployeeDepartment" name="employee_department">
+<input type="hidden" id="hiddenEmployeeDOB" name="employee_dob">
+<input type="hidden" id="hiddenEmployeeGender" name="employee_gender">
+<input type="hidden" id="hiddenEmployeeContact" name="employee_contact">
+<input type="hidden" id="hiddenEmployeeDesignation" name="employee_designation">
+<input type="hidden" id="hiddenEmployeeCorporate" name="employee_corporate">
+<input type="hidden" id="hiddenEmployeeAge" name="employee_age">
+<input type="hidden" id="hiddenEmployeeUserId" name="employee_user_id">
+
+
+
                         </div>
                         <div class="mb-3">
                             <h6 class="fw-semibold">Hospital

@@ -1,5 +1,113 @@
- 
- 'use strict';
+  //Corporate Code
+  $('#hospital_id').on('change', function () {
+    if ($(this).val() === 'other') {
+        $('#hospital_name_div').show();
+    } else {
+        $('#hospital_name_div').hide();
+    }
+});
+$(document).ready(function () {
+    // Show/hide hospital name
+    $('#hospital_id').on('change', function () {
+        $('#hospital_name_div').toggle($(this).val() === 'other');
+    });
+
+    // Show/hide doctor name
+    $('#doctor_id').on('change', function () {
+        $('#doctor_name_div').toggle($(this).val() === 'other');
+    });
+
+    // Submit form
+loadMedicalCondition();
+$('#hospitalizationForm').on('submit', function (e) {
+    e.preventDefault();
+
+    const form = this;
+    const formData = new FormData(form);
+    formData.append('employee_id', bladeEmployeeId);
+    formData.append('employee_user_id', bladeEmployeeUserId);
+
+    fetch('/ohc/health-registry/update-hospitalization-by-id', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').val()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result) {
+            showToast('success', data.message || 'Hospitalization record updated successfully');
+            form.reset();
+        } else {
+            showToast('warning', data.message || 'Something went wrong while updating');
+        }
+    })
+    .catch(error => {
+        console.error('Submission failed:', error);
+        showToast('error', 'Error submitting hospitalization data: ' + (error.message || 'Unknown error'));
+    });
+});
+
+
+});
+function loadMedicalCondition() {
+    const $conditionSelect = $('#conditionSelect');
+
+    // Destroy Select2 if already initialized (optional but safe)
+    if ($conditionSelect.hasClass("select2-hidden-accessible")) {
+        $conditionSelect.select2('destroy');
+    }
+
+    // Show loading placeholder
+    $conditionSelect.html('<option disabled selected>Loading...</option>');
+
+    apiRequest({
+        url: '/UserEmployee/getMedicalCondition',
+        method: 'GET',
+        dataType: 'json',
+        onSuccess: function (response) {
+            if (response.result && Array.isArray(response.data)) {
+                // Add a placeholder as the first option
+                let options = '<option disabled selected value="">Select condition</option>';
+                
+                response.data.forEach(function (condition) {
+                    options += `<option value="${condition.condition_id}">${condition.condition_name}</option>`;
+                });
+
+                $conditionSelect.html(options);
+
+                // Initialize Select2 with placeholder
+                $conditionSelect.select2({
+                    placeholder: 'Select condition',
+                    width: '100%'
+                });
+            } else {
+                showToast('info', 'Notice', response.message || 'No conditions found.');
+                $conditionSelect.html('<option disabled>No conditions found</option>');
+            }
+        },
+        onError: function (error) {
+            showToast('error', 'Error', 'Failed to load medical conditions');
+            $conditionSelect.html('<option disabled>Error loading conditions</option>');
+        }
+    });
+}
+//Employee Code
+const doctorMap = {
+    101: "Dr. Aditi Verma",
+    102: "Dr. Rajeev Kumar",
+    103: "Dr. Meera Singh",
+    other: "Other"
+};
+
+const hospitalMap = {
+    1: "City Hospital",
+    2: "State Medical",
+    other: "Other"
+};
+
+'use strict';
   let fv, offCanvasEl;
   let dt_basic;
   document.addEventListener('DOMContentLoaded', function (e) {
@@ -63,76 +171,68 @@
             toastr.error(error);
           }
         },
-        columns: [
-          {
-            data: 'invoice_date',
-            title: 'Hospitalization Date',
-            render: function(data, type, row) {
-        let date = new Date(row.invoice_date);
-        
-        // For sorting, return the raw date (ISO format)
-        if (type === 'sort' || type === 'type') {
-            return date;
-        }
-        
-        // For display, return the formatted date in DD/MM/YYYY format
-        if (type === 'display') {
-            return date.toLocaleDateString('en-GB'); // Format for display only
-        }
-        
-        return date; // Return raw date for sorting
-    }
-                         
-          },
-          {
-    data: 'vendor_name',
-    title: 'Condition',
-    render: function(data, type, row) {
-        // Check if vendor_name is empty
-        if (!data || data.trim() === '') {
-            return row.cash_vendor;  // Return the value from cash_vendor if vendor_name is empty
-        }
-        return data;  // Otherwise, display the vendor_name
-    }
-},
-
-          {
-            data: 'po_number',
-            title: 'Doctor Name',
-          },
-          {
-            data: 'invoice_number',
-            title: 'Hospital Name',
-          },
-          {
-            data: 'invoice_amount',
-            title: 'Attachments'
-          }, 
-{
+      columns: [
+  {
     data: null,
-    title: 'Actions',
-    render: function(data, type, row) {
-      
-            return `
-                <a class="btn btn-sm btn-warning edit-record" 
-                   data-id="${row.corporate_invoice_id}" 
-                   href="/others/edit-invoice/${row.corporate_invoice_id}" 
-                   style="color:#fff;">Edit</a>
-            `;
-        
+    title: 'Hospitalization Date',
+    render: function (data, type, row) {
+      const from = new Date(row.from_datetime).toLocaleDateString('en-GB');
+      const to = new Date(row.to_datetime).toLocaleDateString('en-GB');
+      return type === 'display' ? `${from} <br>${to}` : row.from_datetime;
     }
-}
+  },
+  {
+    data: 'condition_names',
+    title: 'Condition',
+    render: function (data) {
+      return Array.isArray(data) && data.length ? data.map(name => `<div>${name}</div>`).join('') : '-';
+    }
+  },
+  {
+    data: null,
+    title: 'Doctor Name',
+    render: function (row) {
+      return (!row.doctor_id || row.doctor_id === 0) ? (row.doctor_name || 'Unknown') : (doctorMap[row.doctor_id] || 'Unknown');
+    }
+  },
+  {
+    data: null,
+    title: 'Hospital Name',
+    render: function (row) {
+      return (!row.hospital_id || row.hospital_id === 0) ? (row.hospital_name || 'Unknown') : (hospitalMap[row.hospital_id] || 'Unknown');
+    }
+  },
+ {
+  data: null,
+  title: 'Attachments',
+  render: function (data, type, row) {
+    const dischargeBtn = row.attachment_discharge
+      ? `<button class="btn btn-sm btn-primary view-discharge" data-url="${row.attachment_discharge}">Discharge</button>`
+      : '';
 
-        ],
+    let reportsBtn = '';
+    try {
+      const reports = JSON.parse(row.attachment_test_reports || '[]');
+      if (reports.length) {
+        reportsBtn = `<button class="btn btn-sm btn-info view-reports" data-reports='${JSON.stringify(reports)}'>View Reports</button>`;
+      }
+    } catch (e) {}
+
+    return [dischargeBtn, reportsBtn].filter(Boolean).join(' ');
+  }
+}
+],
+
         order: [
           [0, 'desc']
         ],
         searching: true,    // Disable search
         paging: false,       // Disable pagination
         lengthChange: false,
-        dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-6 pt-md-0"B>>' +
-        '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end mt-n6 mt-md-0"f>>t' +
-        '<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+       dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-2 pt-md-0"B>>' +
+     '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end mt-n2 mt-md-0"f>>t' +
+     '<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+
 
       buttons: [
        
@@ -170,62 +270,38 @@
       });
   
       
-var searchInput = $('#DataTables_Table_0_filter');
-$('.card-header').prepend(searchInput);
+
+// Remove label text from search box
 $('#DataTables_Table_0_filter label').contents().filter(function () {
-        return this.nodeType === 3; // Only target the text node (the label's text)
-      }).remove();
-$('#DataTables_Table_0_filter input').css('width', '325px');
-$('#DataTables_Table_0_filter input').css('height', '37px');
-$('#DataTables_Table_0_filter input').attr('placeholder', 'Search By Hospital Name / Doctor Name');
+    return this.nodeType === 3; // Only target the text node
+}).remove();
 
-// Create the filter row with the desired layout
-var filterRow = `
-<div class="row mb-2 align-items-center" style="display: flex; gap: 10px; width: 100%; flex-wrap: nowrap;">
-    <!-- From Date and To Date -->
-    <div class="col-md-4" style="display: flex; gap: 10px; flex-grow: 1; margin-left: 10px;">
-        <input type="text" id="fromDate" class="form-control flatpickr-input" placeholder="From Date" style="width: 60%; height: 37px; margin-top: 9px;" readonly="readonly">
-        <input type="text" id="toDate" class="form-control flatpickr-input" placeholder="To Date" style="width: 60%; height: 37px; margin-top: 9px;margin-left: 8px;" readonly="readonly">
-    </div>
-    
-    
+// Style the search input
+$('#DataTables_Table_0_filter input')
+    .css({ width: '325px', height: '37px' })
+    .attr('placeholder', 'Search By Hospital Name / Doctor Name');
 
-        <!-- Search Button -->
-        <button id="searchBtn" class="btn btn-primary" style="width: 33px; height: 37px; margin-top: 9px;margin-left: 5px;">
-            <i class="ti ti-search"></i> 
-        </button>
-   
+// Detach the search input container to move it
+const searchInput = $('#DataTables_Table_0_filter').detach(); // ✅ Only declared once here
 
-    <!-- Export Button - This is next to the search button -->
-    <div class="col-md-2" style="flex-grow: 1; margin-top: 9px;">
-        <button class="btn buttons-excel buttons-html5 btn-link" id="exportExcelBtn" tabindex="0" aria-controls="DataTables_Table_0" type="button" title="Export to Excel" style="width:30px; height: 37px;">
-            <span class="d-flex justify-content-center">
-                <i class="fa-sharp fa-solid fa-file-excel" style="font-size: 30px;"></i>
-            </span>
-        </button>
+// Create combined row with search (left) and button (right)
+const customHeaderRow = `
+<div class="row align-items-center mb-3" style="margin-top: 10px;">
+    <div class="col-md-6" id="customSearchContainer"></div>
+    <div class="col-md-6 text-end">
+        <a href="/UserEmployee/add" class="btn btn-primary">
+            <i class="ti ti-plus me-1 ti-xs"></i> Add Hospitalization Details
+        </a>
     </div>
 </div>
 `;
 
-// Insert the filter row right after the search input
-$('#DataTables_Table_0_filter').after(filterRow);
+// Insert layout below DataTables header
+$('.card-header').after(customHeaderRow);
 
-// Create the button row with Add New Inventory and Add New Invoice buttons
-var buttonRow = `
-<div class="row mb-2" style="margin-top:-36px;margin-bottom:5px;margin-right:82px;">
-    <div class="col-md-12" style="display: flex; justify-content: flex-end; margin-left: 18px;">
-            
-    <a href="/UserEmployee/add" class="btn btn-secondary add-new btn-primary waves-effect waves-light">
-        <span><i class="ti ti-plus me-0 me-sm-1 ti-xs" style="color:#fff;"></i><span style="color:#fff;">Add Hospitalization Details</span></span>
-    </a>
+// Append search input into the left column
+$('#customSearchContainer').append(searchInput);
 
-    </div>
-</div>
-`;
-
-
-// Insert the button row below the filters (search, export)
-$('.card-header').after(buttonRow);
 
 
 
@@ -291,68 +367,73 @@ $('#exportExcelBtn').on('click', function () {
     });
   });
 
-  $('#hospital_id').on('change', function () {
-    if ($(this).val() === 'other') {
-        $('#hospital_name_div').show();
-    } else {
-        $('#hospital_name_div').hide();
-    }
-});
-$(document).ready(function () {
-    // Show/hide hospital name
-    $('#hospital_id').on('change', function () {
-        $('#hospital_name_div').toggle($(this).val() === 'other');
-    });
 
-    // Show/hide doctor name
-    $('#doctor_id').on('change', function () {
-        $('#doctor_name_div').toggle($(this).val() === 'other');
-    });
+$('#employeeHospitalizationForm').on('submit', function (e) {
+    e.preventDefault();
 
-    // Submit form
-loadMedicalCondition();
-
-});
-function loadMedicalCondition() {
-    const $conditionSelect = $('#conditionSelect');
-
-    // Destroy Select2 if already initialized (optional but safe)
-    if ($conditionSelect.hasClass("select2-hidden-accessible")) {
-        $conditionSelect.select2('destroy');
-    }
-
-    // Show loading placeholder
-    $conditionSelect.html('<option disabled selected>Loading...</option>');
-
-    apiRequest({
-        url: '/UserEmployee/getMedicalCondition',
-        method: 'GET',
-        dataType: 'json',
-        onSuccess: function (response) {
-            if (response.result && Array.isArray(response.data)) {
-                // Add a placeholder as the first option
-                let options = '<option disabled selected value="">Select condition</option>';
-                
-                response.data.forEach(function (condition) {
-                    options += `<option value="${condition.condition_id}">${condition.condition_name}</option>`;
-                });
-
-                $conditionSelect.html(options);
-
-                // Initialize Select2 with placeholder
-                $conditionSelect.select2({
-                    placeholder: 'Select condition',
-                    width: '100%'
-                });
-            } else {
-                showToast('info', 'Notice', response.message || 'No conditions found.');
-                $conditionSelect.html('<option disabled>No conditions found</option>');
-            }
-        },
-        onError: function (error) {
-            showToast('error', 'Error', 'Failed to load medical conditions');
-            $conditionSelect.html('<option disabled>Error loading conditions</option>');
+    const form = this;
+    const formData = new FormData(form);
+    fetch('/UserEmployee/store', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').val()
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result) {
+            showToast('success', data.message || 'Hospitalization record added successfully');
+            form.reset();
+        } else {
+            showToast('warning', data.message || 'Something went wrong while updating');
+        }
+    })
+    .catch(error => {
+        console.error('Submission failed:', error);
+        showToast('error', 'Error submitting hospitalization data: ' + (error.message || 'Unknown error'));
     });
-}
+});
+
+// Handle test reports (already exists)
+$(document).on('click', '.view-reports', function () {
+  const reports = JSON.parse($(this).attr('data-reports') || '[]');
+  const $list = $('#reportList');
+  $list.empty();
+  $('#previewImage').addClass('d-none').attr('src', '');
+  $('#downloadBtnWrapper').addClass('d-none');
+
+  if (reports.length) {
+    reports.forEach((url, index) => {
+      const filename = `Report ${index + 1}`;
+      const listItem = `
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <a href="#" class="preview-report" data-url="${url}">${filename}</a>
+          <a href="${url}" target="_blank" download class="btn btn-sm btn-outline-secondary">Download</a>
+        </li>`;
+      $list.append(listItem);
+    });
+  }
+
+  $('#reportModal').modal('show');
+});
+
+// Show report image on preview
+$(document).on('click', '.preview-report', function (e) {
+  e.preventDefault();
+  const imgUrl = $(this).data('url');
+  $('#previewImage').attr('src', imgUrl).removeClass('d-none');
+  $('#downloadAttachment').attr('href', imgUrl);
+  $('#downloadBtnWrapper').removeClass('d-none');
+});
+
+// Show discharge summary image in modal
+$(document).on('click', '.view-discharge', function () {
+  const dischargeUrl = $(this).data('url');  
+  $('#reportList').empty();  
+  $('#previewImage').attr('src', dischargeUrl).removeClass('d-none'); 
+  $('#downloadAttachment').attr('href', dischargeUrl).removeClass('d-none');
+  $('#downloadBtnWrapper').removeClass('d-none'); 
+  $('#reportModal').modal('show');
+});
 

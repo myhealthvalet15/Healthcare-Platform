@@ -39,4 +39,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/addIncidentType', [IncidentTypeController::class, 'addIncidentType']);
     Route::post('/editIncidentType/{incident_type_id}', [IncidentTypeController::class, 'editIncidentType']);
     Route::delete('/deleteIncidentType/{incident_type_id}', [IncidentTypeController::class, 'deleteIncidentType']);
+    Route::get('/getAllAssignedIncidentTypes/{corporate_id}', [IncidentTypeController::class, 'getAllAssignedIncidentTypes']);
+    Route::post('/assignIncidentTypes/{corporate_id}', [IncidentTypeController::class, 'assignIncidentTypes']);
 });

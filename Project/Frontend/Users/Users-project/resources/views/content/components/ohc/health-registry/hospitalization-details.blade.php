@@ -39,15 +39,18 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ asset('lib/js/page-scripts/hospitalization-details.js') }}?v={{ time() }}"></script>
-<script>
-    const bladeEmployeeId = "{{ $employee_id }}";
-    const bladeEmployeeUserId = "{{ $employee_user_id }}";
+   
+  <script> 
+  const bladeEmployeeId = "{{ $employee_id }}";
+  const bladeEmployeeUserId = "{{ $employee_user_id }}";
+  const employeeUserId = "{{ $employee_user_id }}";
+  const opRegistryId = "{{ $op_registry_id }}";
 </script>
 
 @section('content')
 <div class="container mt-4">
     <div class="card shadow-sm">
-       
+  // {{$op_registry_id}}    
 @if(isset($employee_id) && isset($hospital_name))
     <div class="card mb-3 border-0 shadow-sm" style="background-color: #4444e5;">
         <div class="card-body d-flex align-items-center gap-3 flex-wrap" style="color: #ffffff;">
@@ -56,7 +59,7 @@
                 <span class="ms-2">( {{ $employee_id }})</span>
             </div>
             <div class="d-flex align-items-center fs-6">
-                🎂 <span class="ms-1">Age: <strong class="ms-1">{{ $employee_gender }}</strong></span>
+                🎂 <span class="ms-1">Age: <strong class="ms-1">{{ $employee_age }}</strong></span>
             </div>
             <div class="d-flex align-items-center fs-6">
                 @php
@@ -79,15 +82,15 @@
                 @csrf
 <input type="hidden" name="employee_id" value="{{ $employee_id }}">
 <input type="hidden" name="employee_user_id" value="{{ $employee_user_id }}">
+<input type="hidden" name="op_registry_id" value="{{ $op_registry_id }}">
                 <!-- Row 1: Hospital + Hospital Name (if other) + Doctor + Doctor Name (if other) -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-3">
                         <label for="hospital_id" class="form-label">Hospital</label>
-                        <select name="hospital_id" id="hospital_id" class="form-select" required>
-                            <option value="">-- Select Hospital --</option>
+                        <select name="hospital_id" id="hospital_id" class="form-select">                            <option value="">-- Select Hospital --</option>
                             <option value="1">City Hospital</option>
                             <option value="2">State Medical</option>
-                            <option value="other">Other</option>
+                            <option value="0">Other</option>
                         </select>
                     </div>
                     <div class="col-md-3" id="hospital_name_div" style="display:none;">
@@ -101,7 +104,7 @@
                             <option value="101">Dr. Aditi Verma</option>
                             <option value="102">Dr. Rajeev Kumar</option>
                             <option value="103">Dr. Meera Singh</option>
-                            <option value="other">Other</option>
+                            <option value="0">Other</option>
                         </select>
                     </div>
                     <div class="col-md-3" id="doctor_name_div" style="display:none;">
@@ -112,15 +115,15 @@
 <!-- Row 2: From Date & To Date (side-by-side, compact) + Condition (right) -->
 <div class="row g-3 mb-3 align-items-end">
     <!-- From & To Dates (compact, side-by-side) -->
-    <div class="col-md-6">
+   <div class="col-md-6">
         <div class="row g-2">
             <div class="col-md-6">
                 <label for="from_date" class="form-label">From Date & Time</label>
-                <input type="datetime-local" name="from_date" class="form-control form-control-sm" required style="height: 38px;" >
+                <input type="datetime-local" name="from_date" class="form-control form-control-sm"  style="height: 38px;" >
             </div>
             <div class="col-md-6">
                 <label for="to_date" class="form-label">To Date & Time</label>
-                <input type="datetime-local" name="to_date" class="form-control form-control-sm" required style="height: 38px;">
+                <input type="datetime-local" name="to_date" class="form-control form-control-sm" style="height: 38px;">
             </div>
         </div>
     </div>

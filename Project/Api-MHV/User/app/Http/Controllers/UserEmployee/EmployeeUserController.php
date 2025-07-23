@@ -227,7 +227,7 @@ class EmployeeUserController extends Controller
     }
     //return $employee ;
     $masterUser = $employee->masterUser;
-    return $masterUser;
+    //return $masterUser;
     $employeeFirstname = $this->aes256DecryptData($masterUser->first_name ?? '');
     $employeeLastname = $this->aes256DecryptData($masterUser->last_name ?? '');
     $employeeGender = $this->aes256DecryptData($masterUser->gender ?? '');
@@ -842,6 +842,58 @@ public function getMedicalCondition()
             'result' => false,
             'message' => 'An error occurred while fetching medical conditions.',
             'error' => $e->getMessage()
+        ], 500);
+    }
+}
+public function storeEmployeeHospitalization(Request $request){
+   //return $request;
+    $request->validate([
+        'from_date' => 'required|date',
+        'to_date' => 'required|date|after_or_equal:from_date',
+        'description' => 'nullable|string',
+        'doctor_id' => 'nullable|integer',
+        'doctor_name' => 'nullable|string',
+        'hospital_id' => 'nullable|integer',
+        'hospital_name' => 'nullable|string',
+        'condition' => 'nullable|array',
+        'discharge_summary_base64' => 'nullable|string',
+        'summary_reports_base64' => 'nullable|array',
+        'employee_user_id' => 'string|alpha_num', // Ensure this is present
+    ]);
+
+    try {
+  
+        $insertData = [
+            'op_registry_id' => 1, // Fixed value
+            'doctor_id' => $request->doctor_id,
+            'doctor_name' => $request->doctor_name,
+            'master_user_id' => $request->employee_user_id, // Only if role_id == 4
+            'hospital_id' => $request->hospital_id,
+            'hospital_name' => $request->hospital_name,
+            'from_datetime' => $request->from_date,
+            'to_datetime' => $request->to_date,
+            'description' => $request->description,
+            'condition_id' => json_encode($request->condition),
+            'other_condition_name' => null, // Extend logic if needed
+            'role_id' => '2',
+            'created_by' => auth('api')->id(),
+            'attachment_discharge' => $request->discharge_summary_base64,
+            'attachment_test_reports' => json_encode($request->summary_reports_base64),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        DB::table('hospitalization_details')->insert($insertData);
+
+        return response()->json([
+            'result' => true,
+            'message' => 'Hospitalization details saved successfully.',
+        ]);
+    } catch (\Exception $e) {
+       // Log::error('Failed to insert hospitalization details', ['error' => $e->getMessage()]);
+        return response()->json([
+            'result' => false,
+            'message' => 'Failed to save hospitalization details: ' . $e->getMessage(),
         ], 500);
     }
 }

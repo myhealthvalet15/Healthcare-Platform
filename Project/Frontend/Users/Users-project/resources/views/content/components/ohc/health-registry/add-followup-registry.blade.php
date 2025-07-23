@@ -166,20 +166,12 @@
                             ?? 'N/A')) }}
                         </p>
                     </div>
-                    <div class="position-absolute end-0 top-0 bottom-0 d-flex flex-column justify-content-between me-4 py-2">
+                    <div class="position-absolute end-0 top-0 bottom-0 d-flex flex-column justify-content-end me-4 py-2">
                         <button type="button" 
-                        class="btn btn-sm" 
-                        style="background-color: #ffffff; color: #6a0dad; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold;">
+                            class="btn btn-sm"
+                            style="background-color: #ffffff; color: #6a0dad; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; width: auto;">
                             Edit Profile
                         </button>
-                        <div>
-                            <p class="mb-0 text-end">
-                                {{ $employeeData['employee_corporate_name'] ?? 'N/A'
-                                }},
-                                {{ $employeeData['employee_location_name'] ?? 'N/A'
-                                }}
-                            </p>
-                        </div>
                     </div>
                     <div class="position-absolute end-0 top-0 bottom-0 border-end border-light"></div>
                 </div>

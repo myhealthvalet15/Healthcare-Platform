@@ -135,7 +135,7 @@
                                 <i class="fa-regular fa-file-waveform"></i>
                             </a>
                               @if($item['corporate_id'] == $item['location_id'])
-                            <a href="{{ route('corporate.editIncidentTypes',['corporate_id' => $item['corporate_id']]) }}"
+                            <a href="{{ route('corporate.assignIncidentTypes',['corporate_id' => $item['corporate_id']]) }}"
                                 class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="Edit incident Types">
                                 <i class="fas fa-envelope"></i>
                             </a>

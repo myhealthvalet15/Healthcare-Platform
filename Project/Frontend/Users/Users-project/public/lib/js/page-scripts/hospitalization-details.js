@@ -1,6 +1,6 @@
   //Corporate Code
   $('#hospital_id').on('change', function () {
-    if ($(this).val() === 'other') {
+    if ($(this).val() === '0') {
         $('#hospital_name_div').show();
     } else {
         $('#hospital_name_div').hide();
@@ -9,24 +9,88 @@
 $(document).ready(function () {
     // Show/hide hospital name
     $('#hospital_id').on('change', function () {
-        $('#hospital_name_div').toggle($(this).val() === 'other');
+        $('#hospital_name_div').toggle($(this).val() === '0');
     });
 
     // Show/hide doctor name
     $('#doctor_id').on('change', function () {
-        $('#doctor_name_div').toggle($(this).val() === 'other');
+        $('#doctor_name_div').toggle($(this).val() === '0');
     });
 
-    // Submit form
-loadMedicalCondition();
+ console.log("employeeUserId:", employeeUserId);
+    console.log("opRegistryId:", opRegistryId);
+
+    loadMedicalCondition();
+
+    // Delay load until conditions dropdown is ready
+    setTimeout(() => {
+        loadHospitalizationDetails();
+    }, 300);
+
+function showError(input, message) {
+        const $input = $(input);
+        $input.addClass('is-invalid');
+        if ($input.next('.invalid-feedback').length === 0) {
+            $input.after(`<div class="invalid-feedback">${message}</div>`);
+        } else {
+            $input.next('.invalid-feedback').text(message);
+        }
+    }
+
+    // Clear specific input error
+    function clearError(input) {
+        const $input = $(input);
+        $input.removeClass('is-invalid');
+        $input.next('.invalid-feedback').remove();
+    }
+
+    // Clear all errors on form
+    function clearAllErrors() {
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+    }
+
+
 $('#hospitalizationForm').on('submit', function (e) {
     e.preventDefault();
-
+    clearAllErrors();
     const form = this;
     const formData = new FormData(form);
     formData.append('employee_id', bladeEmployeeId);
     formData.append('employee_user_id', bladeEmployeeUserId);
+let isValid = true;
 
+        const hospitalId = $('#hospital_id').val();
+        const hospitalName = $('input[name="hospital_name"]').val().trim();
+        const fromDate = $('input[name="from_date"]').val();
+        const toDate = $('input[name="to_date"]').val();
+
+        // Validation 1: Hospital select and name
+        if (!hospitalId) {
+            showError('#hospital_id', 'Please select a hospital.');
+            isValid = false;
+        } else if (hospitalId === '0' && hospitalName === '') {
+            showError('input[name="hospital_name"]', 'Please enter the hospital name.');
+            isValid = false;
+        }
+
+        // Validation 2: From/To dates
+        if (!fromDate) {
+            showError('input[name="from_date"]', 'Please enter the start date.');
+            isValid = false;
+        }
+
+        if (!toDate) {
+            showError('input[name="to_date"]', 'Please enter the end date.');
+            isValid = false;
+        }
+
+        if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {
+            showError('input[name="to_date"]', 'End date must be after or equal to start date.');
+            isValid = false;
+        }
+
+        if (!isValid) return;
     fetch('/ohc/health-registry/update-hospitalization-by-id', {
         method: 'POST',
         body: formData,
@@ -38,7 +102,7 @@ $('#hospitalizationForm').on('submit', function (e) {
     .then(data => {
         if (data.result) {
             showToast('success', data.message || 'Hospitalization record updated successfully');
-            form.reset();
+           
         } else {
             showToast('warning', data.message || 'Something went wrong while updating');
         }
@@ -51,6 +115,81 @@ $('#hospitalizationForm').on('submit', function (e) {
 
 
 });
+function loadHospitalizationDetails() {
+ // console.log('🏁 loadHospitalizationDetails called');
+    if (!employeeUserId || !opRegistryId) return;
+
+    apiRequest({
+        url: `/ohc/health-registry/get-hospitalization-by-id/${employeeUserId}/${opRegistryId}`,
+        method: 'GET',
+        dataType: 'json',
+        onSuccess: function (response) {
+        //  console.log('API response:', response); 
+          const hospitalizationList = response?.data?.data;
+
+          if (Array.isArray(hospitalizationList) && hospitalizationList.length > 0) {
+     const hospitalization = hospitalizationList[0];
+    console.log('🩺 Prefilling with:', hospitalization);
+ setTimeout(() => {
+      prefillHospitalizationForm(hospitalization);
+    }, 300);
+}
+        },
+        error: function (err) {
+            console.error('Failed to load hospitalization details:', err);
+        }
+    });
+}
+
+function formatDateTime(datetimeStr) {
+    if (!datetimeStr) return '';
+    return datetimeStr.replace(' ', 'T').slice(0, 16); // "2025-07-01 19:22:00" → "2025-07-01T19:22"
+}
+
+
+
+
+
+function prefillHospitalizationForm(data) {
+    console.log('Prefilling with:', data);
+
+    // Hospital
+    if (data.hospital_id != null) {
+        $('#hospital_id').val(String(data.hospital_id)).trigger('change');
+        if (parseInt(data.hospital_id) === 0 && data.hospital_name) {
+            $('#hospital_name_div').show();
+            $('input[name="hospital_name"]').val(data.hospital_name);
+        }
+    }
+
+    // Doctor
+    if (data.doctor_id != null) {
+        $('#doctor_id').val(String(data.doctor_id)).trigger('change');
+        if (parseInt(data.doctor_id) === 0 && data.doctor_name) {
+            $('#doctor_name_div').show();
+            $('input[name="doctor_name"]').val(data.doctor_name);
+        }
+    }
+
+    // Dates (use formatter!)
+    $('input[name="from_date"]').val(formatDateTime(data.from_datetime));
+    $('input[name="to_date"]').val(formatDateTime(data.to_datetime));
+
+    // Condition
+    if (data.condition_id) {
+        let conditionArray;
+        try {
+            conditionArray = JSON.parse(data.condition_id);
+        } catch (e) {
+            conditionArray = [];
+        }
+        $('#conditionSelect').val(conditionArray).trigger('change');
+    }
+
+    // Description
+    $('textarea[name="description"]').val(data.description);
+}
+
 function loadMedicalCondition() {
     const $conditionSelect = $('#conditionSelect');
 
@@ -204,17 +343,17 @@ const hospitalMap = {
   },
  {
   data: null,
-  title: 'Attachments',
+  title: 'Discharge Summary / Test Reports',
   render: function (data, type, row) {
     const dischargeBtn = row.attachment_discharge
-      ? `<button class="btn btn-sm btn-primary view-discharge" data-url="${row.attachment_discharge}">Discharge</button>`
+      ? `<button class="btn btn-sm btn-primary view-discharge" data-url="${row.attachment_discharge}">Summary Report</button>`
       : '';
 
     let reportsBtn = '';
     try {
       const reports = JSON.parse(row.attachment_test_reports || '[]');
       if (reports.length) {
-        reportsBtn = `<button class="btn btn-sm btn-info view-reports" data-reports='${JSON.stringify(reports)}'>View Reports</button>`;
+        reportsBtn = `<button class="btn btn-sm btn-info view-reports" data-reports='${JSON.stringify(reports)}'>Test Reports</button>`;
       }
     } catch (e) {}
 
@@ -235,8 +374,7 @@ const hospitalMap = {
 
 
       buttons: [
-       
-    
+         
        
         {
           extend: 'excelHtml5',
@@ -269,26 +407,29 @@ const hospitalMap = {
 
       });
   
-      
-
-// Remove label text from search box
+ // Remove label text from search box
 $('#DataTables_Table_0_filter label').contents().filter(function () {
-    return this.nodeType === 3; // Only target the text node
+    return this.nodeType === 3;
 }).remove();
 
 // Style the search input
 $('#DataTables_Table_0_filter input')
-    .css({ width: '325px', height: '37px' })
+    .css({
+        width: '325px',
+        height: '37px',
+        display: 'inline-block',
+        margin: '0'
+    })
     .attr('placeholder', 'Search By Hospital Name / Doctor Name');
 
-// Detach the search input container to move it
-const searchInput = $('#DataTables_Table_0_filter').detach(); // ✅ Only declared once here
+// Detach the search input container to reposition it
+const searchInput = $('#DataTables_Table_0_filter').detach();
 
-// Create combined row with search (left) and button (right)
+// Create the new header row layout
 const customHeaderRow = `
-<div class="row align-items-center mb-3" style="margin-top: 10px;">
-    <div class="col-md-6" id="customSearchContainer"></div>
-    <div class="col-md-6 text-end">
+<div class="row align-items-center mb-3" style="margin-top: -50px; margin-bottom: 0;">
+    <div class="col-md-6 d-flex align-items-center" id="customSearchContainer"></div>
+    <div class="col-md-6 d-flex justify-content-end">
         <a href="/UserEmployee/add" class="btn btn-primary">
             <i class="ti ti-plus me-1 ti-xs"></i> Add Hospitalization Details
         </a>
@@ -296,13 +437,11 @@ const customHeaderRow = `
 </div>
 `;
 
-// Insert layout below DataTables header
+// Add it below DataTable header
 $('.card-header').after(customHeaderRow);
 
-// Append search input into the left column
+// Place search input in the left section
 $('#customSearchContainer').append(searchInput);
-
-
 
 
 
@@ -367,34 +506,7 @@ $('#exportExcelBtn').on('click', function () {
     });
   });
 
-
-$('#employeeHospitalizationForm').on('submit', function (e) {
-    e.preventDefault();
-
-    const form = this;
-    const formData = new FormData(form);
-    fetch('/UserEmployee/store', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').val()
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.result) {
-            showToast('success', data.message || 'Hospitalization record added successfully');
-            form.reset();
-        } else {
-            showToast('warning', data.message || 'Something went wrong while updating');
-        }
-    })
-    .catch(error => {
-        console.error('Submission failed:', error);
-        showToast('error', 'Error submitting hospitalization data: ' + (error.message || 'Unknown error'));
-    });
-});
-
+ 
 // Handle test reports (already exists)
 $(document).on('click', '.view-reports', function () {
   const reports = JSON.parse($(this).attr('data-reports') || '[]');
@@ -437,3 +549,119 @@ $(document).on('click', '.view-discharge', function () {
   $('#reportModal').modal('show');
 });
 
+//Add
+$(function () {
+    // Show an error message below an input
+    function showError(input, message) {
+        const $input = $(input);
+        $input.addClass('is-invalid');
+        if ($input.next('.invalid-feedback').length === 0) {
+            $input.after(`<div class="invalid-feedback">${message}</div>`);
+        } else {
+            $input.next('.invalid-feedback').text(message);
+        }
+    }
+
+    // Clear specific input error
+    function clearError(input) {
+        const $input = $(input);
+        $input.removeClass('is-invalid');
+        $input.next('.invalid-feedback').remove();
+    }
+
+    // Clear all errors on form
+    function clearAllErrors() {
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+    }
+
+    // Toggle hospital name input visibility
+    $('#hospital_id').on('change', function () {
+        const selected = $(this).val();
+        $('#hospital_name_div').toggle(selected === '0');
+
+        clearError(this); // Clear hospital select error
+
+        // Also validate hospital name if 'Other'
+        if (selected !== '0') {
+            $('input[name="hospital_name"]').val('');
+            clearError('input[name="hospital_name"]');
+        }
+    });
+
+    // Toggle doctor name input visibility
+    $('#doctor_id').on('change', function () {
+        const selected = $(this).val();
+        $('#doctor_name_div').toggle(selected === '0');
+    });
+
+    // Clear errors on user input (live feedback)
+    $('input[name="hospital_name"], input[name="from_date"], input[name="to_date"]').on('input', function () {
+        clearError(this);
+    });
+
+    $('#employeeHospitalizationForm').on('submit', function (e) {
+        e.preventDefault();
+        clearAllErrors();
+
+        const form = this;
+        const formData = new FormData(form);
+        let isValid = true;
+
+        const hospitalId = $('#hospital_id').val();
+        const hospitalName = $('input[name="hospital_name"]').val().trim();
+        const fromDate = $('input[name="from_date"]').val();
+        const toDate = $('input[name="to_date"]').val();
+
+        // Validation 1: Hospital select and name
+        if (!hospitalId) {
+            showError('#hospital_id', 'Please select a hospital.');
+            isValid = false;
+        } else if (hospitalId === '0' && hospitalName === '') {
+            showError('input[name="hospital_name"]', 'Please enter the hospital name.');
+            isValid = false;
+        }
+
+        // Validation 2: From/To dates
+        if (!fromDate) {
+            showError('input[name="from_date"]', 'Please enter the start date.');
+            isValid = false;
+        }
+
+        if (!toDate) {
+            showError('input[name="to_date"]', 'Please enter the end date.');
+            isValid = false;
+        }
+
+        if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {
+            showError('input[name="to_date"]', 'End date must be after or equal to start date.');
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        // Proceed with AJAX submission
+        fetch('/UserEmployee/store', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.result) {
+                showToast('success', data.message || 'Hospitalization record added successfully');
+                setTimeout(() => {
+                    window.location.href = 'https://login-users.hygeiaes.com/UserEmployee/hospitalization';
+                }, 1500);
+            } else {
+                showToast('warning', data.message || 'Something went wrong while updating');
+            }
+        })
+        .catch(error => {
+            console.error('Submission failed:', error);
+            showToast('error', 'Error submitting hospitalization data: ' + (error.message || 'Unknown error'));
+        });
+    });
+});

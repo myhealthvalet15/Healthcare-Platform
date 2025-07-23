@@ -25,12 +25,12 @@
 ])
 @endsection
 @section('content')
-<div class="row g-6 d-flex justify-content-center align-items-center">
-    <div class="col-md-8">
+<div class="row g-6">
+    <div class="col-12">
         <div class="card">
             <div class="card-body demo-vertical-spacing demo-only-element">
                 <div class="row">
-                    <div class="col-9">
+                    <div class="col">
                         <div class="input-group input-group-merge">
                             <span class="input-group-text" id="basic-addon-search31"><i class="ti ti-search"></i></span>
                             <input type="text" class="form-control" id="searchEmployees"
@@ -38,9 +38,9 @@
                                 aria-describedby="basic-addon-search31">
                         </div>
                     </div>
-                    <div class="col-3">
-                        <button id="searchBtn" type="submit"
-                            class="btn btn-primary waves-effect waves-light w-100">Search Employees</button>
+                    <div class="col-auto">
+                        <button id="searchBtn" type="submit" class="btn btn-primary waves-effect waves-light">Search
+                            Employees</button>
                     </div>
                 </div>
                 <!-- Search Spinner -->

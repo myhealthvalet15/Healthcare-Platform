@@ -3167,7 +3167,6 @@ class corporateEmployees extends Controller
 
 public function updateHospitalizationDetailsByEmpId(Request $request)
 {
-    //return $request;
     $request->validate([
         'employee_id' => 'required|string',
         'from_date' => 'required|date',
@@ -3180,47 +3179,116 @@ public function updateHospitalizationDetailsByEmpId(Request $request)
         'condition' => 'nullable|array',
         'discharge_summary_base64' => 'nullable|string',
         'summary_reports_base64' => 'nullable|array',
-        'employee_user_id' => 'string|alpha_num', // Ensure this is present
+        'employee_user_id' => 'required|string|alpha_num',
+        'op_registry_id' => 'nullable|integer'
     ]);
 
     try {
-  
-        $insertData = [
-            'op_registry_id' => 1, // Fixed value
+        $masterUserId = $request->employee_user_id;
+
+        $existing = DB::table('hospitalization_details')
+            ->where('master_user_id', $masterUserId)
+            ->where('op_registry_id', $request->op_registry_id)
+            ->where('role_id', 4)
+            ->first();
+
+        $data = [
+            'op_registry_id' => $request->op_registry_id,
             'doctor_id' => $request->doctor_id,
             'doctor_name' => $request->doctor_name,
-            'master_user_id' => $request->employee_user_id, // Only if role_id == 4
+            'master_user_id' => $masterUserId,
             'hospital_id' => $request->hospital_id,
             'hospital_name' => $request->hospital_name,
             'from_datetime' => $request->from_date,
             'to_datetime' => $request->to_date,
             'description' => $request->description,
-           // 'condition_id' => '1',
             'condition_id' => json_encode($request->condition),
-
-            'other_condition_name' => null, // Extend logic if needed
-            'role_id' => '4',
-            'created_by' => auth('api')->id(),
+            'other_condition_name' => null,
+            'role_id' => 4,
             'attachment_discharge' => $request->discharge_summary_base64,
             'attachment_test_reports' => json_encode($request->summary_reports_base64),
-            'created_at' => now(),
             'updated_at' => now(),
         ];
 
-        DB::table('hospitalization_details')->insert($insertData);
+        if ($existing) {
+            // Update
+            DB::table('hospitalization_details')
+                ->where('master_user_id', $existing->master_user_id)
+                ->where('op_registry_id', $existing->op_registry_id)
+                ->where('role_id', 4)
+                ->update($data);
+
+            $message = 'Hospitalization details updated successfully.';
+        } else {
+            // Insert
+            $data['created_by'] = auth('api')->id();
+            $data['created_at'] = now();
+
+            DB::table('hospitalization_details')->insert($data);
+            $message = 'Hospitalization details saved successfully.';
+        }
 
         return response()->json([
             'result' => true,
-            'message' => 'Hospitalization details saved successfully.',
+            'message' => $message,
         ]);
     } catch (\Exception $e) {
-        Log::error('Failed to insert hospitalization details', ['error' => $e->getMessage()]);
+        Log::error('Failed to save/update hospitalization details', ['error' => $e->getMessage()]);
         return response()->json([
             'result' => false,
-            'message' => 'Failed to save hospitalization details: ' . $e->getMessage(),
+            'message' => 'Failed to process hospitalization details: ' . $e->getMessage(),
         ], 500);
     }
 }
+public function getHospitalizationDetailsById($employee_user_Id, $opRegistryId = null)
+{
+    $query = DB::table('hospitalization_details')
+        ->where('master_user_id', $employee_user_Id)
+        ->where('role_id', 4);
 
-    
+    if ($opRegistryId) {
+        $query->where('op_registry_id', $opRegistryId);
+    }
+
+    $details = $query->get();
+
+    if ($details->isEmpty()) {
+        return response()->json(['result' => false, 'message' => 'No hospitalization details found'], 404);
+    }
+
+    // Fetch all conditions as ['id' => 'condition_name']
+    $allConditions = DB::table('medical_condition')
+        ->pluck('condition_name', 'condition_id')
+        ->toArray();
+
+    // Attach condition_name to each record
+    $details->transform(function ($item) use ($allConditions) {
+        $conditionName = null;
+
+        // If condition_id is JSON-encoded (array), decode and map
+        if (!empty($item->condition_id)) {
+            $conditionIds = json_decode($item->condition_id, true);
+
+            if (is_array($conditionIds)) {
+                $names = [];
+                foreach ($conditionIds as $id) {
+                    if (isset($allConditions[$id])) {
+                        $names[] = $allConditions[$id];
+                    }
+                }
+                $conditionName = $names;
+            } elseif (isset($allConditions[$item->condition_id])) {
+                // else if it's a single ID
+                $conditionName = [$allConditions[$item->condition_id]];
+            }
+        }
+
+        $item->condition_names = $conditionName ?? [];
+
+        return $item;
+    });
+
+    return response()->json(['result' => true, 'data' => $details], 200);
+}
+
 }

@@ -42,12 +42,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/assignHealthPlan/{corporateId}/{locationId}', [corporateEmployees::class, 'assignHealthPlan']);
 
     Route::post('/saveTestResults', [corporateEmployees::class, 'saveTestResults']);
-    Route::get('/getincidentTypeColorCodes/{corporate_id}/{location_id}', [corporateEmployees::class, 'getincidentTypeColorCodes']);
     Route::get('/getAllLocations', [corporateEmployees::class, 'getAllLocations']);
     //Added By Bhava
     Route::get('/getEmployeesDetailById/{employee_id}', [corporateEmployees::class, 'getEmployeesDetailById']);
     Route::put('/updateHospitalizationDetailsById', [corporateEmployees::class, 'updateHospitalizationDetailsByEmpId']);
-    
+    Route::get('/getHospitalizationDetailsById/{employee_user_id}/{op_registry_id}', [CorporateEmployees::class, 'getHospitalizationDetailsById'])
+    ->name('corporate.getHospitalizationDetailsById');
 
     //Events
     Route::get('/getAllEventsByCorporate/{corporate_id}', [EventsController::class, 'getAllEventsByCorporate']);
@@ -62,7 +62,8 @@ Route::middleware(['authGuard.corporate.employee'])->group(function () {
     Route::get('/getAllAssignedHealthPlan/{corporateId}/{locationId}', [corporateEmployees::class, 'getAllAssignedHealthPlan']);
     Route::get('/getAllColorCodes', [corporateEmployees::class, 'getAllColorCodes']);
     Route::get('/getTestDetails/{corporateId}/{locationId}/{testCode}', [corporateEmployees::class, 'getSinglePrescribedTest']);
-
+     Route::get('/getincidentTypeColorCodes/{corporate_id}/{location_id}', [corporateEmployees::class, 'getincidentTypeColorCodes']);
+   
     // TODO: To Move This To List registry Route (Registry Route Page)
     Route::get('/getAllHealthRegistry/{corporateId}/{locationId}', [corporateEmployees::class, 'getAllHealthRegistry']);
     Route::get('/getAllHealthRegistry/{corporateId}/{locationId}/{employeeId}', [corporateEmployees::class, 'getAllHealthRegistry']);

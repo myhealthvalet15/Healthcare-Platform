@@ -40,3 +40,14 @@ function fetchEmployeeDetails(employeeId) {
         }
     });
 }
+ function showErrorInTable(message) {
+        const tableBody = document.getElementById('health-registry-table-body');
+        tableBody.innerHTML = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.setAttribute('colspan', '5');
+        errorCell.className = 'text-center text-danger';
+        errorCell.textContent = message;
+        errorRow.appendChild(errorCell);
+        tableBody.appendChild(errorRow);
+    }

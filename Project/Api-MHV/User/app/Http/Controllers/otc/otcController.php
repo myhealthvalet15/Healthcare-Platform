@@ -26,13 +26,13 @@ class OtcController extends Controller
             $opRegistry = OpRegistry::create([
                  'op_registry_id' => $newOpRegistryId,
                 'doctor_id' => 0,
-                'master_user_id' => 'MU0b528ddccfa',
+                'master_user_id' =>  $request->corporate_user_id,
                 'corporate_id' => $request->corporate_id,
                 'location_id' => $request->location_id,
                 'symptoms' => json_encode($request->symptoms ?? []),
                 'medical_system' => json_encode($request->medicalSystems ?? []),
                 'doctor_notes' => $request->remarks ?? '',
-                'type_of_incident' => 'medicalIllness',
+                'type_of_incident' => '',
                 'corporate_ohc_id' => 1,
                 'open_status' => 1,
                 'movement_slip' => 0,
@@ -44,8 +44,6 @@ class OtcController extends Controller
                 'shift' => $request->shift ?? '',
                 'first_aid_by' => $request->first_aid_by ?? '',
                 'created_date_time' => $request->created_date_time ?? '',
-
-
             ]);
 
             $opRegistryId = $opRegistry->op_registry_id;

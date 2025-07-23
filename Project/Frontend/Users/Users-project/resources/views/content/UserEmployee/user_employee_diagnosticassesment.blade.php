@@ -97,9 +97,9 @@
     const employeeId = @json(session('employee_id'));
     const employeeDetailsUrl = @json(route('employee-user-details'));
 </script>
-<script src="{{ asset('Bhava/JS/employee-details.js') }}?v={{ time() }}"></script>
 
-<script src="{{ asset('Bhava/JS/diagnostic-assesment.js') }}"></script>
+<script src="/lib/js/page-scripts/employee-details.js?v={{ time() }}"></script>
+<script src="/lib/js/page-scripts/diagnostic-assesment.js?v={{ time() }}"></script>
 @endsection
 @section('content')
 <div class="card shadow-sm border-0 mb-4" id="employeeSummaryCard">

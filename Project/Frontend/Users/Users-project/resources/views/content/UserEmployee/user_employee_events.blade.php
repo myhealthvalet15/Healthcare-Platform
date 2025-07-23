@@ -36,7 +36,7 @@
 
 
 </script>
-<script src="{{ asset('Bhava/JS/events.js') }}?v={{ time() }}"></script>
+<script src="/lib/js/page-scripts/events.js?v={{ time() }}"></script>
 @endsection
 <style>
   .card-body {

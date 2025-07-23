@@ -18,10 +18,7 @@ use App\Http\Controllers\otc\otcController;
 
 Route::middleware(['auth:api'])->group(function () {
     // Here include the routes only accessible for corporate and not employees
-});
-Route::middleware(['authGuard.corporate.employee'])->group(function () {
-    // Here include the routes which can be accessed by both corporate and employees
-    Route::get('/getAllModules', [ModulesController::class, 'getAllModules']);
+      Route::get('/getAllModules', [ModulesController::class, 'getAllModules']);
     Route::get('/getAllComponents', [ModulesController::class, 'getAllComponents']);
     Route::get('/getAllComponent/corpId/{corpid}', [ModulesController::class, 'getAllComponentsByCorpId']);
     Route::get('/getAllComponent/accessRights/corpId/{corpid}', [ModulesController::class, 'getAllComponentsByCorpIdByAccessRights']);
@@ -45,8 +42,6 @@ Route::middleware(['authGuard.corporate.employee'])->group(function () {
     Route::get('/getAddUserUploadCount', [AddUserExcel::class, 'getAddCorporateUploadCount']);
     Route::get('/getAddUserStatusFileContent/{id}', [AddUserExcel::class, 'getAddCorporateExcelFileContent']);
     // TODO: .. to be moved => Corporate HealthPlan routes ... By Praveen
-    Route::get('/getAllHealthPlans/{corporateId}', [_CorporateHealthplan::class, 'getAllHealthplans']);
-    Route::get('/getHealthPlan/{corporateId}/{healthplanId}', [_CorporateHealthplan::class, 'getHealthplan']);
     Route::post('/addNewHealthPlan', [_CorporateHealthplan::class, 'addHealthplan']);
     Route::put('/updateHealthplan', [_CorporateHealthplan::class, 'updateHealthplan']);
     Route::delete('/deleteHealthplan', [_CorporateHealthplan::class, 'deleteHealthplan']);
@@ -110,12 +105,10 @@ Route::middleware(['authGuard.corporate.employee'])->group(function () {
 
     //Prescription
     Route::get('/getAllPrescriptionTemplate/{locationId}', [PrescriptionController::class, 'getAllPrescriptionTemplate']);
-    Route::get('/getPrintPrescriptionById/{id}', [PrescriptionController::class, 'getPrintPrescriptionById']);
     Route::post('/addPrescriptionTemplate', [PrescriptionController::class, 'addPrescriptionTemplate'])->name('addPrescriptionTemplate');
     Route::get('/getPrescriptionTemplateById/{id}', [PrescriptionController::class, 'getPrescriptionTemplateById']);
     Route::put('/updatePrescriptionTemplate/{id}', [PrescriptionController::class, 'updatePrescriptionTemplate']);
     Route::get('/getOnlyPrescriptionTemplate/{locationId}', [PrescriptionController::class, 'getOnlyPrescriptionTemplate']);
-    Route::post('/addPrescription', [PrescriptionController::class, 'addPrescription'])->name('addEmployeePrescription');
     Route::get('/getEmployeePrescription/{userId}', [PrescriptionController::class, 'getEmployeePrescription']);
     Route::get('/getStockByDrugId/{drugId}', [PrescriptionController::class, 'getStockByDrugId']);
     Route::get('/getStockByDrugIdAndPharmacyId/{drugId}/{pharmacyId}', [PrescriptionController::class, 'getStockByDrugIdAndPharmacyId']);
@@ -125,8 +118,16 @@ Route::middleware(['authGuard.corporate.employee'])->group(function () {
     Route::post('/closePrescription', [RequestController::class, 'closePrescription'])->name('closePrescription');
     Route::post('/issuePartlyPrescription', [RequestController::class, 'issuePartlyPrescription'])->name('issuePartlyPrescription');
     Route::get('/getAllClosedPrescription/{userId}', [RequestController::class, 'getAllClosedPrescription']);
-
+ 
     Route::post('/addPrescriptionForOTC', [otcController::class, 'addPrescriptionForOTC'])->name('addPrescriptionForOTC');
     Route::get('/getAllotcDetails/{locationId}', [otcController::class, 'getAllotcDetails']);
 
+});
+Route::middleware(['authGuard.corporate.employee'])->group(function () {
+    // Here include the routes which can be accessed by both corporate and employees
+    Route::get('/getAllHealthPlans/{corporateId}', [_CorporateHealthplan::class, 'getAllHealthplans']);
+    Route::get('/getHealthPlan/{corporateId}/{healthplanId}', [_CorporateHealthplan::class, 'getHealthplan']);
+    Route::get('/getPrintPrescriptionById/{id}', [PrescriptionController::class, 'getPrintPrescriptionById']);
+    Route::post('/addPrescription', [PrescriptionController::class, 'addPrescription'])->name('addEmployeePrescription');
+   
 });

@@ -583,7 +583,8 @@ public function updateHospitalizationDetails(Request $request)
 
         return view('content.components.ohc.health-registry.hospitalization-details', [
             'HeaderData' => $headerData,
-            'employee_id' => $request->employee_id,
+            'employee_id' => $request->employee_id,  
+            'op_registry_id' => $request->op_registry_id,
             'hospital_name' => $request->hospital_name,
             'employee_name' => $request->employee_name,
             'employee_email' => $request->employee_email,
@@ -594,6 +595,8 @@ public function updateHospitalizationDetails(Request $request)
             'employee_designation' => $request->employee_designation,
             'employee_corporate' => $request->employee_corporate,
             'employee_user_id' => $request->employee_user_id,
+            'employee_age' => $request->employee_age,
+            'op_registry_id' => $request->op_registry_id,
         ]);
     } catch (\Exception $e) {
         Log::error('Error updating hospitalization: ' . $e->getMessage());
@@ -630,7 +633,7 @@ public function updateHospitalizationDetails(Request $request)
 public function updateHospitalizationDetailsById(Request $request)
 {
     //return 'Hi';
-  // Log::info('updateHospitalizationDetailsById called', $request->all());
+  Log::info('updateHospitalizationDetailsById called', $request->all());
     $validator = Validator::make($request->all(), [
         'employee_id' => 'required|string|alpha_num',
         'hospital_name' => 'nullable|string',
@@ -644,7 +647,8 @@ public function updateHospitalizationDetailsById(Request $request)
         'condition.*' => 'string',
         'discharge_summary' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
         'summary_reports.*' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-        'employee_user_id'=> 'string|alpha_num'
+        'employee_user_id'=> 'string|alpha_num',
+        'op_registry_id'=> 'nullable|integer'
         ]);
 
     if ($validator->fails()) {
@@ -680,6 +684,7 @@ public function updateHospitalizationDetailsById(Request $request)
         $payload = [
             'employee_id' => $validated['employee_id'],
              'employee_user_id' => $validated['employee_user_id'],
+            'op_registry_id' => $validated['op_registry_id'],
             'hospital_name' => $request->input('hospital_name'),
             'doctor_name' => $request->input('doctor_name'),
             'hospital_id' => $request->input('hospital_id'),
@@ -717,6 +722,38 @@ public function updateHospitalizationDetailsById(Request $request)
 
     } catch (\Exception $e) {
         Log::error('Hospitalization update failed', ['error' => $e->getMessage()]);
+        return response()->json([
+            'result' => false,
+            'message' => 'Something went wrong: ' . $e->getMessage()
+        ], 500);
+    }
+}
+public function getHospitalizationDetailsById(Request $request, $employee_user_id = null, $op_registry_id = null)
+{
+   
+    //return $employee_user_id;
+    try {
+        $url = "https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/getHospitalizationDetailsById/{$employee_user_id}/{$op_registry_id}";
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . request()->cookie('access_token'),
+        ])->get($url);
+
+        if ($response->successful()) {
+            return response()->json([
+                'result' => true,
+                'data' => $response->json(),
+            ]);
+        }
+
+        return response()->json([
+            'result' => false,
+            'message' => $response['message'] ?? 'API call failed',
+        ], $response->status());
+
+    } catch (\Exception $e) {
+        Log::error('Hospitalization fetch error', ['error' => $e->getMessage()]);
         return response()->json([
             'result' => false,
             'message' => 'Something went wrong: ' . $e->getMessage()

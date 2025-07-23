@@ -14,7 +14,6 @@ class IncidentTypeController extends Controller
         $incident = $this->getAllIncidentTypes($request);
         return view('content.incident.view-incident-type', ['incident' =>  $incident ]);
     }
-
     public function getAllIncidentTypes(Request $request)
     {
         try {
@@ -30,7 +29,6 @@ class IncidentTypeController extends Controller
             return response()->json(['result' => false, 'data' => 'Internal Server Error'], 500);
         }
     }
-
     public function addIncidentType(Request $request)
     {
         try {
@@ -50,7 +48,6 @@ class IncidentTypeController extends Controller
             return response()->json(['result' => false, 'data' => 'Internal Server Error'], 500);
         }
     }
-
     public function editIncidentType(Request $request, $incident_type_id)
     {
         try {
@@ -70,7 +67,6 @@ class IncidentTypeController extends Controller
             return response()->json(['result' => false, 'data' => 'Internal Server Error'], 500);
         }
     }
-
     public function deleteIncidentType(Request $request, $incident_type_id)
     {
         try {
@@ -116,6 +112,7 @@ class IncidentTypeController extends Controller
     }
     public function assignIncidentTypes(Request $request, $corporate_id)
     {
+
         try {
             if (!$corporate_id) {
                 return response()->json([

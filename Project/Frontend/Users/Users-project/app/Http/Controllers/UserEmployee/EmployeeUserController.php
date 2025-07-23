@@ -420,7 +420,7 @@ class EmployeeUserController extends Controller
     }
     public function getHospitalizationDetails(Request $request)
     {
-       // return 'Hi';
+    
         $user_id = session('master_user_user_id');
         try {
             $response = Http::withHeaders([
@@ -461,7 +461,8 @@ public function getMedicalCondition(Request $request)
 }   
 }
 public function storeHospitalization(Request $request)
-{
+{ 
+    $master_user_user_id = session('master_user_user_id');
     $validator = Validator::make($request->all(), [
         'hospital_name' => 'nullable|string',
         'doctor_name' => 'nullable|string',
@@ -474,7 +475,7 @@ public function storeHospitalization(Request $request)
         'condition.*' => 'string',
         'discharge_summary' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
         'summary_reports.*' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-        'employee_user_id'=> 'string|alpha_num'
+        
         ]);
 
     if ($validator->fails()) {
@@ -509,7 +510,7 @@ public function storeHospitalization(Request $request)
         // Final payload
         $payload = [
            
-             'employee_user_id' => $validated['employee_user_id'],
+             'employee_user_id' => $master_user_user_id,
             'hospital_name' => $request->input('hospital_name'),
             'doctor_name' => $request->input('doctor_name'),
             'hospital_id' => $request->input('hospital_id'),
@@ -527,7 +528,7 @@ public function storeHospitalization(Request $request)
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-        ])->put(
+        ])->post(
             'https://api-user.hygeiaes.com/V1/master-user/masteruser/storeEmployeeHospitalization',
             $payload
         );

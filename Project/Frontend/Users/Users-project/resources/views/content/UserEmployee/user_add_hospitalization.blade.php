@@ -53,11 +53,11 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-3">
                         <label for="hospital_id" class="form-label">Hospital</label>
-                        <select name="hospital_id" id="hospital_id" class="form-select" required>
+                        <select name="hospital_id" id="hospital_id" class="form-select">
                             <option value="">-- Select Hospital --</option>
                             <option value="1">City Hospital</option>
                             <option value="2">State Medical</option>
-                            <option value="other">Other</option>
+                            <option value="0">Other</option>
                         </select>
                     </div>
                     <div class="col-md-3" id="hospital_name_div" style="display:none;">
@@ -71,7 +71,7 @@
                             <option value="101">Dr. Aditi Verma</option>
                             <option value="102">Dr. Rajeev Kumar</option>
                             <option value="103">Dr. Meera Singh</option>
-                            <option value="other">Other</option>
+                            <option value="0">Other</option>
                         </select>
                     </div>
                     <div class="col-md-3" id="doctor_name_div" style="display:none;">
@@ -86,11 +86,11 @@
         <div class="row g-2">
             <div class="col-md-6">
                 <label for="from_date" class="form-label">From Date & Time</label>
-                <input type="datetime-local" name="from_date" class="form-control form-control-sm" required style="height: 38px;" >
+                <input type="datetime-local" name="from_date" class="form-control form-control-sm"  style="height: 38px;" >
             </div>
             <div class="col-md-6">
                 <label for="to_date" class="form-label">To Date & Time</label>
-                <input type="datetime-local" name="to_date" class="form-control form-control-sm" required style="height: 38px;">
+                <input type="datetime-local" name="to_date" class="form-control form-control-sm" style="height: 38px;">
             </div>
         </div>
     </div>

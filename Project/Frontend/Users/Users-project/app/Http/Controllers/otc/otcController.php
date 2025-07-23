@@ -53,7 +53,7 @@ class OtcController extends Controller
 
             $headerData = 'Add OTC Details';
             if ($op_registry_id !== null) {
-                return view('content.otc.edit-ostc', [
+                return view('content.otc.edit-otc', [
                     'HeaderData' => $headerData,
                     'employeeData' => $data['message']
                 ]);
@@ -82,7 +82,7 @@ class OtcController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPrescriptionForOTC', $requestData);
-            return $response;
+           // return $response;
             //return response()->json($response->json());
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred: ');

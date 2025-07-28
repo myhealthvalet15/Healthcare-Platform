@@ -29,36 +29,57 @@
   }
 
   .color-picker {
-    width: 30px !important;
-    height: 31px;
-    padding: 0;
-    border: none !important;
-    border-radius: 0.25rem 0 0 0.25rem;
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 0.25rem 0 0 0.25rem !important;
     background: none !important;
     outline: none !important;
     box-shadow: none !important;
     cursor: pointer;
+    margin: 0 !important;
+  }
+
+  .color-picker {
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 30px !important;
+    padding: 0 !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    background: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    margin: 0 !important;
   }
 
   .color-picker::-webkit-color-swatch-wrapper {
-    padding: 0;
-    border: none;
-    border-radius: 0.25rem 0 0 0.25rem;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0.25rem 0 0 0.25rem !important;
+    margin: 0 !important;
   }
 
   .color-picker::-webkit-color-swatch {
-    border: none;
-    border-radius: 0.25rem 0 0 0.25rem;
+    border: none !important;
+    border-radius: 0.25rem 0 0 0.25rem !important;
+    margin: 0 !important;
   }
 
   .color-picker::-moz-color-swatch {
-    border: none;
-    border-radius: 0.25rem 0 0 0.25rem;
+    border: none !important;
+    border-radius: 0.25rem 0 0 0.25rem !important;
+    margin: 0 !important;
   }
 
   .color-hex-input {
     font-size: 0.75rem;
     padding: 0.25rem 0.5rem;
+    min-width: 90px;
+    height: 24px !important;
+    line-height: 1;
   }
 
   .form-check-input {
@@ -101,9 +122,57 @@
     transition: all 0.3s ease;
   }
 
+  /* Improved column widths and spacing */
+  .injury-type-name-col {
+    flex: 0 0 48%;
+    max-width: 48%;
+    padding-right: 0.25rem;
+  }
+
+  .injury-type-color-col {
+    flex: 0 0 37%;
+    max-width: 37%;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .injury-type-action-col {
+    flex: 0 0 15%;
+    max-width: 15%;
+    padding-left: 0.25rem;
+  }
+
+  .header-name-col {
+    flex: 0 0 48%;
+    max-width: 48%;
+    padding-right: 0.25rem;
+  }
+
+  .header-color-col {
+    flex: 0 0 37%;
+    max-width: 37%;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .header-action-col {
+    flex: 0 0 15%;
+    max-width: 15%;
+    padding-left: 0.25rem;
+  }
+
+  .input-group {
+    gap: 0;
+  }
+
+  .color-hex-input {
+    border-left: none !important;
+    border-radius: 0 0.25rem 0.25rem 0 !important;
+  }
+
   /* Responsive adjustments */
   @media (max-width: 768px) {
-    .col-md-6 {
+    .col-lg-4 {
       margin-bottom: 1rem;
     }
 
@@ -120,13 +189,92 @@
     .card-header h5 {
       margin-bottom: 0.5rem;
     }
+
+    .injury-type-name-col,
+    .header-name-col {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    .injury-type-color-col,
+    .header-color-col {
+      flex: 0 0 35%;
+      max-width: 35%;
+    }
+
+    .injury-type-action-col,
+    .header-action-col {
+      flex: 0 0 15%;
+      max-width: 15%;
+    }
+  }
+
+  /* Additional responsive breakpoints for better 3-column layout */
+  @media (max-width: 992px) and (min-width: 769px) {
+    .col-lg-4 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .col-lg-4 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+
+  .input-group-sm {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .color-picker {
+    width: 32px !important;
+    height: 32px !important;
+    border: none !important;
+    padding: 0 !important;
+    border-radius: 6px !important;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .color-hex-input {
+    height: 32px;
+    line-height: 1;
+    font-size: 0.875rem;
+    padding: 0 0.5rem;
+    min-width: 100px;
+    border-radius: 4px;
+  }
+
+  .injury-type-name-col input {
+    height: 32px;
+    font-size: 0.875rem;
+  }
+
+  .injury-type-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .injury-type-action-col button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    border-radius: 6px;
   }
 </style>
 <div class="card">
   <div class="d-flex justify-content-between align-items-center card-header">
     <h5 class="mb-0">Incident Types</h5>
-    <button type="button" class="btn btn-primary" id="saveChangesBtn"
-      style="display: none;">
+    <button type="button" class="btn btn-primary" id="saveChangesBtn" style="display: none;">
       <i class="fas fa-save me-1"></i>Save Changes
     </button>
   </div>
@@ -190,7 +338,7 @@
   }
   function createIncidentTypeCard(incidentType, assignedData = null) {
     const cardCol = document.createElement('div');
-    cardCol.className = 'col-md-6 mb-4';
+    cardCol.className = 'col-lg-4 col-md-6 col-sm-12 mb-4';
     const card = document.createElement('div');
     card.className = 'card incident-type-card';
     card.dataset.incidentTypeId = incidentType.incident_type_id;
@@ -214,15 +362,15 @@
     cardBody.className = 'card-body injury-types-container p-3';
     cardBody.style.display = assignedData ? 'block' : 'none';
     const headerRow = document.createElement('div');
-    headerRow.className = 'row mb-2 fw-semibold text-muted small';
+    headerRow.className = 'd-flex mb-2 fw-semibold text-muted small';
     const injuryTypeHeader = document.createElement('div');
-    injuryTypeHeader.className = 'col-6';
+    injuryTypeHeader.className = 'header-name-col';
     injuryTypeHeader.textContent = 'Injury Type Text';
     const colorHeader = document.createElement('div');
-    colorHeader.className = 'col-4';
+    colorHeader.className = 'header-color-col';
     colorHeader.textContent = 'Injury Type Color';
     const actionHeader = document.createElement('div');
-    actionHeader.className = 'col-2';
+    actionHeader.className = 'header-action-col';
     headerRow.appendChild(injuryTypeHeader);
     headerRow.appendChild(colorHeader);
     headerRow.appendChild(actionHeader);
@@ -254,14 +402,14 @@
     const rowId = Date.now() + Math.random();
     const existingRows = container.querySelectorAll('.injury-type-row').length;
     if (existingRows >= 5) {
-      alert('Maximum of 5 injury types allowed per incident type.');
+      showToast('error', 'Maximum of 5 injury types allowed per incident type.');
       return;
     }
     const row = document.createElement('div');
-    row.className = 'row mb-2 injury-type-row align-items-center';
+    row.className = 'd-flex mb-2 injury-type-row align-items-center';
     row.dataset.rowId = rowId;
     const nameCol = document.createElement('div');
-    nameCol.className = 'col-6';
+    nameCol.className = 'injury-type-name-col';
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.className = 'form-control form-control-sm injury-type-name';
@@ -270,7 +418,7 @@
     nameInput.addEventListener('input', markAsChanged);
     nameCol.appendChild(nameInput);
     const colorCol = document.createElement('div');
-    colorCol.className = 'col-4';
+    colorCol.className = 'injury-type-color-col';
     const colorInputGroup = document.createElement('div');
     colorInputGroup.className = 'input-group input-group-sm';
     const colorInput = document.createElement('input');
@@ -325,7 +473,7 @@
     colorInputGroup.appendChild(colorTextInput);
     colorCol.appendChild(colorInputGroup);
     const buttonCol = document.createElement('div');
-    buttonCol.className = 'col-2 text-center';
+    buttonCol.className = 'injury-type-action-col text-center';
     if (isFirstRow) {
       const addButton = document.createElement('button');
       addButton.className = 'btn btn-sm btn-primary add-injury-type';
@@ -362,7 +510,7 @@
   function updateRowButtons(container, incidentTypeId) {
     const rows = container.querySelectorAll('.injury-type-row');
     rows.forEach((row, index) => {
-      const buttonCol = row.querySelector('.col-2');
+      const buttonCol = row.querySelector('.injury-type-action-col');
       buttonCol.textContent = '';
       if (index === 0 && rows.length < 5) {
         const addButton = document.createElement('button');
@@ -382,7 +530,6 @@
         removeButton.className = 'btn btn-sm btn-danger remove-injury-type';
         const removeIcon = document.createElement('i');
         removeIcon.className = 'fas fa-minus';
-        removeButton.appendChild(removeIcon);
         removeButton.title = 'Remove this injury type';
         removeButton.type = 'button';
         removeButton.addEventListener('click', function () {
@@ -390,7 +537,7 @@
           updateRowButtons(container, incidentTypeId);
           markAsChanged();
         });
-        buttonCol.appendChild(removeButton);
+        buttonCol.appendChild(removeIcon);
       }
     });
   }
@@ -425,7 +572,7 @@
       }
     });
     if (incidentTypes.length === 0) {
-      alert('Please select at least one incident type with injury types before saving.');
+      showToast('error', 'Please select at least one incident type with injury types before saving.');
       return;
     }
     const saveBtn = document.getElementById('saveChangesBtn');
@@ -456,16 +603,7 @@
         saveBtn.style.display = 'none';
         hasChanges = false;
         if (data.result) {
-          if (typeof Swal !== 'undefined') {
-            Swal.fire({
-              title: 'Success!',
-              text: data.data || 'Incident types synced successfully.',
-              icon: 'success',
-              confirmButtonText: 'OK'
-            });
-          } else {
-            alert(data.data || 'Incident types synced successfully.');
-          }
+          showToast('success', data.data || 'Incident types synced successfully.');
           refreshAssignedData();
         } else {
           throw new Error(data.message || 'Failed to save incident types');
@@ -475,16 +613,7 @@
         console.error('Error saving incident types:', error);
         saveBtn.disabled = false;
         saveBtn.textContent = originalText;
-        if (typeof Swal !== 'undefined') {
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to save changes. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        } else {
-          alert('Failed to save changes. Please try again.');
-        }
+        showToast('error', 'Failed to save changes. Please try again.');
       });
   }
   function refreshAssignedData() {

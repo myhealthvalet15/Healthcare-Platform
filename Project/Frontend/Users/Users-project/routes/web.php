@@ -186,6 +186,7 @@ use App\Http\Controllers\UserEmployee\EmployeeDashboard;
 use App\Http\Controllers\otc\otcController;
 use App\Http\Controllers\components\mhc\HealthRiskAssessment;
 use App\Http\Controllers\components\events\EventsController;
+use App\Http\Controllers\PreEmployment\PreEmploymentController;
 use Illuminate\Http\Request;
 
 // icons
@@ -652,8 +653,14 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/otc/list-otc', [otcController::class, 'listOTC'])->name('otc-list-otc');
     Route::get('/otc/listotcdetails', [otcController::class, 'listotcdetails'])->name('otc-list-otc');
 
-    // 
-
+    // PreEmployeement
+    Route::get('/pre-employment/list-users', [PreEmploymentController::class, 'index'])->name('pre-employment');
+    Route::get('/pre-employment/getPreEmploymentDetails', [PreEmploymentController::class, 'getPreEmploymentDetails'])->name('getPreEmploymentDetails');
+    Route::get('/pre-employment/pre-employment-add', [PreEmploymentController::class, 'preEmploymentAdd'])->name('pre-employment-add');
+    Route::post('/pre-employment/store', [PreEmploymentController::class, 'store'])->name('PreEmployment.store');
+    Route::get('/pre-employment/pre-employment-edit/{id}', [PreEmploymentController::class, 'preEmploymentEdit'])->name('pre-employment-edit');
+    Route::get('/pre-employment/pre-employment-upload-user', [PreEmploymentController::class, 'preEmploymentUploadUser'])->name('pre-employment-upload-user');
+    
     // employee routes below
     Route::get('/UserEmployee/user_dashboard', [EmployeeUserController::class, 'index'])->name('employee-user-dashboard-analytics');
     Route::get('/UserEmployee/userpersonalInformation', [EmployeeUserController::class, 'showPersonalInfo'])->name('employee-user-personal-info');

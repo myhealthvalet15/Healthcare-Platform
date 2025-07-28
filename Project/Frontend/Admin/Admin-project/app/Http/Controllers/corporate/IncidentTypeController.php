@@ -112,7 +112,6 @@ class IncidentTypeController extends Controller
     }
     public function assignIncidentTypes(Request $request, $corporate_id)
     {
-
         try {
             if (!$corporate_id) {
                 return response()->json([

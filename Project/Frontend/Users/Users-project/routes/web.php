@@ -652,7 +652,7 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/otc/list-otc', [otcController::class, 'listOTC'])->name('otc-list-otc');
     Route::get('/otc/listotcdetails', [otcController::class, 'listotcdetails'])->name('otc-list-otc');
 
-
+    // 
 
     // employee routes below
     Route::get('/UserEmployee/user_dashboard', [EmployeeUserController::class, 'index'])->name('employee-user-dashboard-analytics');

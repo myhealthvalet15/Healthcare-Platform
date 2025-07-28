@@ -5,6 +5,7 @@ namespace App\Http\Controllers\UserEmployee;
 use App\Http\Controllers\Controller;
 use App\Models\Corporate\EmployeeUserMapping;
 use Illuminate\Http\Request;
+use App\Models\Hra\Factors\HraFactor;
 use App\Models\Hra\Templates\HraTemplate;
 use App\Models\Corporate\HraAssignedTemplate;
 use App\Models\Hra\Templates\HraTemplateQuestions;
@@ -45,17 +46,56 @@ class EmployeeDashboard extends Controller
             $templateModels = HraTemplate::whereIn('template_id', $templateIds)
                 ->get(['template_id', 'template_name'])
                 ->keyBy('template_id');
+            $completedResults = HraOverallResult::whereIn('hra_template_id', $templateIds)->get();
+            $completedMap = $completedResults->keyBy('hra_template_id');
+            $attendedTemplateIds = HraInduvidualAnswer::whereIn('template_id', $templateIds)
+                ->pluck('template_id')
+                ->unique()
+                ->toArray();
+            $allFactorScores = $completedResults->pluck('factor_score')->filter()->toArray();
+            $allFactorIds = [];
+            foreach ($allFactorScores as $factorScoreRaw) {
+                $factorScoreArray = is_string($factorScoreRaw) ? json_decode($factorScoreRaw, true) : $factorScoreRaw;
+                if (is_array($factorScoreArray)) {
+                    $allFactorIds = array_merge($allFactorIds, array_keys($factorScoreArray));
+                }
+            }
+            $allFactorIds = array_unique($allFactorIds);
+            $factors = HraFactor::whereIn('factor_id', $allFactorIds)->pluck('factor_name', 'factor_id')->toArray();
             $validTemplates = $assignedTemplates->filter(function ($t) use ($designation, $employeeTypeId, $departmentId) {
                 return
                     $this->matches($designation, $t->designation) &&
                     $this->matches($employeeTypeId, $t->employee_type) &&
                     $this->matches($departmentId, $t->department);
-            })->map(function ($t) use ($templateModels) {
+            })->map(function ($t) use ($templateModels, $completedMap, $attendedTemplateIds, $factors) {
                 $template = $templateModels[$t->template_id] ?? null;
-                return $template ? [
+                if (!$template) {
+                    return null;
+                }
+                $status = 'Not Attended';
+                $score = '';
+                $factorPoints = [];
+                if (isset($completedMap[$t->template_id])) {
+                    $status = 'Completed';
+                    $score = $completedMap[$t->template_id]->health_index;
+                    $factorPointsRaw = $completedMap[$t->template_id]->factor_score;
+                    $factorScoreArray = is_string($factorPointsRaw)
+                        ? json_decode($factorPointsRaw, true)
+                        : (is_array($factorPointsRaw) ? $factorPointsRaw : []);
+                    foreach ($factorScoreArray as $factorId => $value) {
+                        $name = $factors[$factorId] ?? $factorId;
+                        $factorPoints[$name] = $value;
+                    }
+                } elseif (in_array($t->template_id, $attendedTemplateIds)) {
+                    $status = 'Attended';
+                }
+                return [
                     'template_id' => $template->template_id,
-                    'template_name' => $template->template_name
-                ] : null;
+                    'template_name' => $template->template_name,
+                    'status' => $status,
+                    'score' => $score,
+                    'factor_points' => $factorPoints
+                ];
             })->filter()->values()->all();
             if (empty($validTemplates)) {
                 return response()->json(['result' => true, 'data' => 'No templates assigned'], 404);

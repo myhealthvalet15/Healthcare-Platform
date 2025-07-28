@@ -118,5 +118,4 @@
 </div>
 <hr class="my-12">
 <script src="/lib/js/page-scripts/show-factors.js"></script>
-</script>
 @endsection

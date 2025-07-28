@@ -496,6 +496,7 @@ class ModulesController extends Controller
     // backend Code
     private function getAllComponentsByCorpId($corporate_id)
     {
+    //    return 'hi';
         try {
             $corporateComponents = CorporateComponents::where('corporate_id', $corporate_id)->get();
             if ($corporateComponents->isEmpty()) {
@@ -553,6 +554,7 @@ class ModulesController extends Controller
     }
     public function getAllComponentsByCorpIdByAccessRights(Request $request, $corporate_id)
     {
+       // return 'Hi';
         $response = $this->getAllComponentsByCorpId($corporate_id);
         $responseData = json_decode($response->getContent(), true);
         $userId = auth('api')->user()->id;

@@ -295,31 +295,45 @@
 <script>
   let allIncidentTypes = [];
   let assignedIncidentTypes = [];
+  const corporateId = window.location.pathname.split('/').pop();
   let hasChanges = false;
   document.addEventListener('DOMContentLoaded', function () {
     Promise.all([
-      fetch('https://mhv-admin.hygeiaes.com/corporate/getAllIncidentTypes'),
-      fetch('https://mhv-admin.hygeiaes.com/corporate/getAllAssignedIncidentTypes/MCBoAmzVFigh')
-    ])
-      .then(responses => Promise.all(responses.map(response => response.json())))
-      .then(([incidentTypesData, assignedData]) => {
-        if (incidentTypesData.result) {
-          allIncidentTypes = incidentTypesData.data;
-          if (assignedData.result) {
-            assignedIncidentTypes = assignedData.data;
+      apiRequest({
+        url: '/corporate/getAllIncidentTypes',
+        method: 'GET',
+        onSuccess: (response) => {
+          if (response.result) {
+            allIncidentTypes = response.data;
           }
-          renderIncidentTypes();
+          return response;
+        },
+        onError: (error) => {
+          console.error('Error fetching incident types:', error);
+          const preloader = document.getElementById('preloader');
+          preloader.textContent = '';
+          const errorMsg = document.createElement('p');
+          errorMsg.className = 'text-danger';
+          errorMsg.textContent = 'Error loading incident types. Please try again.';
+          preloader.appendChild(errorMsg);
+        }
+      }),
+      apiRequest({
+        url: `/corporate/getAllAssignedIncidentTypes/${corporateId}`,
+        method: 'GET',
+        onSuccess: (response) => {
+          if (response.result) {
+            assignedIncidentTypes = response.data;
+          }
+          return response;
+        },
+        onError: (error) => {
+          console.error('Error fetching assigned incident types:', error);
         }
       })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        const preloader = document.getElementById('preloader');
-        preloader.textContent = '';
-        const errorMsg = document.createElement('p');
-        errorMsg.className = 'text-danger';
-        errorMsg.textContent = 'Error loading incident types. Please try again.';
-        preloader.appendChild(errorMsg);
-      });
+    ]).then(() => {
+      renderIncidentTypes();
+    });
     document.getElementById('saveChangesBtn').addEventListener('click', function () {
       saveChanges();
     });
@@ -447,72 +461,13 @@
         this.value = expandedHex;
       }
     });
-    colorTextInput.addEventListener('paste', function (e) {
-      setTimeout(() => {
-        const hexValue = this.value.trim();
-        if (/^#[0-9A-Fa-f]{6}$/i.test(hexValue)) {
-          colorInput.value = hexValue;
-        } else if (/^#[0-9A-Fa-f]{3}$/i.test(hexValue)) {
-          const expandedHex = '#' + hexValue[1] + hexValue[1] + hexValue[2] + hexValue[2] + hexValue[3] + hexValue[3];
-          colorInput.value = expandedHex;
-          this.value = expandedHex;
-        }
-      }, 10);
-    });
-    colorTextInput.addEventListener('keyup', function () {
-      const hexValue = this.value.trim();
-      if (/^#[0-9A-Fa-f]{6}$/i.test(hexValue)) {
-        colorInput.value = hexValue;
-      } else if (/^#[0-9A-Fa-f]{3}$/i.test(hexValue)) {
-        const expandedHex = '#' + hexValue[1] + hexValue[1] + hexValue[2] + hexValue[2] + hexValue[3] + hexValue[3];
-        colorInput.value = expandedHex;
-        this.value = expandedHex;
-      }
-    });
     colorInputGroup.appendChild(colorInput);
     colorInputGroup.appendChild(colorTextInput);
     colorCol.appendChild(colorInputGroup);
     const buttonCol = document.createElement('div');
     buttonCol.className = 'injury-type-action-col text-center';
     if (isFirstRow) {
-      const addButton = document.createElement('button');
-      addButton.className = 'btn btn-sm btn-primary add-injury-type';
-      const addIcon = document.createElement('i');
-      addIcon.className = 'fas fa-plus';
-      addButton.appendChild(addIcon);
-      addButton.title = 'Add another injury type';
-      addButton.type = 'button';
-      addButton.addEventListener('click', function () {
-        addInjuryTypeRow(container, incidentTypeId, false);
-        updateRowButtons(container, incidentTypeId);
-      });
-      buttonCol.appendChild(addButton);
-    } else if (existingRows >= 2) {
-      const removeButton = document.createElement('button');
-      removeButton.className = 'btn btn-sm btn-danger remove-injury-type';
-      const removeIcon = document.createElement('i');
-      removeIcon.className = 'fas fa-minus';
-      removeButton.appendChild(removeIcon);
-      removeButton.title = 'Remove this injury type';
-      removeButton.type = 'button';
-      removeButton.addEventListener('click', function () {
-        row.remove();
-        updateRowButtons(container, incidentTypeId);
-        markAsChanged();
-      });
-      buttonCol.appendChild(removeButton);
-    }
-    row.appendChild(nameCol);
-    row.appendChild(colorCol);
-    row.appendChild(buttonCol);
-    container.appendChild(row);
-  }
-  function updateRowButtons(container, incidentTypeId) {
-    const rows = container.querySelectorAll('.injury-type-row');
-    rows.forEach((row, index) => {
-      const buttonCol = row.querySelector('.injury-type-action-col');
-      buttonCol.textContent = '';
-      if (index === 0 && rows.length < 5) {
+      if (existingRows < 5) {
         const addButton = document.createElement('button');
         addButton.className = 'btn btn-sm btn-primary add-injury-type';
         const addIcon = document.createElement('i');
@@ -525,19 +480,72 @@
           updateRowButtons(container, incidentTypeId);
         });
         buttonCol.appendChild(addButton);
-      } else if (index >= 2) {
+      }
+    } else {
+      if (existingRows >= 2) {
         const removeButton = document.createElement('button');
         removeButton.className = 'btn btn-sm btn-danger remove-injury-type';
         const removeIcon = document.createElement('i');
         removeIcon.className = 'fas fa-minus';
+        removeButton.appendChild(removeIcon);
         removeButton.title = 'Remove this injury type';
         removeButton.type = 'button';
         removeButton.addEventListener('click', function () {
-          row.remove();
-          updateRowButtons(container, incidentTypeId);
-          markAsChanged();
+          if (container.querySelectorAll('.injury-type-row').length > 2) {
+            row.remove();
+            updateRowButtons(container, incidentTypeId);
+            markAsChanged();
+          } else {
+            showToast('error', 'Minimum 2 injury types required');
+          }
         });
-        buttonCol.appendChild(removeIcon);
+        buttonCol.appendChild(removeButton);
+      }
+    }
+    row.appendChild(nameCol);
+    row.appendChild(colorCol);
+    row.appendChild(buttonCol);
+    container.appendChild(row);
+  }
+  function updateRowButtons(container, incidentTypeId) {
+    const rows = container.querySelectorAll('.injury-type-row');
+    const totalRows = rows.length;
+    rows.forEach((row, index) => {
+      const buttonCol = row.querySelector('.injury-type-action-col');
+      buttonCol.innerHTML = '';
+      if (index === 0) {
+        if (totalRows < 5) {
+          const addButton = document.createElement('button');
+          addButton.className = 'btn btn-sm btn-primary add-injury-type';
+          const addIcon = document.createElement('i');
+          addIcon.className = 'fas fa-plus';
+          addButton.appendChild(addIcon);
+          addButton.title = 'Add another injury type';
+          addButton.type = 'button';
+          addButton.addEventListener('click', function () {
+            addInjuryTypeRow(container, incidentTypeId, false);
+            updateRowButtons(container, incidentTypeId);
+          });
+          buttonCol.appendChild(addButton);
+        }
+      } else {
+        if (totalRows > 2) {
+          const removeButton = document.createElement('button');
+          removeButton.className = 'btn btn-sm btn-danger remove-injury-type';
+          const removeIcon = document.createElement('i');
+          removeIcon.className = 'fas fa-minus';
+          removeButton.appendChild(removeIcon);
+          removeButton.title = 'Remove this injury type';
+          removeButton.type = 'button';
+          removeButton.addEventListener('click', function () {
+            if (totalRows > 2) {
+              row.remove();
+              updateRowButtons(container, incidentTypeId);
+              markAsChanged();
+            }
+          });
+          buttonCol.appendChild(removeButton);
+        }
       }
     });
   }
@@ -579,54 +587,45 @@
     const originalText = saveBtn.textContent;
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving...';
-    const requestData = {
-      incident_types: incidentTypes
-    };
-    fetch('https://mhv-admin.hygeiaes.com/corporate/assignIncidentTypes/MCBoAmzVFigh', {
+    apiRequest({
+      url: `/corporate/assignIncidentTypes/${corporateId}`,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      data: {
+        incident_types: incidentTypes
       },
-      body: JSON.stringify(requestData)
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
+      onSuccess: (response) => {
         saveBtn.disabled = false;
         saveBtn.textContent = originalText;
         saveBtn.style.display = 'none';
         hasChanges = false;
-        if (data.result) {
-          showToast('success', data.data || 'Incident types synced successfully.');
+        if (response.result) {
+          showToast('success', response.data || 'Incident types synced successfully.');
           refreshAssignedData();
         } else {
-          throw new Error(data.message || 'Failed to save incident types');
+          throw new Error(response.message || 'Failed to save incident types');
         }
-      })
-      .catch(error => {
+      },
+      onError: (error) => {
         console.error('Error saving incident types:', error);
         saveBtn.disabled = false;
         saveBtn.textContent = originalText;
         showToast('error', 'Failed to save changes. Please try again.');
-      });
+      }
+    });
   }
   function refreshAssignedData() {
-    fetch('https://mhv-admin.hygeiaes.com/corporate/getAllAssignedIncidentTypes/MCBoAmzVFigh')
-      .then(response => response.json())
-      .then(data => {
-        if (data.result) {
-          assignedIncidentTypes = data.data;
+    apiRequest({
+      url: `/corporate/getAllAssignedIncidentTypes/${corporateId}`,
+      method: 'GET',
+      onSuccess: (response) => {
+        if (response.result) {
+          assignedIncidentTypes = response.data;
         }
-      })
-      .catch(error => {
+      },
+      onError: (error) => {
         console.error('Error refreshing assigned data:', error);
-      });
+      }
+    });
   }
   document.addEventListener('click', function (e) {
     if (e.target.classList.contains('add-injury-type') || e.target.closest('.add-injury-type')) {
@@ -641,9 +640,13 @@
       const row = button.closest('.injury-type-row');
       const container = button.closest('.injury-types-container');
       const incidentTypeId = button.closest('.incident-type-card').dataset.incidentTypeId;
-      row.remove();
-      updateRowButtons(container, incidentTypeId);
-      markAsChanged();
+      if (container.querySelectorAll('.injury-type-row').length > 2) {
+        row.remove();
+        updateRowButtons(container, incidentTypeId);
+        markAsChanged();
+      } else {
+        showToast('error', 'Minimum 2 injury types required');
+      }
     }
   });
 </script>

@@ -17,8 +17,7 @@ $(document).ready(function () {
         $('#doctor_name_div').toggle($(this).val() === '0');
     });
 
- console.log("employeeUserId:", employeeUserId);
-    console.log("opRegistryId:", opRegistryId);
+
 
     loadMedicalCondition();
 
@@ -232,6 +231,10 @@ function loadMedicalCondition() {
         }
     });
 }
+
+
+
+
 //Employee Code
 const doctorMap = {
     101: "Dr. Aditi Verma",

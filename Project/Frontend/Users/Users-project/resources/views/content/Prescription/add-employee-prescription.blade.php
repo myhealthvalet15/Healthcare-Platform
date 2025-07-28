@@ -347,16 +347,16 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
                     <div style="width: 5%;">Days</div>
                     <div style="width: 30%;">
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                            <img src="https://www.hygeiaes.co/img/Morning.png">
+                            <img src="/assets/img/prescription-icons/morning.png">
                         </div>
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                            <img src="https://www.hygeiaes.co/img/Noon.png">
+                            <img src="/assets/img/prescription-icons/noon.png">
                         </div>
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                            <img src="https://www.hygeiaes.co/img/Evening.png">
+                            <img src="/assets/img/prescription-icons/evening.png">
                         </div>
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                            <img src="https://www.hygeiaes.co/img/Night.png">
+                            <img src="/assets/img/prescription-icons/night.png">
                         </div>
                     </div>
                     <div style="width: 15%;">AF/BF</div>
@@ -447,20 +447,20 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
                 <div class="prescription-header" style="display: flex; justify-content: space-between;">
                     <div style="width: 35%;color:#7367f0 !important;"> @if (session('user_type') != 'MasterUser')
 Outside
-                        Prescription @endif Drug Name - Type - Strength </div>
+                        Prescription @endif @if (session('user_type') == 'MasterUser') Drug Name - Type - Strength @endif </div>
                     <div style="width: 5%;">Days</div>
                     <div style="width: 30%;">
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                            <img src="https://www.hygeiaes.co/img/Morning.png">
+                            <img src="/assets/img/prescription-icons/morning.png">
                         </div>
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                            <img src="https://www.hygeiaes.co/img/Noon.png">
+                            <img src="/assets/img/prescription-icons/noon.png">
                         </div>
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                            <img src="https://www.hygeiaes.co/img/Evening.png">
+                            <img src="/assets/img/prescription-icons/evening.png">
                         </div>
                         <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                            <img src="https://www.hygeiaes.co/img/Night.png">
+                            <img src="/assets/img/prescription-icons/night.png">
                         </div>
                     </div>
                     <div style="width: 15%;">AF/BF</div>
@@ -565,7 +565,9 @@ Outside
                 <p style="margin-bottom: 10px;"> <input type="checkbox" name="share_patient">&nbsp;Send Mail To Patient
                 </p>
               
-            </div>  @endif
+            </div>  @endif 
+             @if (session('user_type') == 'MasterUser')
+
             <div class="col-md-3" style="margin-left:20px;">
 
     <!-- 🔗 Attach Prescription -->
@@ -578,7 +580,7 @@ Outside
         <!-- Thumbnails will appear here -->
     </div>
     </div>
-
+@endif
  <div class="mb-2">
     
 
@@ -1467,7 +1469,7 @@ if (prescription_Date) {
                                     <img src="">
                                 </div>
                                 <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
-                                    <img src="https://www.hygeiaes.co/img/Noon.png">
+                                    <img src="/assets/img/prescription-icons/noon.png">
                                 </div>
                                 <div style="display: inline-block; text-align: center; width: 50px; margin: 0 5px;">
                                     <img src="https://www.hygeiaes.co/img/Evening.png">

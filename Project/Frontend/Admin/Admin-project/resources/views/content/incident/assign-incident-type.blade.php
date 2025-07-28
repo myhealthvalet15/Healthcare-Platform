@@ -32,6 +32,16 @@
     font-weight: 500;
     color: #343a40;
 }
+#incrementCode {
+  height: 40px;
+  width: 40px;
+  font-size: 24px;
+  line-height: 20px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 </style>
 @endsection
@@ -41,16 +51,20 @@
   <div class="row mb-3" id="incidentTypesRow"></div>
  <div id="inputFields" style="display: none;">
     <div class="row align-items-center mb-2">
-      <div class="col-md-5">
-        <input type="text" id="injuryText" class="form-control" placeholder="Injury Type Text">
+      <div class="col-md-3">
+        <input type="text"  class="form-control injury-text" placeholder="Injury Type Text">
       </div>
       <div class="col-md-1 text-center">
-        <input type="color" id="colorPicker" class="form-control form-control-color" style="width: 40px; height: 40px; padding: 0;">
+        <input type="color" id="colorPicker" class="form-control form-control-color color-picker" style="width: 40px; height: 40px; padding: 0;">
       </div>
-      <div class="col-md-5">
-        <input type="text" id="colorCode" class="form-control" placeholder="Color Code" readonly>
+      <div class="col-md-4">
+        <input type="text" id="colorCode" class="form-control color-code" placeholder="Color Code" readonly>
       </div>
+       <div class="col-md-1 mt-2">
+  <button id="incrementCode" class="btn btn-primary form-control" onclick="incrementIncidentTypes()">+</button>
+</div>
     </div>
+       <div id="addinputFields"></div>
 
     <div class="text-end mb-3">
       <button class="btn btn-primary" onclick="saveIncidentTypes()">Save Incident Types</button>
@@ -58,7 +72,7 @@
   </div>
 </div>
 
-<script src="/lib/js/page-scripts/show-corporate-incidenttypes.js?v=48"></script>
+<script src="/lib/js/page-scripts/show-corporate-incidenttypes.js?v=65"></script>
 
 @endsection
 

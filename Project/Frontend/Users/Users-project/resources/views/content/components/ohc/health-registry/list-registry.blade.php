@@ -302,7 +302,13 @@
     #health-registry-table.table-bordered td {
         border: none;
         border-bottom: 1px solid #e9ecef;
-    }
+    }#attachmentSection {
+  display: flex;
+  gap: 1rem; /* space between cards */
+  flex-wrap: nowrap; /* prevent wrapping, or change to wrap if you want */
+}
+
+
 </style>
 <div class="card">
     <div class="card-body">
@@ -1645,22 +1651,118 @@ function populateReferralModal(entry) {
 
     document.getElementById('employeeESI').textContent = referral.employee_esi === 1 ? 'Yes' : 'No';
     document.getElementById('mrNumber').textContent = referral.mr_number || 'N/A';
-    document.getElementById('opRegistryId').textContent = referral.op_registry_id || 'N/A';
-
+    const opRegistryIdSpan = document.getElementById('hiddenOpRegistryId');
+if (opRegistryIdSpan) {
+    opRegistryIdSpan.textContent = referral.op_registry_id || 'N/A';
+}
     // Reusable preview function
-    function showPreview(url) {
-      const img = document.getElementById('previewImage');
-      const downloadLink = document.getElementById('downloadAttachment');
-      const wrapper = document.getElementById('downloadBtnWrapper');
+ function renderAttachmentsSection(details) {
+  const attachmentSection = document.getElementById('attachmentSection');
+  attachmentSection.innerHTML = ''; // Clear previous content
 
-      img.src = url;
-      img.classList.remove('d-none');
-      downloadLink.href = url;
-      wrapper.classList.remove('d-none');
+  // Create a single flex container for the label + buttons
+  const buttonRow = document.createElement('div');
+  buttonRow.className = 'd-flex flex-wrap align-items-center gap-2';
 
-      const modal = new bootstrap.Modal(document.getElementById('reportModal'));
-      modal.show();
+  // "Attachments:" label
+  const label = document.createElement('h6');
+  label.className = 'fw-semibold mb-0';
+  label.textContent = 'Attachments:';
+  buttonRow.appendChild(label);
+
+  // Discharge Summary Button
+  const dischargeBtn = document.createElement('button');
+  dischargeBtn.type = 'button';
+  dischargeBtn.className = 'btn btn-outline-primary btn-sm';
+  dischargeBtn.textContent = 'Discharge Summary';
+
+  dischargeBtn.addEventListener('click', () => {
+    if (details.attachment_discharge) {
+      openPreview(details.attachment_discharge);
+    } else {
+      alert('No discharge attachment available.');
     }
+  });
+
+  buttonRow.appendChild(dischargeBtn);
+
+  // Parse test reports and create buttons
+  let testReportsArray = [];
+  try {
+    testReportsArray = JSON.parse(details.attachment_test_reports);
+  } catch {
+    // Invalid JSON, fallback to empty array
+  }
+
+  if (Array.isArray(testReportsArray) && testReportsArray.length > 0) {
+    testReportsArray.forEach((attachment, index) => {
+      const reportBtn = document.createElement('button');
+      reportBtn.type = 'button';
+      reportBtn.className = 'btn btn-outline-secondary btn-sm';
+      reportBtn.textContent = `Test Report ${index + 1}`;
+
+      reportBtn.addEventListener('click', () => {
+        openPreview(attachment);
+      });
+
+      buttonRow.appendChild(reportBtn);
+    });
+  } else {
+    const noReportsText = document.createElement('span');
+    noReportsText.className = 'text-muted';
+    noReportsText.textContent = 'No test report attachments available.';
+    buttonRow.appendChild(noReportsText);
+  }
+
+  // Add label + buttons to the attachment section
+  attachmentSection.appendChild(buttonRow);
+}
+
+
+function openPreview(dataUrl, title = 'Attachment') {
+  const mimeType = dataUrl.substring(5, dataUrl.indexOf(';'));
+  const newWindow = window.open('', '_blank');
+
+  if (!newWindow) {
+    alert('Popup blocked! Please allow popups for this site.');
+    return;
+  }
+
+  let content = `
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+          img, embed { max-width: 100%; margin-top: 20px; }
+          .btn-download {
+            margin-top: 20px;
+            display: inline-block;
+            background: #0d6efd;
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>${title}</h3>
+  `;
+
+  if (mimeType.startsWith('image/')) {
+    content += `<img src="${dataUrl}" alt="${title}" />`;
+  } else if (mimeType === 'application/pdf') {
+    content += `<embed src="${dataUrl}" width="100%" height="600px" />`;
+  } else {
+    content += `<p>Unsupported file format for preview.</p>`;
+  }
+
+  content += `<br><a href="${dataUrl}" download="${title.replace(/\s+/g, '_')}" class="btn-download">Download</a></body></html>`;
+
+  newWindow.document.write(content);
+  newWindow.document.close();
+}
 
     if (employeeId) {
         fetch(`/ohc/health-registry/get-employee?employee_id=${employeeId}`, {
@@ -1741,7 +1843,7 @@ function populateReferralModal(entry) {
                         document.getElementById('vehicleType').textContent = details.vehicle_type || 'N/A';
                         document.getElementById('employeeESI').textContent = details.employee_esi === 1 ? 'Yes' : 'No';
                         document.getElementById('mrNumber').textContent = details.mr_number || 'N/A';
-                        document.getElementById('opRegistryId').textContent = details.op_registry_id || 'N/A';
+                        document.getElementById('hiddenOpRegistryId').textContent = details.op_registry_id || 'N/A';
 
                         if (details.vehicle_type === 'ambulance') {
                             ambulanceSection.classList.remove('d-none');
@@ -1788,28 +1890,9 @@ document.getElementById('hospitalizationToDate').textContent = formatDate(detail
                         document.getElementById('hospitalNameCard').textContent = details.hospital_name || 'N/A';
                         document.getElementById('doctorName').textContent = details.doctor_name || 'N/A';
 
-                        // Attach event listeners for attachments here because details object is ready
+                        // Attach event listeners for attachments here because details object is ready// Render the new attachment section with cards
+renderAttachmentsSection(details);
 
-                        document.getElementById('btnAttachmentDischarge').addEventListener('click', function () {
-                            if (details.attachment_discharge) {
-                                showPreview(details.attachment_discharge);
-                            } else {
-                                alert('No discharge attachment available.');
-                            }
-                        });
-
-                        document.getElementById('btnAttachmentTestReports').addEventListener('click', function () {
-                            try {
-                                const testReports = JSON.parse(details.attachment_test_reports);
-                                if (Array.isArray(testReports) && testReports.length > 0) {
-                                    showPreview(testReports[0]);
-                                } else {
-                                    alert('No test report attachment available.');
-                                }
-                            } catch (err) {
-                                alert('Invalid test report format.');
-                            }
-                        });
                     }
                 })
                 .catch(err => {
@@ -1993,102 +2076,123 @@ document.getElementById('hospitalizationToDate').textContent = formatDate(detail
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" style="color: #ffffff;margin-bottom: 15px;" id="outsideReferralModalLabel">Prescription & Referral Details</h5>
         </div>
+<div class="modal-body">
 
-      <div class="modal-body">
-        <div class="row">
-          <!-- LEFT COLUMN -->
-          <div class="col-md-7 border-end pe-4">
-
-            <!-- Employee Info -->
-            <div class="mb-4">
-              <h6 class="fw-semibold">Employee Information</h6>
-              <p id="employeeName" class="mb-1 fw-medium"></p>
-              <div><span class="fw-medium">OP Registry ID:</span> <span id="opRegistryId"></span></div>
-
-              <!-- Hidden Inputs -->
-              <input type="hidden" id="hiddenEmployeeId">
-              <input type="hidden" name="employee_id" id="hiddenEmployeeId">
-              <input type="hidden" name="employee_name" id="hiddenEmployeeName">
-              <input type="hidden" name="employee_email" id="hiddenEmployeeEmail">
-              <input type="hidden" name="employee_department" id="hiddenEmployeeDepartment">
-              <input type="hidden" name="employee_dob" id="hiddenEmployeeDOB">
-              <input type="hidden" name="employee_gender" id="hiddenEmployeeGender">
-              <input type="hidden" name="employee_contact" id="hiddenEmployeeContact">
-              <input type="hidden" name="employee_designation" id="hiddenEmployeeDesignation">
-              <input type="hidden" name="employee_corporate" id="hiddenEmployeeCorporate">
-              <input type="hidden" name="employee_age" id="hiddenEmployeeAge">
-              <input type="hidden" name="employee_user_id" id="hiddenEmployeeUserId">
-              <input type="hidden" name="op_registry_id" id="hiddenOpRegistryId">
-            </div>
-
-            <!-- Hospital Info -->
-            <div class="mb-4">
-              <h6 class="fw-semibold">Hospital Information</h6>
-              <div><span class="fw-medium">Hospital Name:</span> <span id="hospitalName"></span></div>
-              <div><span class="fw-medium">Accompanied By:</span> <span id="accompaniedBy"></span></div>
-            </div>
-
-            <!-- Transport Info -->
-            <div class="mb-4">
-              <h6 class="fw-semibold">Transportation Details</h6>
-              <div><span class="fw-medium">Vehicle Type:</span> <span id="vehicleType"></span></div>
-            </div>
-
-            <!-- Ambulance Info -->
-            <div id="ambulanceDetailsSection" class="mb-4 d-none">
-              <h6 class="fw-semibold">Ambulance Details</h6>
-              <div class="row">
-                <div class="col-md-6"><span class="fw-medium">Driver:</span> <span id="ambulanceDriver"></span></div>
-                <div class="col-md-6"><span class="fw-medium">Ambulance Number:</span> <span id="ambulanceNumber"></span></div>
-                <div class="col-md-6"><span class="fw-medium">Out Time:</span> <span id="ambulanceOutTime"></span></div>
-                <div class="col-md-6"><span class="fw-medium">In Time:</span> <span id="ambulanceInTime"></span></div>
-                <div class="col-md-6"><span class="fw-medium">Meter Out:</span> <span id="meterOut"></span></div>
-                <div class="col-md-6"><span class="fw-medium">Meter In:</span> <span id="meterIn"></span></div>
-              </div>
-            </div>
-
-            <!-- Additional Info -->
-            <div class="mb-4">
-              <h6 class="fw-semibold">Additional Information</h6>
-              <div><span class="fw-medium">Employee ESI:</span> <span id="employeeESI"></span></div>
-              <div><span class="fw-medium">MR Number:</span> <span id="mrNumber"></span></div>
-            </div>
-          </div>
-
-          <!-- RIGHT COLUMN -->
-          <div class="col-md-5 ps-4">
-            <!-- Referral Details -->
-            <div class="mb-4">
-              <h6 class="fw-semibold">Referral Details</h6>
-              <div class="card bg-light p-3">
-                <div class="mb-2"><strong>Condition Name:</strong> <span id="conditionName">N/A</span></div>
-                <div class="mb-2"><strong>Description:</strong> <span id="description">N/A</span></div>
-                <div class="mb-2"><strong>From Date:</strong> <span id="hospitalizationfromDate">N/A</span></div>
-                <div class="mb-2"><strong>To Date:</strong> <span id="hospitalizationToDate">N/A</span></div>
-                <div class="mb-2"><strong>Hospital Name:</strong> <span id="hospitalNameCard">N/A</span></div>
-                <div class="mb-2"><strong>Doctor Name:</strong> <span id="doctorName">N/A</span></div>
-              </div>
-            </div>
-
-            <!-- Attachments -->
-            <div class="mb-4">
-  <h6 class="fw-semibold">Attachments</h6>
-  <button type="button" id="btnAttachmentDischarge" class="btn btn-outline-primary btn-sm me-2">
-    Discharge Attachment
-  </button>
-  <button type="button" id="btnAttachmentTestReports" class="btn btn-outline-primary btn-sm">
-    Test Reports
-  </button>
-</div>
-
+  <!-- ROW 1: Referral Details (Full Width) -->
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title fw-semibold">Referral Details</h6>
+          <div class="row">
+            <div class="col-12 mb-2"><strong>Condition Name:</strong> <span id="conditionName">N/A</span></div>
+            <div class="col-12 mb-2"><strong>Description:</strong> <span id="description">N/A</span></div>
+            <div class="col-md-6 mb-2"><strong>From Date:</strong> <span id="hospitalizationfromDate">N/A</span></div>
+            <div class="col-md-6 mb-2"><strong>To Date:</strong> <span id="hospitalizationToDate">N/A</span></div>
+            <div class="col-md-6 mb-2"><strong>Hospital Name:</strong> <span id="hospitalNameCard">N/A</span></div>
+            <div class="col-md-6 mb-2"><strong>Doctor Name:</strong> <span id="doctorName">N/A</span></div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="updateHospitalizationBtn">Update Hospitalization Details</button>
+  <!-- ROW 2: Attachments (Full Width) -->
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          
+          <div id="attachmentSection" style="display: flex; gap: 1rem;">
+            <h6 class="card-title fw-semibold">Attachments</h6>
+          </div>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: 4 Cards (Unchanged) -->
+  <div class="row g-3 mb-3">
+
+    <!-- Employee Info -->
+    <div class="col-md-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="card-title fw-semibold">Employee Information</h6>
+          <p id="employeeName" class="mb-1 fw-medium"></p>
+
+          <!-- Hidden Inputs -->
+          <input type="hidden" id="hiddenEmployeeId" name="employee_id">
+          <input type="hidden" name="employee_name" id="hiddenEmployeeName">
+          <input type="hidden" name="employee_email" id="hiddenEmployeeEmail">
+          <input type="hidden" name="employee_department" id="hiddenEmployeeDepartment">
+          <input type="hidden" name="employee_dob" id="hiddenEmployeeDOB">
+          <input type="hidden" name="employee_gender" id="hiddenEmployeeGender">
+          <input type="hidden" name="employee_contact" id="hiddenEmployeeContact">
+          <input type="hidden" name="employee_designation" id="hiddenEmployeeDesignation">
+          <input type="hidden" name="employee_corporate" id="hiddenEmployeeCorporate">
+          <input type="hidden" name="employee_age" id="hiddenEmployeeAge">
+          <input type="hidden" name="employee_user_id" id="hiddenEmployeeUserId">
+          <input type="hidden" name="op_registry_id" id="hiddenOpRegistryId">
+        </div>
+      </div>
+    </div>
+
+    <!-- Hospital Info -->
+    <div class="col-md-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="card-title fw-semibold">Hospital Information</h6>
+          <div><strong>Hospital Name:</strong> <span id="hospitalName"></span></div>
+          <div><strong>Accompanied By:</strong> <span id="accompaniedBy"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transportation Info -->
+    <div class="col-md-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="card-title fw-semibold">Transportation Details</h6>
+          <div><strong>Vehicle Type:</strong> <span id="vehicleType"></span></div>
+
+          <!-- Ambulance Info -->
+          <div id="ambulanceDetailsSection" class="mt-3 d-none">
+            <h6 class="fw-semibold">Ambulance Details</h6>
+            <div><strong>Driver:</strong> <span id="ambulanceDriver"></span></div>
+            <div><strong>Ambulance Number:</strong> <span id="ambulanceNumber"></span></div>
+            <div><strong>Out Time:</strong> <span id="ambulanceOutTime"></span></div>
+            <div><strong>In Time:</strong> <span id="ambulanceInTime"></span></div>
+            <div><strong>Meter Out:</strong> <span id="meterOut"></span></div>
+            <div><strong>Meter In:</strong> <span id="meterIn"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="col-md-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="card-title fw-semibold">Additional Information</h6>
+          <div><strong>Employee ESI:</strong> <span id="employeeESI"></span></div>
+          <div><strong>MR Number:</strong> <span id="mrNumber"></span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer">
+  <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
+  <button type="button" class="btn btn-primary" id="updateHospitalizationBtn">Update Hospitalization Details</button>
+</div>
+
+
+
     </div>
   </div>
 </div>

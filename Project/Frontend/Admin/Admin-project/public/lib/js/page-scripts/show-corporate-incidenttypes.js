@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     fetchIncidentTypes();
 });
+  let incidentTypeCount = 1; 
+  const maxTypes = 5;
 
 function fetchIncidentTypes() {
     const row = document.getElementById('incidentTypesRow');
     const inputFields = document.getElementById('inputFields');
-    const incidentText = document.getElementById('incidentText');
-    const colorPicker = document.getElementById('colorPicker');
-    const colorCode = document.getElementById('colorCode');
+    //const incidentText = document.getElementById('incidentText');
 
     fetch('/corporate/getAllIncidentTypes')
         .then(res => res.json())
@@ -23,6 +23,7 @@ function fetchIncidentTypes() {
                                    type="checkbox" 
                                    name="incidentType" 
                                    id="incident-${item.incident_type_id}" 
+                                   data-id="${item.incident_type_id}" 
                                    data-name="${item.incident_type_name}">
                             <label class="form-check-label" for="incident-${item.incident_type_id}">
                                 ${item.incident_type_name}
@@ -43,23 +44,55 @@ function fetchIncidentTypes() {
 
                         if (this.checked) {
                             inputFields.style.display = 'block';
-                            incidentText.value = this.dataset.name;
+                           // incidentText.value = this.dataset.name;
                         } else {
                             inputFields.style.display = 'none';
-                            incidentText.value = '';
-                            colorCode.value = '';
+                           // incidentText.value = '';
                         }
                     });
                 });
 
-                // Update color code field
-                colorPicker.addEventListener('input', () => {
-                    colorCode.value = colorPicker.value;
-                });
+               
             }
         });
 }
 
+
+  function incrementIncidentTypes() {
+    if (incidentTypeCount >= maxTypes) {
+      alert("You can add only up to 5 incident types.");
+      return;
+    }
+
+    const addInputFields = document.getElementById('addinputFields');
+    const div = document.createElement('div');
+    div.className = 'row align-items-center mb-2';
+
+    div.innerHTML = `
+      <div class="col-md-3">
+      <input type="text" class="form-control injury-text" placeholder="Injury Type Text">
+    </div>
+    <div class="col-md-1 text-center">
+      <input type="color" class="form-control form-control-color color-picker" style="width: 40px; height: 40px; padding: 0;">
+    </div>
+    <div class="col-md-4">
+      <input type="text" class="form-control color-code" placeholder="Color Code" readonly>
+    </div>
+    `;
+
+    addInputFields.appendChild(div);
+    incidentTypeCount++;
+  }
+
+document.addEventListener('input', function (e) {
+  if (e.target.classList.contains('color-picker')) {
+    const row = e.target.closest('.row');
+    const colorCodeInput = row.querySelector('.color-code');
+    if (colorCodeInput) {
+      colorCodeInput.value = e.target.value;
+    }
+  }
+});
 
 function saveIncidentTypes() {
     const selectedCheckbox = document.querySelector('.incident-checkbox:checked');
@@ -71,31 +104,44 @@ function saveIncidentTypes() {
 
     const incidentTypeId = selectedCheckbox.dataset.id;
     const incidentTypeName = selectedCheckbox.dataset.name;
-    console.log("xxxx",incidentTypeId);
 
-    const colorPicker = document.getElementById('colorPicker'); 
-    const colorCodeInput = document.getElementById('colorCode');
+console.log(incidentTypeId);
 
-    if (colorPicker && colorCodeInput) {
-        colorCodeInput.value = colorPicker.value;
-    }
+    // const colorPicker = document.getElementById('colorPicker'); 
+    // const colorCodeInput = document.getElementById('colorCode');
 
-    const injuryText = document.getElementById('injuryText')?.value.trim();
-    const colorCode = colorCodeInput?.value?.trim();
+    // if (colorPicker && colorCodeInput) {
+    //     colorCodeInput.value = colorPicker.value;
+    // }
 
-    if (!injuryText || !colorCode) {
-        Swal.fire('Validation Error', 'All fields are required.', 'warning');
-        return;
-    }
+    // const injuryText = document.getElementById('injuryText')?.value.trim();
+    // const colorCode = colorCodeInput?.value?.trim();
 
+    // if (!injuryText || !colorCode) {
+    //     Swal.fire('Validation Error', 'All fields are required.', 'warning');
+    //     return;
+    // }
+ const injuryTexts = document.querySelectorAll('.injury-text');
+  const colorPickers = document.querySelectorAll('.color-picker');
+  const colorCodes = document.querySelectorAll('.color-code');
+
+  const injury_color_types = {};
+
+  for (let i = 0; i < injuryTexts.length; i++) {
+    const text = injuryTexts[i].value.trim();
+    const code = colorCodes[i].value.trim();
+
+    if (text && code) {
+    injury_color_types[text] = code;
+  }
+    
+  }
     const corporateId = 'MCBoAmzVFigh';  
 
     const incident_types = [
         {
             id: incidentTypeId,
-            injury_color_types: {
-                [injuryText]: colorCode 
-            }
+            injury_color_types: injury_color_types
         }
     ];
 

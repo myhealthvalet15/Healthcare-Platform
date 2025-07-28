@@ -188,7 +188,7 @@ class health_registry extends Controller
                 'HeaderData' => 'Add Employee Prescription',
                 'prescriptionTemplates' => $prescriptionTemplates,
                 'pharmacyData' => $pharmacyData,
-                'employeeData' => $employeeData['message']
+                'employeeData' => $employeeData['message'],
             ]);
         }
         return response()->json([
@@ -575,16 +575,43 @@ class health_registry extends Controller
 
 public function updateHospitalizationDetails(Request $request)
 {
-    //return $request;
     Log::info('updateHospitalizationDetails called', $request->all());
 
     try {
         $headerData = 'Hospitalization Details';
 
+        // Step 1: Determine if op_registry_id is null and construct the API URL
+        $employeeId = $request->employee_id;
+        $opRegistryId = $request->op_registry_id ?? null;
+
+        $employeeApiUrl = is_null($opRegistryId)
+            ? "https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/checkEmployeeId/followUp/0/{$employeeId}"
+            : "https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/checkEmployeeId/followUp/0/{$employeeId}/op/{$opRegistryId}";
+
+        // Step 2: Make the employee API call
+        $employeeResponse = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . request()->cookie('access_token'),
+        ])->get($employeeApiUrl);
+
+        // Step 3: Check if the API call was successful
+        if (!$employeeResponse->successful()) {
+            Log::error('Employee API failed: ' . $employeeResponse->body());
+            return response('Failed to fetch employee data', 500);
+        }
+
+        $employeeData = $employeeResponse->json();
+
+        if (!isset($employeeData['result']) || !$employeeData['result']) {
+            return response('Invalid employee data received', 422);
+        }
+
+        // Step 4: Pass all data to the view
         return view('content.components.ohc.health-registry.hospitalization-details', [
             'HeaderData' => $headerData,
-            'employee_id' => $request->employee_id,  
-            'op_registry_id' => $request->op_registry_id,
+            'employee_id' => $employeeId,  
+            'op_registry_id' => $opRegistryId,
             'hospital_name' => $request->hospital_name,
             'employee_name' => $request->employee_name,
             'employee_email' => $request->employee_email,
@@ -596,13 +623,14 @@ public function updateHospitalizationDetails(Request $request)
             'employee_corporate' => $request->employee_corporate,
             'employee_user_id' => $request->employee_user_id,
             'employee_age' => $request->employee_age,
-            'op_registry_id' => $request->op_registry_id,
+            'employeeData' => $employeeData['message'], // Passed employee data
         ]);
     } catch (\Exception $e) {
         Log::error('Error updating hospitalization: ' . $e->getMessage());
         return response('Error rendering view: ' . $e->getMessage(), 500);
     }
 }
+
 
 
 

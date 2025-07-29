@@ -705,13 +705,23 @@
                 </div>
                 <div class="modal-body">
                     <div class="row mb-3">
-                        <div class="col-md-12">
-                            <label for="hospitalName" class="form-label">Enter
-                                Hospital Name</label>
-                            <input type="text" id="hospitalName" class="form-control" placeholder="Enter Hospital Name"
-                                id="hospitalName">
-                        </div>
-                    </div>
+ <div class="row mb-3">
+  <div class="col-md-6">
+    <label for="hospital_id" class="form-label">Hospital</label>
+    <select name="hospital_id" id="hospital_id" class="form-select">
+      <option value="">-- Select Hospital --</option>
+      <option value="1">City Hospital</option>
+      <option value="2">State Medical</option>
+      <option value="0">Other</option>
+    </select>
+  </div>
+  <div class="col-md-6" id="hospital_name_div" style="display:none;">
+    <label for="hospital_name" class="form-label">Hospital Name</label>
+    <input type="text" name="hospital_name" id="hospital_name" class="form-control" placeholder="Enter Hospital Name">
+  </div>
+</div>
+
+
                     <div class="row mb-3">
                         <div class="col-md-12">
                             <div class="form-check">
@@ -1088,17 +1098,34 @@
             }
         });
     }
-    $(document).ready(function () {
+        $(document).ready(function () {
         document.getElementById("saveChangesModal").addEventListener("click", function () {
-            let hospitalNameInput = document.getElementById("hospitalName").value.trim();
-            let sanitizedHospitalName = hospitalNameInput.replace(/[<>]/g, "");
-            document.getElementById("outsideReferralHospitalName").textContent = sanitizedHospitalName || "No Hospital Name Entered";
-            let modal = bootstrap.Modal.getInstance(document.getElementById("basicModal"));
-            modal.hide();
-            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-            document.body.classList.remove("modal-open");
-            document.body.style.overflow = "auto";
-        });
+        const hospitalSelect = document.getElementById("hospital_id");
+        const selectedHospitalId = hospitalSelect.value;
+        const hospitalTextInput = document.getElementById("hospital_name").value.trim();
+        let displayValue = "";
+
+        if (selectedHospitalId === "0") {
+            // If "Other" is selected, use the input field and sanitize it
+            let sanitizedHospitalName = hospitalTextInput.replace(/[<>]/g, "");
+            displayValue = sanitizedHospitalName || "No Hospital Name Entered";
+        } else {
+            // Use the selected hospital's text from the dropdown
+            const selectedOption = hospitalSelect.options[hospitalSelect.selectedIndex];
+            displayValue = selectedOption.text || "No Hospital Selected";
+        }
+
+        // Display the result somewhere in the DOM
+        document.getElementById("outsideReferralHospitalName").textContent = displayValue;
+
+        // Close the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("basicModal"));
+        modal.hide();
+        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "auto";
+    });
+
         document.getElementById("referralSelect").addEventListener("change", function () {
             let selectedValue = this.value;
             if (selectedValue === "OutsideReferral") {
@@ -1226,5 +1253,19 @@
                 console.error('One or more API requests failed:', error);
             });
     });
+    
+</script>
+<script>
+document.getElementById('hospital_id').addEventListener('change', function () {
+  const hospitalNameDiv = document.getElementById('hospital_name_div');
+  if (this.value === "0") {
+    hospitalNameDiv.style.display = 'block';
+  } else {
+    hospitalNameDiv.style.display = 'none';
+    // Optional: Clear the hospital name input when hidden
+    document.getElementById('hospital_name').value = '';
+  }
+});
+
 </script>
 @endsection

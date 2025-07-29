@@ -1651,118 +1651,134 @@ function populateReferralModal(entry) {
 
     document.getElementById('employeeESI').textContent = referral.employee_esi === 1 ? 'Yes' : 'No';
     document.getElementById('mrNumber').textContent = referral.mr_number || 'N/A';
+
     const opRegistryIdSpan = document.getElementById('hiddenOpRegistryId');
-if (opRegistryIdSpan) {
-    opRegistryIdSpan.textContent = referral.op_registry_id || 'N/A';
-}
-    // Reusable preview function
- function renderAttachmentsSection(details) {
-  const attachmentSection = document.getElementById('attachmentSection');
-  attachmentSection.innerHTML = ''; // Clear previous content
-
-  // Create a single flex container for the label + buttons
-  const buttonRow = document.createElement('div');
-  buttonRow.className = 'd-flex flex-wrap align-items-center gap-2';
-
-  // "Attachments:" label
-  const label = document.createElement('h6');
-  label.className = 'fw-semibold mb-0';
-  label.textContent = 'Attachments:';
-  buttonRow.appendChild(label);
-
-  // Discharge Summary Button
-  const dischargeBtn = document.createElement('button');
-  dischargeBtn.type = 'button';
-  dischargeBtn.className = 'btn btn-outline-primary btn-sm';
-  dischargeBtn.textContent = 'Discharge Summary';
-
-  dischargeBtn.addEventListener('click', () => {
-    if (details.attachment_discharge) {
-      openPreview(details.attachment_discharge);
-    } else {
-      alert('No discharge attachment available.');
+    if (opRegistryIdSpan) {
+        opRegistryIdSpan.textContent = referral.op_registry_id || 'N/A';
     }
-  });
 
-  buttonRow.appendChild(dischargeBtn);
+    // Reusable preview function
+    function renderAttachmentsSection(details) {
+        const attachmentSection = document.getElementById('attachmentSection');
+        const attachmentsCard = document.getElementById('attachmentsCard');
 
-  // Parse test reports and create buttons
-  let testReportsArray = [];
-  try {
-    testReportsArray = JSON.parse(details.attachment_test_reports);
-  } catch {
-    // Invalid JSON, fallback to empty array
-  }
+        // Clear previous content and hide section by default
+        attachmentSection.innerHTML = '';
+        attachmentSection.style.display = 'none';
+        attachmentsCard.style.display = 'none';
 
-  if (Array.isArray(testReportsArray) && testReportsArray.length > 0) {
-    testReportsArray.forEach((attachment, index) => {
-      const reportBtn = document.createElement('button');
-      reportBtn.type = 'button';
-      reportBtn.className = 'btn btn-outline-secondary btn-sm';
-      reportBtn.textContent = `Test Report ${index + 1}`;
+        let hasAttachment = false;
 
-      reportBtn.addEventListener('click', () => {
-        openPreview(attachment);
-      });
+        // Create container for buttons and label
+        const buttonRow = document.createElement('div');
+        buttonRow.className = 'd-flex flex-wrap align-items-center gap-2';
 
-      buttonRow.appendChild(reportBtn);
-    });
-  } else {
-    const noReportsText = document.createElement('span');
-    noReportsText.className = 'text-muted';
-    noReportsText.textContent = 'No test report attachments available.';
-    buttonRow.appendChild(noReportsText);
-  }
+        // --- Discharge Summary ---
+        if (details.attachment_discharge) {
+            hasAttachment = true;
 
-  // Add label + buttons to the attachment section
-  attachmentSection.appendChild(buttonRow);
-}
+            const dischargeBtn = document.createElement('button');
+            dischargeBtn.type = 'button';
+            dischargeBtn.className = 'btn btn-outline-primary btn-sm';
+            dischargeBtn.textContent = 'Discharge Summary';
 
+            dischargeBtn.addEventListener('click', () => {
+                openPreview(details.attachment_discharge, 'Discharge Summary');
+            });
 
-function openPreview(dataUrl, title = 'Attachment') {
-  const mimeType = dataUrl.substring(5, dataUrl.indexOf(';'));
-  const newWindow = window.open('', '_blank');
+            buttonRow.appendChild(dischargeBtn);
+        }
 
-  if (!newWindow) {
-    alert('Popup blocked! Please allow popups for this site.');
-    return;
-  }
+        // --- Test Reports ---
+        let testReportsArray = [];
+        try {
+            testReportsArray = JSON.parse(details.attachment_test_reports);
+        } catch {
+            testReportsArray = [];
+        }
 
-  let content = `
-    <html>
-      <head>
-        <title>${title}</title>
-        <style>
-          body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-          img, embed { max-width: 100%; margin-top: 20px; }
-          .btn-download {
-            margin-top: 20px;
-            display: inline-block;
-            background: #0d6efd;
-            color: #fff;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-          }
-        </style>
-      </head>
-      <body>
-        <h3>${title}</h3>
-  `;
+        if (Array.isArray(testReportsArray) && testReportsArray.length > 0) {
+            hasAttachment = true;
 
-  if (mimeType.startsWith('image/')) {
-    content += `<img src="${dataUrl}" alt="${title}" />`;
-  } else if (mimeType === 'application/pdf') {
-    content += `<embed src="${dataUrl}" width="100%" height="600px" />`;
-  } else {
-    content += `<p>Unsupported file format for preview.</p>`;
-  }
+            testReportsArray.forEach((attachment, index) => {
+                const reportBtn = document.createElement('button');
+                reportBtn.type = 'button';
+                reportBtn.className = 'btn btn-outline-secondary btn-sm';
+                reportBtn.textContent = `Test Report ${index + 1}`;
 
-  content += `<br><a href="${dataUrl}" download="${title.replace(/\s+/g, '_')}" class="btn-download">Download</a></body></html>`;
+                reportBtn.addEventListener('click', () => {
+                    openPreview(attachment, `Test Report ${index + 1}`);
+                });
 
-  newWindow.document.write(content);
-  newWindow.document.close();
-}
+                buttonRow.appendChild(reportBtn);
+            });
+        }
+
+        // --- Show or Hide the Card ---
+        if (hasAttachment) {
+            const label = document.createElement('h6');
+            label.className = 'fw-semibold mb-0';
+            label.textContent = 'Attachments:';
+
+            buttonRow.prepend(label);
+            attachmentSection.appendChild(buttonRow);
+
+            attachmentSection.style.display = 'flex';
+            attachmentSection.style.gap = '1rem';
+            attachmentsCard.style.display = 'block';
+            console.log('Attachments found for this referral.');
+        } else {
+            console.log('No attachments found for this referral.');
+            // No attachments: ensure section is hidden
+            attachmentSection.style.display = 'none';
+            attachmentsCard.style.display = 'none';
+        }
+    }
+
+    function openPreview(dataUrl, title = 'Attachment') {
+        const mimeType = dataUrl.substring(5, dataUrl.indexOf(';'));
+        const newWindow = window.open('', '_blank');
+
+        if (!newWindow) {
+            alert('Popup blocked! Please allow popups for this site.');
+            return;
+        }
+
+        let content = `
+        <html>
+            <head>
+                <title>${title}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+                    img, embed { max-width: 100%; margin-top: 20px; }
+                    .btn-download {
+                        margin-top: 20px;
+                        display: inline-block;
+                        background: #0d6efd;
+                        color: #fff;
+                        padding: 10px 15px;
+                        text-decoration: none;
+                        border-radius: 5px;
+                    }
+                </style>
+            </head>
+            <body>
+                <h3>${title}</h3>
+        `;
+
+        if (mimeType.startsWith('image/')) {
+            content += `<img src="${dataUrl}" alt="${title}" />`;
+        } else if (mimeType === 'application/pdf') {
+            content += `<embed src="${dataUrl}" width="100%" height="600px" />`;
+        } else {
+            content += `<p>Unsupported file format for preview.</p>`;
+        }
+
+        content += `<br><a href="${dataUrl}" download="${title.replace(/\s+/g, '_')}" class="btn-download">Download</a></body></html>`;
+
+        newWindow.document.write(content);
+        newWindow.document.close();
+    }
 
     if (employeeId) {
         fetch(`/ohc/health-registry/get-employee?employee_id=${employeeId}`, {
@@ -1820,10 +1836,21 @@ function openPreview(dataUrl, title = 'Attachment') {
                     }
                 })
                 .then(res => {
-                    if (!res.ok) throw new Error('Failed to fetch hospitalization details');
+                    if (!res.ok) {
+                        // Try to parse JSON error message
+                        return res.json().then(data => {
+                        throw new Error(data.message || 'Failed to fetch hospitalization details');
+                        }).catch(() => {
+                        throw new Error('Failed to fetch hospitalization details');
+                        });
+                    }
                     return res.json();
                 })
                 .then(hospData => {
+                    if (!hospData.result || !hospData.data) {
+                        throw new Error('No hospitalization details found');
+                    }
+
                     let details = null;
                     if (hospData && hospData.result && hospData.data) {
                         if (Array.isArray(hospData.data.data) && hospData.data.data.length > 0) {
@@ -1869,34 +1896,54 @@ function openPreview(dataUrl, title = 'Attachment') {
                             : (details.other_condition_name || 'N/A');
 
                         document.getElementById('description').textContent = details.description || 'N/A';
-console.log('from_datetime raw:', details.from_datetime);
-console.log('to_datetime raw:', details.to_datetime);
-            function formatDate(dateStr) {
-    if (!dateStr) return 'N/A';
 
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-    const year = date.getFullYear();
+                        console.log('from_datetime raw:', details.from_datetime);
+                        console.log('to_datetime raw:', details.to_datetime);
 
-    return `${day}-${month}-${year}`;
-}
+                        function formatDate(dateStr) {
+                            if (!dateStr) return 'N/A';
 
-document.getElementById('hospitalizationfromDate').textContent = formatDate(details.from_datetime);
-document.getElementById('hospitalizationToDate').textContent = formatDate(details.to_datetime);
+                            const date = new Date(dateStr);
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+                            const year = date.getFullYear();
 
+                            return `${day}-${month}-${year}`;
+                        }
 
+                        document.getElementById('hospitalizationfromDate').textContent = formatDate(details.from_datetime);
+                        document.getElementById('hospitalizationToDate').textContent = formatDate(details.to_datetime);
 
                         document.getElementById('hospitalNameCard').textContent = details.hospital_name || 'N/A';
                         document.getElementById('doctorName').textContent = details.doctor_name || 'N/A';
 
-                        // Attach event listeners for attachments here because details object is ready// Render the new attachment section with cards
-renderAttachmentsSection(details);
+                        // Attach event listeners for attachments here because details object is ready
+                        // Render the new attachment section with cards
+                        const referralCard = document.getElementById('referralDetailsCard');
+                        if (referralCard) referralCard.style.display = 'block';
 
+                        // Also show attachmentsCard if applicable
+                        const attachmentsCard = document.getElementById('attachmentsCard');
+                        if (attachmentsCard) attachmentsCard.style.display = 'block';
+                                                renderAttachmentsSection(details);
+
+                    } else {
+                        const attachmentsCard = document.getElementById('attachmentsCard');
+                        if (attachmentsCard) {
+                            attachmentsCard.style.display = 'none';
+                        }
                     }
                 })
                 .catch(err => {
                     console.error('Error fetching hospitalization details:', err);
+                    const referralCard = document.getElementById('referralDetailsCard');
+  if (referralCard) referralCard.style.display = 'none';
+
+                    const attachmentsCard = document.getElementById('attachmentsCard');
+  if (attachmentsCard) {
+    attachmentsCard.style.display = 'none';
+  }
+
                 });
             }
         })
@@ -1906,6 +1953,7 @@ renderAttachmentsSection(details);
         });
     }
 }
+
 
     function populatePrescriptionModal(entry) {
         if (!entry.prescriptionsForRegistry ||
@@ -2079,7 +2127,7 @@ renderAttachmentsSection(details);
 <div class="modal-body">
 
   <!-- ROW 1: Referral Details (Full Width) -->
-  <div class="row g-3 mb-3">
+ <div class="row g-3 mb-3" id="referralDetailsCard" style="display:none;">
     <div class="col-12">
       <div class="card shadow-sm">
         <div class="card-body">
@@ -2098,18 +2146,16 @@ renderAttachmentsSection(details);
   </div>
 
   <!-- ROW 2: Attachments (Full Width) -->
-  <div class="row g-3 mb-3">
-    <div class="col-12">
-      <div class="card shadow-sm h-100">
-        <div class="card-body">
-          
-          <div id="attachmentSection" style="display: flex; gap: 1rem;">
-            <h6 class="card-title fw-semibold">Attachments</h6>
-          </div>
-        </div>
+<div class="row g-3 mb-3" id="attachmentsCard" style="display:none;">
+  <div class="col-12">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <div id="attachmentSection"></div>
       </div>
     </div>
   </div>
+</div>
+
 
   <!-- ROW 3: 4 Cards (Unchanged) -->
   <div class="row g-3 mb-3">

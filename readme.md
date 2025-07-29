@@ -285,4 +285,4 @@ See the full [Backend LICENSE](./Project/Api-MHV/License.txt) for more details.
 - Advanced reporting dashboards
 **Enterprise Healthcare Platform** - Transforming Corporate Healthcare Management
 
-[![Made with ❤️ by Hygeiaes Team](https://img.shields.io/badge/Made%20with%20❤️%20by-Hygeiaes%20Team-red?style=for-the-badge)](https://www.myhealthvalet.in/health-productivity/)
+[![Made with ❤️ by Hygeiaes Team](https://img.shields.io/badge/Made%20with%20❤️%20by-Hygeiaes%20Team-red?style=for-the-badge)](https://www.myhealthvalet.in/health-productivity/

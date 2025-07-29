@@ -2,7 +2,8 @@ Project/Api-MHV/private_key.pem
 Project/Api-MHV/public_key.pem
 .vscode/
 .idea/
-permission-cache-clear.sh
+permission-config.sh
+*.sh
 
 Project/Api-MHV/Admin/storage/logs/*
 Project/Api-MHV/Admin/storage/framework/cache/*

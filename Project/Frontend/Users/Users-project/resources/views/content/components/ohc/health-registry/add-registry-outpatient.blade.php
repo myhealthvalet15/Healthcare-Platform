@@ -644,10 +644,17 @@
                         </div>
                     </div>
                     <script>
-                        document.getElementById("outsideReferralHospitalName").addEventListener("click", function () {
-                            const myModal = new bootstrap.Modal(document.getElementById('basicModal'));
-                            myModal.show();
-                        });
+                         document.addEventListener("DOMContentLoaded", function () {
+        const referralNameElement = document.getElementById("outsideReferralHospitalName");
+        if (referralNameElement) {
+            referralNameElement.addEventListener("click", function () {
+                const myModal = new bootstrap.Modal(document.getElementById('basicModal'));
+                myModal.show();
+            });
+        } else {
+            console.warn("Element #outsideReferralHospitalName not found.");
+        }
+    });
                     </script>
                     <div class="row">
                         <div class="col-md-12">
@@ -717,7 +724,8 @@
   </div>
   <div class="col-md-6" id="hospital_name_div" style="display:none;">
     <label for="hospital_name" class="form-label">Hospital Name</label>
-    <input type="text" name="hospital_name" id="hospital_name" class="form-control" placeholder="Enter Hospital Name">
+   
+    <input type="text" name="hospitalName" id="hospitalName" class="form-control" placeholder="Enter Hospital Name">
   </div>
 </div>
 
@@ -1099,32 +1107,40 @@
         });
     }
         $(document).ready(function () {
-        document.getElementById("saveChangesModal").addEventListener("click", function () {
-        const hospitalSelect = document.getElementById("hospital_id");
-        const selectedHospitalId = hospitalSelect.value;
-        const hospitalTextInput = document.getElementById("hospital_name").value.trim();
-        let displayValue = "";
+       document.getElementById("saveChangesModal").addEventListener("click", function () {
+    const hospitalSelect = document.getElementById("hospital_id");
+    const selectedHospitalId = hospitalSelect.value;
+    const hospitalTextInput = document.getElementById("hospitalName").value.trim();
+    const hospitalNameField = document.getElementById("hospitalName");
+   // const hospitalNameField = document.getElementById("hospitalName");
+   let sanitizedHospitalName = "";
 
-        if (selectedHospitalId === "0") {
-            // If "Other" is selected, use the input field and sanitize it
-            let sanitizedHospitalName = hospitalTextInput.replace(/[<>]/g, "");
-            displayValue = sanitizedHospitalName || "No Hospital Name Entered";
-        } else {
-            // Use the selected hospital's text from the dropdown
-            const selectedOption = hospitalSelect.options[hospitalSelect.selectedIndex];
-            displayValue = selectedOption.text || "No Hospital Selected";
-        }
+if (hospitalNameField) {
+  hospitalNameField.value = sanitizedHospitalName;
+}   
 
-        // Display the result somewhere in the DOM
-        document.getElementById("outsideReferralHospitalName").textContent = displayValue;
+    if (selectedHospitalId === "0") {
+        // If "Other" is selected, use the input field and sanitize it
+        let sanitizedHospitalName = hospitalTextInput.replace(/[<>]/g, "");
+        hospitalNameField.value = sanitizedHospitalName;
+        document.getElementById("outsideReferralHospitalName").textContent =
+            sanitizedHospitalName || "No Hospital Name Entered";
+    } else {
+        // Save the selected hospital ID in the same field
+        hospitalNameField.value = selectedHospitalId;
+        const selectedOption = hospitalSelect.options[hospitalSelect.selectedIndex];
+        document.getElementById("outsideReferralHospitalName").textContent =
+            selectedOption.text || "No Hospital Selected";
+    }
 
-        // Close the modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById("basicModal"));
-        modal.hide();
-        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-        document.body.classList.remove("modal-open");
-        document.body.style.overflow = "auto";
-    });
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById("basicModal"));
+    modal.hide();
+    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "auto";
+});
+
 
         document.getElementById("referralSelect").addEventListener("change", function () {
             let selectedValue = this.value;
@@ -1263,7 +1279,7 @@ document.getElementById('hospital_id').addEventListener('change', function () {
   } else {
     hospitalNameDiv.style.display = 'none';
     // Optional: Clear the hospital name input when hidden
-    document.getElementById('hospital_name').value = '';
+    document.getElementById('hospitalName').value = '';
   }
 });
 

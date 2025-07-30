@@ -1622,9 +1622,16 @@ function populateReferralModal(entry) {
 
     const employeeId = entry.employee_id?.toLowerCase();
     document.getElementById('hiddenEmployeeId').value = employeeId;
-
+const hospitalMap = {
+  "1": "City Hospital",
+  "2": "State Medical"
+};
     const referral = entry.outside_referral || {};
-    document.getElementById('hospitalName').textContent = referral.hospital_name || 'N/A';
+ const hospitalValue = referral.hospital_name;
+const hospitalNameElement = document.getElementById('hospitalName');
+
+// If hospitalValue is a known ID, use the mapped name; else use it as-is
+hospitalNameElement.textContent = hospitalMap[hospitalValue] || hospitalValue || 'N/A';
     document.getElementById('accompaniedBy').textContent = referral.accompanied_by || 'N/A';
     document.getElementById('vehicleType').textContent = referral.vehicle_type || 'N/A';
 

@@ -668,3 +668,112 @@ $(function () {
         });
     });
 });
+    document.addEventListener("DOMContentLoaded", function () {
+    const hospitalIdSelect = document.getElementById("hospital_id");
+    const hospitalNameInput = document.getElementById("hospital_name");
+    const hospitalNameDiv = document.getElementById("hospital_name_div");
+
+    const hospitalValue = document.getElementById("hospital_value").value.trim();
+
+    const knownHospitalIds = ["1", "2", "3"]; // Add more as needed
+
+    if (knownHospitalIds.includes(hospitalValue)) {
+        hospitalIdSelect.value = hospitalValue;
+        hospitalNameDiv.style.display = "none";
+        hospitalNameInput.value = "";
+    } else if (hospitalValue) {
+        hospitalIdSelect.value = "0"; // Select "Other"
+        hospitalNameDiv.style.display = "block";
+        hospitalNameInput.value = hospitalValue;
+    } else {
+        hospitalIdSelect.value = "";
+        hospitalNameDiv.style.display = "none";
+        hospitalNameInput.value = "";
+    }
+
+    hospitalIdSelect.addEventListener("change", function () {
+        if (this.value === "0") {
+            hospitalNameDiv.style.display = "block";
+        } else {
+            hospitalNameDiv.style.display = "none";
+            hospitalNameInput.value = "";
+        }
+    });
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("hospitalizationContainer");
+
+    // Simulated API response
+    const hospitalization = {
+        attachment_discharge: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAbo", // Replace with real base64
+        attachment_test_reports: [
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA1",
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA2"
+        ]
+    };
+
+    // Helper to create image viewer and delete button
+    function createAttachmentRow(label, base64, index = null, type = 'report') {
+        const row = document.createElement("div");
+        row.className = "d-flex align-items-center mb-2 gap-2";
+
+        const viewBtn = document.createElement("button");
+        viewBtn.className = "btn btn-outline-primary btn-sm";
+        viewBtn.innerText = label;
+        viewBtn.type = "button";
+        viewBtn.addEventListener("click", () => {
+    const modalImg = document.getElementById("modalImage");
+    modalImg.src = base64;
+
+    const bootstrapModal = new bootstrap.Modal(document.getElementById("imagePreviewModal"));
+    bootstrapModal.show();
+});
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn btn-danger btn-sm";
+        deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
+        deleteBtn.type = "button";
+        deleteBtn.addEventListener("click", () => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Delete ${label}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Delete logic here (e.g., AJAX or DOM removal)
+                    row.remove(); // Just removes from view
+                    Swal.fire('Deleted!', `${label} has been deleted.`, 'success');
+                }
+            });
+        });
+
+        row.appendChild(viewBtn);
+        row.appendChild(deleteBtn);
+        container.appendChild(row);
+    }
+
+    // 1. Discharge Summary
+    if (hospitalization.attachment_discharge) {
+        createAttachmentRow("Discharge Summary", hospitalization.attachment_discharge, null, 'discharge');
+    }
+
+    // 2. Test Reports
+    let reports = hospitalization.attachment_test_reports;
+    if (typeof reports === 'string') {
+        try {
+            reports = JSON.parse(reports);
+        } catch (e) {
+            reports = [];
+        }
+    }
+
+    if (Array.isArray(reports)) {
+        reports.forEach((report, idx) => {
+            createAttachmentRow(`Report ${idx + 1}`, report, idx, 'report');
+        });
+    }
+});

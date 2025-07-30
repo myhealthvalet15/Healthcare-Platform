@@ -85,10 +85,9 @@
     switch (status.toLowerCase()) {
       case 'completed':
         return 'badge bg-success';
-      case 'not attended':
+      case 'not started':
         return 'badge bg-danger';
-      case 'in progress':
-      case 'attended':
+      case 'In Pocess':
         return 'badge bg-warning';
       default:
         return 'badge bg-warning';
@@ -215,7 +214,7 @@
               actionButton.removeAttribute('href');
             } else {
               actionButton.className = 'btn btn-primary btn-sm w-100';
-              const buttonText = template.status.toLowerCase() === 'not attended'
+              const buttonText = template.status.toLowerCase() === 'not started'
                 ? 'Start Assessment'
                 : 'Continue Assessment';
               actionButton.textContent = buttonText;

@@ -1,4 +1,4 @@
-hra questions in employee login
+hra trigger questions UI
 backend api`s for assign incident type for corporate 
 type of incident shld be dynamic 
 

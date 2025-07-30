@@ -12,7 +12,9 @@
 'resources/assets/vendor/libs/flatpickr/flatpickr.scss',
 'resources/assets/vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.scss',
 'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-'resources/assets/vendor/libs/spinkit/spinkit.scss'
+'resources/assets/vendor/libs/spinkit/spinkit.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
+
 ])
 @endsection
 
@@ -22,6 +24,7 @@
 
 'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
 'resources/assets/vendor/libs/moment/moment.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
 'resources/assets/vendor/libs/select2/select2.js',
 'resources/assets/vendor/libs/flatpickr/flatpickr.js',
 'resources/assets/vendor/libs/@form-validation/popular.js',
@@ -306,6 +309,20 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
     </div>
     @endif
 </div>
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Image Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" alt="Attachment" style="max-width: 100%; max-height: 80vh;" />
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -317,6 +334,8 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
 <input type="hidden" name="op_registry_id" value="{{ $op_registry_id }}">
                 <!-- Row 1: Hospital + Hospital Name (if other) + Doctor + Doctor Name (if other) -->
                 <div class="row g-3 mb-3">
+<input type="hidden" id="hospital_value" value="{{ $hospital_name ?? '' }}">
+
                     <div class="col-md-3">
                         <label for="hospital_id" class="form-label">Hospital</label>
                         <select name="hospital_id" id="hospital_id" class="form-select">                            <option value="">-- Select Hospital --</option>
@@ -327,7 +346,7 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
                     </div>
                     <div class="col-md-3" id="hospital_name_div" style="display:none;">
                         <label for="hospital_name" class="form-label">Hospital Name</label>
-                        <input type="text" name="hospital_name" class="form-control" placeholder="Enter Hospital Name">
+                        <input type="text" name="hospital_name" class="form-control" placeholder="Enter Hospital Name" id="hospital_name">
                     </div>
                     <div class="col-md-3">
                         <label for="doctor_id" class="form-label">Doctor</label>
@@ -383,10 +402,12 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
                     <div class="col-md-6">
                         <label class="form-label">Discharge Summary (1 file)</label>
                         <input type="file" name="discharge_summary" class="form-control" accept=".pdf,.jpg,.png">
-                    </div>
+                         <div id="discharge_summary_preview" class="mt-2"></div>
+                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Test Reports (up to 3 files)</label>
                         <input type="file" name="summary_reports[]" class="form-control" multiple accept=".pdf,.jpg,.png">
+                        <div id="summary_reports_preview" class="mt-2"></div>
                     </div>
                 </div>
 

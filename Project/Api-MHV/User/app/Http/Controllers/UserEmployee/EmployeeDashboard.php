@@ -72,7 +72,7 @@ class EmployeeDashboard extends Controller
                 if (!$template) {
                     return null;
                 }
-                $status = 'Not Attended';
+                $status = 'Not Started';
                 $score = '';
                 $factorPoints = [];
                 if (isset($completedMap[$t->template_id])) {
@@ -87,7 +87,7 @@ class EmployeeDashboard extends Controller
                         $factorPoints[$name] = $value;
                     }
                 } elseif (in_array($t->template_id, $attendedTemplateIds)) {
-                    $status = 'Attended';
+                    $status = 'In Pocess';
                 }
                 return [
                     'template_id' => $template->template_id,

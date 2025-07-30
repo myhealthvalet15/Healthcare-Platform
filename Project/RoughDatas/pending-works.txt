@@ -1,9 +1,7 @@
 hra trigger questions UI
 backend api`s for assign incident type for corporate 
 type of incident shld be dynamic 
-
-test list page instead redirect show in popup 
-
 view past history 
+test list page instead redirect show in popup 
 edit question bug
 redirect on login and other endpoints 

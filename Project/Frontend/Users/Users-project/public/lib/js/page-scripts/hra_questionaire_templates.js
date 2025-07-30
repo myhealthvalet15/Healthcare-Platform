@@ -178,15 +178,25 @@ class HRA {
     getActiveTriggerInstance(globalKey) {
         const triggerData = this.globalTriggerMap.get(globalKey);
         if (!triggerData) return null;
+        if (this.triggerOwnership.has(globalKey)) {
+            const ownerId = this.triggerOwnership.get(globalKey);
+            for (const instance of triggerData.instances) {
+                if (instance.parentId === ownerId) {
+                    if (this.activeTriggers.has(ownerId)) {
+                        const activeTriggerKeys = this.activeTriggers.get(ownerId);
+                        if (activeTriggerKeys.has(instance.triggerKey)) {
+                            return instance;
+                        }
+                    }
+                }
+            }
+        }
         for (const instance of triggerData.instances) {
             if (this.activeTriggers.has(instance.parentId)) {
                 const activeTriggerKeys = this.activeTriggers.get(instance.parentId);
                 if (activeTriggerKeys.has(instance.triggerKey)) {
-                    const currentOwner = this.triggerOwnership.get(globalKey);
-                    if (!currentOwner || currentOwner === instance.parentId) {
-                        this.triggerOwnership.set(globalKey, instance.parentId);
-                        return instance;
-                    }
+                    this.triggerOwnership.set(globalKey, instance.parentId);
+                    return instance;
                 }
             }
         }
@@ -751,18 +761,35 @@ class HRA {
         const question = this.q.find(q => q.id === questionId);
         if (!question || !question.triggers) return;
         this.removeTriggers(questionId);
-        const optionIndex = question.options.findIndex(option => option === selectedValue);
-        if (optionIndex === -1) return;
-        const triggerNumber = optionIndex + 1;
-        const triggerKey = `key${triggerNumber}`;
-        if (question.triggers[triggerKey]) {
-            if (!this.activeTriggers.has(questionId)) {
-                this.activeTriggers.set(questionId, new Set())
+        const triggerKey = this.findTriggerKey(question, selectedValue);
+        if (!triggerKey || !question.triggers[triggerKey]) return;
+        question.triggers[triggerKey].forEach(triggerQuestion => {
+            const globalKey = `${triggerQuestion.originalId}_${triggerQuestion.question}`;
+            if (this.triggerOwnership.has(globalKey)) {
+                const currentOwner = this.triggerOwnership.get(globalKey);
+                if (currentOwner !== questionId) {
+                    if (this.activeTriggers.has(currentOwner)) {
+                        const ownerTriggerKeys = this.activeTriggers.get(currentOwner);
+                        ownerTriggerKeys.forEach(key => {
+                            if (question.triggers[key]?.some(tq =>
+                                `${tq.originalId}_${tq.question}` === globalKey)) {
+                                ownerTriggerKeys.delete(key);
+                            }
+                        });
+                        if (ownerTriggerKeys.size === 0) {
+                            this.activeTriggers.delete(currentOwner);
+                        }
+                    }
+                }
             }
-            this.activeTriggers.get(questionId).add(triggerKey);
-            this.render();
-            this.up()
+            this.triggerOwnership.set(globalKey, questionId);
+        });
+        if (!this.activeTriggers.has(questionId)) {
+            this.activeTriggers.set(questionId, new Set());
         }
+        this.activeTriggers.get(questionId).add(triggerKey);
+        this.render();
+        this.up();
     }
     findTriggerKey(question, selectedValue) {
         const optionIndex = question.options.findIndex(option => option === selectedValue);
@@ -777,21 +804,20 @@ class HRA {
         if (this.activeTriggers.has(questionId)) {
             const activeTriggerKeys = this.activeTriggers.get(questionId);
             activeTriggerKeys.forEach(triggerKey => {
-                const triggerQuestions = question.triggers[triggerKey];
-                if (triggerQuestions && Array.isArray(triggerQuestions)) {
-                    triggerQuestions.forEach(triggerQuestion => {
+                if (question.triggers[triggerKey]) {
+                    question.triggers[triggerKey].forEach(triggerQuestion => {
+                        const globalKey = `${triggerQuestion.originalId}_${triggerQuestion.question}`;
+                        if (this.triggerOwnership.get(globalKey) === questionId) {
+                            this.triggerOwnership.delete(globalKey);
+                        }
                         delete this.r[triggerQuestion.id];
                         this.a.delete(triggerQuestion.id);
                         this.s.delete(triggerQuestion.id);
-                        const triggerCard = document.getElementById(`trigger-question-card-${triggerQuestion.id}`);
-                        if (triggerCard) {
-                            triggerCard.remove()
-                        }
-                    })
+                    });
                 }
             });
             this.activeTriggers.delete(questionId);
-            this.up()
+            this.up();
         }
     }
     restoreAnswer(q, container) {

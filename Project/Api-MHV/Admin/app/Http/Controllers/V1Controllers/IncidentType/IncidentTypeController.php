@@ -113,7 +113,7 @@ class IncidentTypeController extends Controller
             ], 400);
         }
         $validator = Validator::make($request->all(), [
-            'incident_types' => 'required|array',
+            'incident_types' => 'required|array|min:2|max:5',
             'incident_types.*.id' => 'required|integer|exists:incident_types,incident_type_id',
             'incident_types.*.injury_color_types' => 'required|array',
             'incident_types.*.injury_color_types.*' => ['regex:/^#[0-9A-Fa-f]{6}$/']

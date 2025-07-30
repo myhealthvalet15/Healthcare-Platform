@@ -1,7 +1,8 @@
-hra trigger questions UI
-backend api`s for assign incident type for corporate 
-type of incident shld be dynamic 
-view past history 
-test list page instead redirect show in popup 
-edit question bug
-redirect on login and other endpoints 
+hra trigger questions UI - Completed
+backend api`s for assign incident type for corporate - Completed
+
+type of incident shld be dynamic - Pending
+view past history - Pending
+test list page instead redirect show in popup - Pending
+edit question bug - Pending
+redirect on login and other endpoints - Pending

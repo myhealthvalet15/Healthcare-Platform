@@ -127,5 +127,5 @@
         <div class="toast-body">Your progress has been saved successfully!</div>
     </div>
 </div>
-<script src="/lib/js/page-scripts/hra_questionaire_template.js"></script>
+<script src="/lib/js/page-scripts/hra_questionaire_templates.js"></script>
 @endsection

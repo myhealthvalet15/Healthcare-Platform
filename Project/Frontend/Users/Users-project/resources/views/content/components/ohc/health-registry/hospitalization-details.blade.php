@@ -309,24 +309,24 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
     </div>
     @endif
 </div>
-<!-- Image Preview Modal -->
-<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+<div id="hospitalizationContainer"></div>
+
+<!-- Modal for image preview -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Image Preview</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center">
-        <img id="modalImage" src="" alt="Attachment" style="max-width: 100%; max-height: 80vh;" />
+        <img id="modalImage" src="" alt="Attachment" class="img-fluid" />
       </div>
     </div>
   </div>
 </div>
 
-
-
-        <div class="card-body">
+<div class="card-body">
             <form id="hospitalizationForm" enctype="multipart/form-data">
                 @csrf
 <input type="hidden" name="employee_id" value="{{ $employee_id }}">

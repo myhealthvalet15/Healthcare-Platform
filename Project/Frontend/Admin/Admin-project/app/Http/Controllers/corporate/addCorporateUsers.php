@@ -488,7 +488,6 @@ class addCorporateUsers extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-admin.hygeiaes.com/V1/corporate/corporate-components/getEmployeeData/'. $keyword);
-          return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => $response['message']]);
             }

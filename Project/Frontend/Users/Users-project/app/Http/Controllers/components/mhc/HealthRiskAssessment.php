@@ -150,7 +150,7 @@ class HealthRiskAssessment extends Controller
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-            ])->post('https://api-user.hygeiaes.com/V1/hra/templates/assignHRATemplate', $apiData); return $response;
+            ])->post('https://api-user.hygeiaes.com/V1/hra/templates/assignHRATemplate', $apiData); 
             if ($response->successful()) {
                 $responseData = $response->json();
                 return response()->json([

@@ -1,3 +1,94 @@
-/*! myhelathvalet - v1.0.0 - Last Sync: 21/2/2025 @ 8:14:19 */
-/*! myhelathvalet - Developer: M S Praveen Kumar @mspraveenkumar77@gmail.com - https://www.praveenms.live */
-var _0x1cbdbb=_0x2e06;function _0x4261(){var _0x5a6751=['2294200DiTeAM','content','json','fadeOut','slice','15Fddzgf','fromCharCode','message','application/json','7630088lVkKoe','toast-top-right','12mZmBWJ','DELETE','[KObuWZKqUCOQHxKpEVSXQLtjrObkNOHZBHCVGwDQMCRxP]','stringify','[zvKZMgWrAAJHLAZCrFNXWRLhgCq]','reload','getAttribute','swing','3850728yDqUAl','indexOf','641722BAOsBy','POST','azbovuKt:ZbMlangWkrAAJHLAZCrFNXWRLhgCq','location','length','209774DfwuFp','status','linear','toastr\x20','168500poGhtG','fadeIn','Operation\x20was\x20successful!','1719CDcWjo','body','meta[name=\x22csrf-token\x22]','\x20-\x20','HTTP\x20Error:\x20','replace','success','An\x20error\x20occurred!','GET','toLowerCase','<strong>','4297452mQrZrO','PUT'];_0x4261=function(){return _0x5a6751;};return _0x4261();}(function(_0x5e0e19,_0x2f8c78){var _0x9cff3d=_0x2e06,_0x1ad0c4=_0x5e0e19();while(!![]){try{var _0x17d3f6=-parseInt(_0x9cff3d(0x185))/0x1+-parseInt(_0x9cff3d(0x18a))/0x2*(parseInt(_0x9cff3d(0x1a3))/0x3)+parseInt(_0x9cff3d(0x19c))/0x4+-parseInt(_0x9cff3d(0x19e))/0x5+-parseInt(_0x9cff3d(0x1a9))/0x6*(parseInt(_0x9cff3d(0x183))/0x7)+-parseInt(_0x9cff3d(0x1a7))/0x8+parseInt(_0x9cff3d(0x191))/0x9*(parseInt(_0x9cff3d(0x18e))/0xa);if(_0x17d3f6===_0x2f8c78)break;else _0x1ad0c4['push'](_0x1ad0c4['shift']());}catch(_0xeb0862){_0x1ad0c4['push'](_0x1ad0c4['shift']());}}}(_0x4261,0x95d73));var _0xc4689f=(function(){var _0x26ebbd=!![];return function(_0x234f5f,_0x45beac){var _0x58781d=_0x26ebbd?function(){if(_0x45beac){var _0x42370c=_0x45beac['apply'](_0x234f5f,arguments);return _0x45beac=null,_0x42370c;}}:function(){};return _0x26ebbd=![],_0x58781d;};}()),_0x4b86c0=_0xc4689f(this,function(){var _0xf19a18=_0x2e06,_0x1470d5;try{var _0x4dabb4=Function('return\x20(function()\x20'+'{}.constructor(\x22return\x20this\x22)(\x20)'+');');_0x1470d5=_0x4dabb4();}catch(_0x356b67){_0x1470d5=window;}var _0x2a63c2=new RegExp(_0xf19a18(0x1ab),'g'),_0x41d148='mhKObv-admin.huWygeiZKqUaeCOs.QcomHxKpEVSXQLtjrObkNOHZBHCVGwDQMCRxP'[_0xf19a18(0x196)](_0x2a63c2,'')['split'](';'),_0x323b40,_0x95eedc,_0x155dba,_0x1154c4,_0x44f838=function(_0x4bbc5c,_0x47f7ee,_0xc09ceb){if(_0x4bbc5c['length']!=_0x47f7ee)return![];for(var _0x19f304=0x0;_0x19f304<_0x47f7ee;_0x19f304++){for(var _0x1d2ecc=0x0;_0x1d2ecc<_0xc09ceb['length'];_0x1d2ecc+=0x2){if(_0x19f304==_0xc09ceb[_0x1d2ecc]&&_0x4bbc5c['charCodeAt'](_0x19f304)!=_0xc09ceb[_0x1d2ecc+0x1])return![];}}return!![];},_0x9b786b=function(_0x1a4712,_0xf2df59,_0x41f5f7){return _0x44f838(_0xf2df59,_0x41f5f7,_0x1a4712);},_0x1d31df=function(_0x4a2e9a,_0x566a14,_0x45eb4f){return _0x9b786b(_0x566a14,_0x4a2e9a,_0x45eb4f);},_0x1b53b1=function(_0x55e4ed,_0x49efa1,_0x4e1a51){return _0x1d31df(_0x49efa1,_0x4e1a51,_0x55e4ed);};for(var _0x40cece in _0x1470d5){if(_0x44f838(_0x40cece,0x8,[0x7,0x74,0x5,0x65,0x3,0x75,0x0,0x64])){_0x323b40=_0x40cece;break;}}for(var _0x17a85d in _0x1470d5[_0x323b40]){if(_0x1b53b1(0x6,_0x17a85d,[0x5,0x6e,0x0,0x64])){_0x95eedc=_0x17a85d;break;}}for(var _0x45f317 in _0x1470d5[_0x323b40]){if(_0x1d31df(_0x45f317,[0x7,0x6e,0x0,0x6c],0x8)){_0x155dba=_0x45f317;break;}}if(!('~'>_0x95eedc))for(var _0x5df7bf in _0x1470d5[_0x323b40][_0x155dba]){if(_0x9b786b([0x7,0x65,0x0,0x68],_0x5df7bf,0x8)){_0x1154c4=_0x5df7bf;break;}}if(!_0x323b40||!_0x1470d5[_0x323b40])return;var _0x1890f0=_0x1470d5[_0x323b40][_0x95eedc],_0x19c76d=!!_0x1470d5[_0x323b40][_0x155dba]&&_0x1470d5[_0x323b40][_0x155dba][_0x1154c4],_0x43ebb9=_0x1890f0||_0x19c76d;if(!_0x43ebb9)return;var _0x336d9b=![];for(var _0x646262=0x0;_0x646262<_0x41d148['length'];_0x646262++){var _0x95eedc=_0x41d148[_0x646262],_0x5aa2bc=_0x95eedc[0x0]===String[_0xf19a18(0x1a4)](0x2e)?_0x95eedc[_0xf19a18(0x1a2)](0x1):_0x95eedc,_0x320901=_0x43ebb9[_0xf19a18(0x189)]-_0x5aa2bc[_0xf19a18(0x189)],_0x3016a1=_0x43ebb9['indexOf'](_0x5aa2bc,_0x320901),_0x12dd04=_0x3016a1!==-0x1&&_0x3016a1===_0x320901;_0x12dd04&&((_0x43ebb9[_0xf19a18(0x189)]==_0x95eedc[_0xf19a18(0x189)]||_0x95eedc[_0xf19a18(0x184)]('.')===0x0)&&(_0x336d9b=!![]));}if(!_0x336d9b){var _0x32e32f=new RegExp(_0xf19a18(0x1ad),'g'),_0x110af0=_0xf19a18(0x187)[_0xf19a18(0x196)](_0x32e32f,'');_0x1470d5[_0x323b40][_0x155dba]=_0x110af0;}});_0x4b86c0();function reloadAfter1Second(){setTimeout(function(){var _0x3a43fa=_0x2e06;window[_0x3a43fa(0x188)][_0x3a43fa(0x1ae)]();},0x3e8);}function reloadAfter2Second(){setTimeout(function(){var _0x453994=_0x2e06;window[_0x453994(0x188)][_0x453994(0x1ae)]();},0x7d0);}function _0x2e06(_0x4532ef,_0x54d2f8){var _0x443215=_0x4261();return _0x2e06=function(_0x4b86c0,_0xc4689f){_0x4b86c0=_0x4b86c0-0x182;var _0x428854=_0x443215[_0x4b86c0];return _0x428854;},_0x2e06(_0x4532ef,_0x54d2f8);}async function apiRequest({url:_0x29f7c5,method:method=_0x1cbdbb(0x199),data:data=null,headers:headers={},onSuccess:_0x2b7cb9,onError:_0x488367}){var _0x2410f8=_0x1cbdbb;try{const _0x53388c={'Content-Type':'application/json','Accept':_0x2410f8(0x1a6),'X-CSRF-TOKEN':document['querySelector'](_0x2410f8(0x193))[_0x2410f8(0x1af)](_0x2410f8(0x19f))},_0x53a173={'method':method,'headers':{..._0x53388c,...headers}};data&&(method===_0x2410f8(0x186)||method===_0x2410f8(0x19d)||method===_0x2410f8(0x1aa))&&(_0x53a173[_0x2410f8(0x192)]=JSON[_0x2410f8(0x1ac)](data));const _0x3d706e=await fetch(_0x29f7c5,_0x53a173);if(!_0x3d706e['ok']){const _0x14cd72=await _0x3d706e[_0x2410f8(0x1a0)](),_0x4fdfc9=_0x14cd72[_0x2410f8(0x1a5)]||_0x2410f8(0x195)+_0x3d706e[_0x2410f8(0x18b)]+_0x2410f8(0x194)+_0x3d706e['statusText'];if(_0x488367)_0x488367(_0x4fdfc9);throw new Error(_0x4fdfc9);}const _0x3d9e0e=await _0x3d706e['json']();if(_0x2b7cb9)_0x2b7cb9(_0x3d9e0e);return _0x3d9e0e;}catch(_0x14722e){if(_0x488367)_0x488367(_0x14722e[_0x2410f8(0x1a5)]);}}var toastCount=0x0,$toastlast,getMessage=function(_0x2b83d4){var _0x49e9e0=_0x1cbdbb;if(_0x2b83d4===_0x49e9e0(0x197))return _0x49e9e0(0x190);else return _0x2b83d4==='error'?_0x49e9e0(0x198):_0x2b83d4;return'';};function showToast(_0x26c62a,_0x10432c,_0x5ce342){var _0x4302e4=_0x1cbdbb;_0x26c62a=_0x26c62a[_0x4302e4(0x19a)]();var _0x456a0d=_0x5ce342||getMessage(_0x26c62a),_0x127655=_0x10432c||'',_0x46262f='toast-'+_0x26c62a;toastr['options']={'closeButton':!![],'progressBar':!![],'positionClass':_0x4302e4(0x1a8),'showDuration':0x12c,'hideDuration':0x3e8,'timeOut':0x1388,'extendedTimeOut':0x3e8,'showEasing':_0x4302e4(0x182),'hideEasing':_0x4302e4(0x18c),'showMethod':_0x4302e4(0x18f),'hideMethod':_0x4302e4(0x1a1),'toastClass':_0x4302e4(0x18d)+_0x46262f};var _0x294924=_0x4302e4(0x19b)+_0x127655+'</strong><br>'+_0x456a0d,_0x4ee00e=toastr[_0x26c62a](_0x294924);$toastlast=_0x4ee00e;}
+/**
+* A reusable function to send API requests.
+* @param {string} url - The endpoint URL.
+* @param {string} method - HTTP method (GET, POST, PUT, DELETE, etc.).
+* @param {Object} [data] - Request body (for POST, PUT, etc.).
+* @param {Object} [headers] - Custom headers for the request.
+* @param {Function} [onSuccess] - Callback function for successful response.
+* @param {Function} [onError] - Callback function for error handling.
+* @returns {Promise<void>} - Resolves when the request completes.
+*/
+function reloadAfter1Second() {
+    setTimeout(function () {
+        window.location.reload();
+    }, 1000);
+}
+function reloadAfter2Second() {
+    setTimeout(function () {
+        window.location.reload();
+    }, 2000);
+}
+async function apiRequest({ url, method = 'GET', data = null, headers = {}, onSuccess, onError }) {
+    try {
+        const defaultHeaders = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        };
+        const options = {
+            method,
+            headers: { ...defaultHeaders, ...headers },
+        };
+        if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
+            options.body = JSON.stringify(data);
+        }
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            const errorMessage = errorResponse.message || `HTTP Error: ${response.status} - ${response.statusText}`;
+            if (onError) onError(errorMessage);
+            throw new Error(errorMessage);
+        }
+        const responseData = await response.json();
+        if (onSuccess) onSuccess(responseData);
+        return responseData;
+    } catch (error) {
+        if (onError) onError(error.message);
+        // console.error('API Request Error:', error);
+    }
+}
+
+var toastCount = 0;
+var $toastlast;
+
+var getMessage = function (type) {
+    if (type === 'success') {
+        return "Operation was successful!";
+    } else if (type === 'error') {
+        return "An error occurred!";
+    } else {
+        return type;
+    }
+    return "";
+};
+function showToast(type, title, message) {
+    type = type.toLowerCase();
+    var msg = message || getMessage(type);
+    var toastTitle = title || ''; // Use title if provided
+
+    // Add a custom class based on type
+    var customClass = `toast-${type}`;
+
+    toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-top-right',
+        showDuration: 300,
+        hideDuration: 1000,
+        timeOut: 5000,
+        extendedTimeOut: 1000,
+        showEasing: 'swing',
+        hideEasing: 'linear',
+        showMethod: 'fadeIn',
+        hideMethod: 'fadeOut',
+        // Custom class applied to the toast
+        toastClass: `toastr ${customClass}`,
+    };
+
+    // Build the title and message content
+    var toastHtml = `<strong>${toastTitle}</strong><br>${msg}`;
+
+    // Display the toast
+    var $toast = toastr[type](toastHtml);
+    $toastlast = $toast;
+}

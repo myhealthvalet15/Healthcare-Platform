@@ -115,7 +115,6 @@ let isValid = true;
 
 });
 function loadHospitalizationDetails() {
- // console.log('🏁 loadHospitalizationDetails called');
     if (!employeeUserId || !opRegistryId) return;
 
     apiRequest({
@@ -123,16 +122,15 @@ function loadHospitalizationDetails() {
         method: 'GET',
         dataType: 'json',
         onSuccess: function (response) {
-        //  console.log('API response:', response); 
-          const hospitalizationList = response?.data?.data;
+            const hospitalizationList = response?.data?.data;
 
-          if (Array.isArray(hospitalizationList) && hospitalizationList.length > 0) {
-     const hospitalization = hospitalizationList[0];
-    console.log('🩺 Prefilling with:', hospitalization);
- setTimeout(() => {
-      prefillHospitalizationForm(hospitalization);
-    }, 300);
-}
+            if (Array.isArray(hospitalizationList) && hospitalizationList.length > 0) {
+                const hospitalization = hospitalizationList[0];
+                console.log('🩺 Prefilling with:', hospitalization);
+                setTimeout(() => {
+                    prefillHospitalizationForm(hospitalization);
+                }, 300);
+            }
         },
         error: function (err) {
             console.error('Failed to load hospitalization details:', err);
@@ -142,12 +140,8 @@ function loadHospitalizationDetails() {
 
 function formatDateTime(datetimeStr) {
     if (!datetimeStr) return '';
-    return datetimeStr.replace(' ', 'T').slice(0, 16); // "2025-07-01 19:22:00" → "2025-07-01T19:22"
+    return datetimeStr.replace(' ', 'T').slice(0, 16);
 }
-
-
-
-
 
 function prefillHospitalizationForm(data) {
     console.log('Prefilling with:', data);
@@ -170,7 +164,7 @@ function prefillHospitalizationForm(data) {
         }
     }
 
-    // Dates (use formatter!)
+    // Dates
     $('input[name="from_date"]').val(formatDateTime(data.from_datetime));
     $('input[name="to_date"]').val(formatDateTime(data.to_datetime));
 
@@ -187,6 +181,75 @@ function prefillHospitalizationForm(data) {
 
     // Description
     $('textarea[name="description"]').val(data.description);
+
+    // === Attachments ===
+    try {
+        // Discharge Summary
+        if (data.attachment_discharge) {
+            renderAttachmentPreview(
+                'discharge_summary_preview',
+                'Discharge Summary',
+                data.attachment_discharge
+            );
+        }
+
+        // Test Reports
+        const testReports = JSON.parse(data.attachment_test_reports || '[]');
+        if (Array.isArray(testReports)) {
+            testReports.forEach((img, index) => {
+                renderAttachmentPreview(
+                    'summary_reports_preview',
+                    `Test Report ${index + 1}`,
+                    img
+                );
+            });
+        }
+    } catch (e) {
+        console.warn('Attachment parsing failed:', e);
+    }
+}
+
+// Render attachment preview with view & delete buttons
+function renderAttachmentPreview(containerId, label, base64Data) {
+    const container = document.getElementById(containerId);
+
+    const id = `att_${Math.random().toString(36).substring(2, 10)}`;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'd-inline-block me-2 mb-2';
+
+    wrapper.innerHTML = `
+        <button type="button" class="btn btn-outline-primary btn-sm" id="${id}_view">${label}</button>
+        <button type="button" class="btn btn-outline-danger btn-sm ms-1" id="${id}_delete">🗑</button>
+    `;
+
+    // View in popup
+    wrapper.querySelector(`#${id}_view`).addEventListener('click', () => {
+        Swal.fire({
+            title: label,
+            imageUrl: base64Data,
+            imageAlt: label,
+            confirmButtonText: 'Close'
+        });
+    });
+
+    // Delete with confirmation
+    wrapper.querySelector(`#${id}_delete`).addEventListener('click', () => {
+        Swal.fire({
+            title: `Delete "${label}"?`,
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                wrapper.remove();
+                // Optional: API call to delete attachment from backend
+            }
+        });
+    });
+
+    container.appendChild(wrapper);
 }
 
 function loadMedicalCondition() {

@@ -31,9 +31,6 @@ addincidentButton.addEventListener('click', () => {
          &nbspSaving...`;
     addNewincident(incidentName);
 });
-
-
-
 function addNewincident(incidentName) {
     if (!incidentName || incidentName.trim().length === 0) {
         addincidentButton.disabled = false;
@@ -217,8 +214,3 @@ function deleteincident(incidentId) {
         }
     });
 }
-
-
-
-
-

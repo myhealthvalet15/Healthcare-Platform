@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () { 
+document.addEventListener('DOMContentLoaded', function () {
     const url = window.location.href;
     const regex = /(\d+)\/(\d+)\/(\d+)$/;
     const matches = url.match(regex);

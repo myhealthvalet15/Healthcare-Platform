@@ -44,23 +44,19 @@
         background-color: #0d6efd;
         border-color: #0d6efd;
     }
-
     /* Warning color for Moderate */
     .moderate-radio:checked {
         background-color: #ffc107;
         border-color: #ffc107;
     }
-
     /* Danger color for Severe */
     .severe-radio:checked {
         background-color: #dc3545;
         border-color: #dc3545;
     }
-
     .hidden {
         display: none;
     }
-
     /* Centering the Spinner Container */
     .add-registry-spinner {
         display: flex;
@@ -72,7 +68,6 @@
         transform: translate(-50%, -50%);
         z-index: 1050;
     }
-
     /* Spinner Card Background */
     .spinner-card {
         background: white;
@@ -86,20 +81,17 @@
         min-width: 180px;
         text-align: center;
     }
-
     /* Existing Spinner Styles */
     .spinner-container {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
-
     .sk-bounce {
         display: flex;
         justify-content: space-between;
         width: 50px;
     }
-
     .sk-bounce-dot {
         width: 30px;
         height: 30px;
@@ -108,16 +100,13 @@
         border-radius: 50%;
         animation: sk-bounce 1.4s infinite ease-in-out both;
     }
-
     @keyframes sk-bounce {
-
         0%,
         80%,
         100% {
             transform: scale(0);
             opacity: 0.3;
         }
-
         40% {
             transform: scale(1);
             opacity: 1;
@@ -128,7 +117,6 @@
     var employeeData = <?php echo json_encode($employeeData); ?>;
 </script>
 <?php
-// print_r($employeeData);
 ?>
 <div class="add-registry-spinner" id="add-registry-spinner" style="display: block;">
     <div class="spinner-card">
@@ -506,7 +494,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div class="mb-4">
                                 <label class="form-label text-primary mb-2"
                                     style="font-size: 15px; color: #6c5ce7 !important; font-weight: 500;">
@@ -517,7 +504,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div class="mb-4">
                                 <label class="form-label text-primary mb-2"
                                     style="font-size: 15px; color: #6c5ce7 !important; font-weight: 500;">
@@ -606,8 +592,9 @@
                             <textarea class="form-control" rows="2" id="medicalHistory"></textarea>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-link">View Past
-                                History</button>
+                            <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;">
+                                View Past History
+                            </button>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -645,16 +632,16 @@
                     </div>
                     <script>
                          document.addEventListener("DOMContentLoaded", function () {
-        const referralNameElement = document.getElementById("outsideReferralHospitalName");
-        if (referralNameElement) {
-            referralNameElement.addEventListener("click", function () {
-                const myModal = new bootstrap.Modal(document.getElementById('basicModal'));
-                myModal.show();
-            });
-        } else {
-            console.warn("Element #outsideReferralHospitalName not found.");
-        }
-    });
+                            const referralNameElement = document.getElementById("outsideReferralHospitalName");
+                            if (referralNameElement) {
+                                referralNameElement.addEventListener("click", function () {
+                                    const myModal = new bootstrap.Modal(document.getElementById('basicModal'));
+                                    myModal.show();
+                                });
+                            } else {
+                                console.warn("Element #outsideReferralHospitalName not found.");
+                            }
+                        });
                     </script>
                     <div class="row">
                         <div class="col-md-12">
@@ -712,24 +699,21 @@
                 </div>
                 <div class="modal-body">
                     <div class="row mb-3">
- <div class="row mb-3">
-  <div class="col-md-6">
-    <label for="hospital_id" class="form-label">Hospital</label>
-    <select name="hospital_id" id="hospital_id" class="form-select">
-      <option value="">-- Select Hospital --</option>
-      <option value="1">City Hospital</option>
-      <option value="2">State Medical</option>
-      <option value="0">Other</option>
-    </select>
-  </div>
-  <div class="col-md-6" id="hospital_name_div" style="display:none;">
-    <label for="hospital_name" class="form-label">Hospital Name</label>
-   
-    <input type="text" name="hospitalName" id="hospitalName" class="form-control" placeholder="Enter Hospital Name">
-  </div>
-</div>
-
-
+                        <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="hospital_id" class="form-label">Hospital</label>
+                            <select name="hospital_id" id="hospital_id" class="form-select">
+                            <option value="">-- Select Hospital --</option>
+                            <option value="1">City Hospital</option>
+                            <option value="2">State Medical</option>
+                            <option value="0">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="hospital_name_div" style="display:none;">
+                            <label for="hospital_name" class="form-label">Hospital Name</label>
+                            <input type="text" name="hospitalName" id="hospitalName" class="form-control" placeholder="Enter Hospital Name">
+                        </div>
+                    </div>
                     <div class="row mb-3">
                         <div class="col-md-12">
                             <div class="form-check">
@@ -1106,42 +1090,156 @@
             }
         });
     }
-        $(document).ready(function () {
-       document.getElementById("saveChangesModal").addEventListener("click", function () {
-    const hospitalSelect = document.getElementById("hospital_id");
-    const selectedHospitalId = hospitalSelect.value;
-    const hospitalTextInput = document.getElementById("hospitalName").value.trim();
-    const hospitalNameField = document.getElementById("hospitalName");
-   // const hospitalNameField = document.getElementById("hospitalName");
-   let sanitizedHospitalName = "";
-
-if (hospitalNameField) {
-  hospitalNameField.value = sanitizedHospitalName;
-}   
-
-    if (selectedHospitalId === "0") {
-        // If "Other" is selected, use the input field and sanitize it
-        let sanitizedHospitalName = hospitalTextInput.replace(/[<>]/g, "");
-        hospitalNameField.value = sanitizedHospitalName;
-        document.getElementById("outsideReferralHospitalName").textContent =
-            sanitizedHospitalName || "No Hospital Name Entered";
-    } else {
-        // Save the selected hospital ID in the same field
-        hospitalNameField.value = selectedHospitalId;
-        const selectedOption = hospitalSelect.options[hospitalSelect.selectedIndex];
-        document.getElementById("outsideReferralHospitalName").textContent =
-            selectedOption.text || "No Hospital Selected";
+    function loadAllDataParallel() {
+        const spinnerLabel = document.getElementById('spinnerLabeltext');
+        const spinner = document.getElementById('add-registry-spinner');
+        const registryCard = document.getElementById('add-registry-card');
+        const isOutPatientAdded = $('#isOutPatientAdded').val();
+        spinnerLabel.textContent = 'Loading data...';
+        const apiRequests = [
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllSymptoms',
+                selectIds: ['select2Primary_symptoms'],
+                name: 'Symptoms'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllDiagnosis',
+                selectIds: ['select2Primary_diagnosis'],
+                name: 'Diagnosis'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllMedicalSystem',
+                selectIds: ['select2Primary_medical_system'],
+                name: 'Medical Systems'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllBodyParts',
+                selectIds: ['select2Primary_body_part', 'select2Primary_body_part_IA'],
+                name: 'Body Parts'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllNatureOfInjury',
+                selectIds: ['select2Primary_nature_of_injury'],
+                name: 'Nature of Injury'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllInjuryMechanism',
+                selectIds: ['select2Primary_injury_mechanism'],
+                name: 'Injury Mechanism'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getMRNumber',
+                isMRNumber: true,
+                name: 'MR Number'
+            }
+        ];
+        let completedRequests = 0;
+        const totalRequests = apiRequests.length;
+        const loadedData = [];
+        function updateProgress() {
+            const progress = Math.round((completedRequests / totalRequests) * 100);
+            spinnerLabel.textContent = `Loading data... ${progress}% (${completedRequests}/${totalRequests})`;
+        }
+        const apiPromises = apiRequests.map((request, index) => {
+            return new Promise((resolve, reject) => {
+                apiRequest({
+                    url: request.url,
+                    onSuccess: function (response) {
+                        completedRequests++;
+                        updateProgress();
+                        if (response.result && response.message) {
+                            if (request.isMRNumber) {
+                            } else {
+                                request.selectIds.forEach(selectId => {
+                                    populateSelect(selectId, response.message);
+                                });
+                            }
+                        }
+                        loadedData.push({
+                            name: request.name,
+                            success: true
+                        });
+                        resolve(response);
+                    },
+                    onError: function (error) {
+                        completedRequests++;
+                        updateProgress();
+                        console.error(`Error fetching ${request.name}:`, error);
+                        showToast('error', 'Error', `Failed to load ${request.name}`);
+                        loadedData.push({
+                            name: request.name,
+                            success: false,
+                            error: error
+                        });
+                        resolve(null);
+                    }
+                });
+            });
+        });
+        Promise.all(apiPromises)
+            .then((results) => {
+                const successfulLoads = loadedData.filter(item => item.success);
+                const failedLoads = loadedData.filter(item => !item.success);
+                if (successfulLoads.length > 0) {
+                    if (isOutPatientAdded) {
+                        showToast('success', 'Data Fetched Successfully.');
+                    }
+                    if (failedLoads.length > 0) {
+                        console.warn('Some data failed to load:', failedLoads.map(f => f.name));
+                        showToast('warning', 'Warning', `Some data failed to load: ${failedLoads.map(f => f.name).join(', ')}`);
+                    }
+                }
+                spinnerLabel.textContent = "Preparing Outpatient Data...";
+                setTimeout(() => {
+                    spinner.style.display = 'none';
+                    registryCard.style.display = 'block';
+                }, 500);
+            })
+            .catch((error) => {
+                console.error('Unexpected error during parallel loading:', error);
+                showToast('error', 'Error', 'An unexpected error occurred while loading data');
+                setTimeout(() => {
+                    spinner.style.display = 'none';
+                    registryCard.style.display = 'block';
+                }, 500);
+            });
     }
-
-    // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById("basicModal"));
-    modal.hide();
-    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-    document.body.classList.remove("modal-open");
-    document.body.style.overflow = "auto";
-});
-
-
+    $(document).ready(function () {
+        document.getElementById('hospital_id').addEventListener('change', function () {
+            const hospitalNameDiv = document.getElementById('hospital_name_div');
+            if (this.value === "0") {
+                hospitalNameDiv.style.display = 'block';
+            } else {
+                hospitalNameDiv.style.display = 'none';
+                document.getElementById('hospitalName').value = '';
+            }
+        });
+        document.getElementById("saveChangesModal").addEventListener("click", function () {
+            const hospitalSelect = document.getElementById("hospital_id");
+            const selectedHospitalId = hospitalSelect.value;
+            const hospitalTextInput = document.getElementById("hospitalName").value.trim();
+            const hospitalNameField = document.getElementById("hospitalName");
+            let sanitizedHospitalName = "";
+            if (hospitalNameField) {
+                hospitalNameField.value = sanitizedHospitalName;
+            }
+            if (selectedHospitalId === "0") {
+                let sanitizedHospitalName = hospitalTextInput.replace(/[<>]/g, "");
+                hospitalNameField.value = sanitizedHospitalName;
+                document.getElementById("outsideReferralHospitalName").textContent =
+                    sanitizedHospitalName || "No Hospital Name Entered";
+            } else {
+                hospitalNameField.value = selectedHospitalId;
+                const selectedOption = hospitalSelect.options[hospitalSelect.selectedIndex];
+                document.getElementById("outsideReferralHospitalName").textContent =
+                    selectedOption.text || "No Hospital Selected";
+            }
+            const modal = bootstrap.Modal.getInstance(document.getElementById("basicModal"));
+            modal.hide();
+            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.overflow = "auto";
+        });
         document.getElementById("referralSelect").addEventListener("change", function () {
             let selectedValue = this.value;
             if (selectedValue === "OutsideReferral") {
@@ -1169,7 +1267,6 @@ if (hospitalNameField) {
         document.getElementById('leave-from').value = formattedDateTime_1;
         const dayLater = new Date(now);
         dayLater.setDate(dayLater.getDate() + 1);
-        // document.getElementById('leave-upto').value = formatDateForInput(dayLater);
         document.getElementById('leave-upto').value = formattedDateTime_1;
         document.getElementById('outTime').value = formattedDateTime_1;
         const formattedDateTime_2 = formatDateForInput(now);
@@ -1188,7 +1285,6 @@ if (hospitalNameField) {
                 window.location = '/prescription/add-employee-prescription/' + employeeId + '/op/' + opRegistryId;
             });
         });
-
         document.getElementById('addTest').addEventListener('click', () => {
             if (!handleIncidentType()) return;
             if (!handleObservations()) return;
@@ -1197,7 +1293,6 @@ if (hospitalNameField) {
                 window.location = '/ohc/health-registry/add-test/' + employeeId + '/op/' + opRegistryId;
             });
         });
-
         document.getElementById('saveClose').addEventListener('click', () => {
             if (!handleIncidentType()) return;
             if (!handleObservations()) return;
@@ -1205,7 +1300,6 @@ if (hospitalNameField) {
                 window.location = '/ohc/health-registry/list-registry';
             });
         });
-
         document.getElementById('saveHR').addEventListener('click', () => {
             if (!handleIncidentType()) return;
             if (!handleObservations()) return;
@@ -1214,74 +1308,7 @@ if (hospitalNameField) {
                 window.location = '/ohc/health-registry/edit-registry/edit-outpatient/' + employeeId + '/op/' + opRegistryId;
             });
         });
-
-        const spinnerLabel = document.getElementById('spinnerLabeltext');
-        const spinner = document.getElementById('add-registry-spinner');
-        const registryCard = document.getElementById('add-registry-card');
-        const apiSteps = [
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllSymptoms', message: 'Retrieving Symptoms...', selectId: 'select2Primary_symptoms' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllDiagnosis', message: 'Retrieving Diagnosis...', selectId: 'select2Primary_diagnosis' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllMedicalSystem', message: 'Retrieving Medical Systems...', selectId: 'select2Primary_medical_system' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllBodyParts', message: 'Retrieving Body Parts...', selectId: ['select2Primary_body_part', 'select2Primary_body_part_IA'] },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllNatureOfInjury', message: 'Retrieving Nature of Injury...', selectId: 'select2Primary_nature_of_injury' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllInjuryMechanism', message: 'Retrieving Injury Mechanism...', selectId: 'select2Primary_injury_mechanism' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getMRNumber', message: 'Fetching MR Number...', isMRNumber: true }
-        ];
-        const apiPromises = apiSteps.map((step, index) => {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    spinnerLabel.textContent = step.message;
-                    apiRequest({
-                        url: step.url,
-                        onSuccess: function (response) {
-                            if (response.result && response.message) {
-                                if (step.isMRNumber) {
-                                    // document.getElementById('mrNumber').textContent = response.message;
-                                } else if (Array.isArray(step.selectId)) {
-                                    step.selectId.forEach(id => populateSelect(id, response.message));
-                                } else {
-                                    populateSelect(step.selectId, response.message);
-                                }
-                            }
-                            resolve();
-                        },
-                        onError: function (error) {
-                            console.error(`Error fetching ${step.message}:`, error);
-                            showToast('error', 'Error', `Failed to load ${step.message}`);
-                            reject(error);
-                        }
-                    });
-                }, index * 500);
-            });
-        });
-        Promise.all(apiPromises)
-            .then(() => {
-                if (isOutPatientAdded) {
-                    showToast('success', 'Data Fetched Successfully.');
-                }
-                spinnerLabel.textContent = "Preparing Outpatient Data...";
-                setTimeout(() => {
-                    spinner.style.display = 'none';
-                    registryCard.style.display = 'block';
-                }, 1000);
-            })
-            .catch((error) => {
-                console.error('One or more API requests failed:', error);
-            });
+        loadAllDataParallel();
     });
-    
-</script>
-<script>
-document.getElementById('hospital_id').addEventListener('change', function () {
-  const hospitalNameDiv = document.getElementById('hospital_name_div');
-  if (this.value === "0") {
-    hospitalNameDiv.style.display = 'block';
-  } else {
-    hospitalNameDiv.style.display = 'none';
-    // Optional: Clear the hospital name input when hidden
-    document.getElementById('hospitalName').value = '';
-  }
-});
-
 </script>
 @endsection

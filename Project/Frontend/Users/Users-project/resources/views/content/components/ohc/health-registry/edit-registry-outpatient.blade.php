@@ -44,23 +44,19 @@
         background-color: #0d6efd;
         border-color: #0d6efd;
     }
-
     /* Warning color for Moderate */
     .moderate-radio:checked {
         background-color: #ffc107;
         border-color: #ffc107;
     }
-
     /* Danger color for Severe */
     .severe-radio:checked {
         background-color: #dc3545;
         border-color: #dc3545;
     }
-
     .hidden {
         display: none;
     }
-
     /* Centering the Spinner Container */
     .add-registry-spinner {
         display: flex;
@@ -72,7 +68,6 @@
         transform: translate(-50%, -50%);
         z-index: 1050;
     }
-
     /* Spinner Card Background */
     .spinner-card {
         background: white;
@@ -86,20 +81,17 @@
         min-width: 180px;
         text-align: center;
     }
-
     /* Existing Spinner Styles */
     .spinner-container {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
-
     .sk-bounce {
         display: flex;
         justify-content: space-between;
         width: 50px;
     }
-
     .sk-bounce-dot {
         width: 30px;
         height: 30px;
@@ -108,16 +100,13 @@
         border-radius: 50%;
         animation: sk-bounce 1.4s infinite ease-in-out both;
     }
-
     @keyframes sk-bounce {
-
         0%,
         80%,
         100% {
             transform: scale(0);
             opacity: 0.3;
         }
-
         40% {
             transform: scale(1);
             opacity: 1;
@@ -129,7 +118,6 @@
     var employeeData = <?php echo json_encode($employeeData); ?>;
 </script>
 <?php
-// print_r($employeeData);
 ?>
 <div class="add-registry-spinner" id="add-registry-spinner" style="display: block;">
     <div class="spinner-card">
@@ -384,30 +372,24 @@
             </div>
             <div class="card shadow-sm" id="industrialFields" style="display: none;">
                 <div class="card-body">
-                   @if (!empty($employeeData['incidentTypeColorCodes']))
-    <style>
-        .custom-radio {
-            position: relative;
-            cursor: pointer;
-        }
-
-        @foreach ($employeeData['incidentTypeColorCodes'] as $label => $color)
-            @php
-                $id = \Illuminate\Support\Str::slug($label);
-            @endphp
-
-            #{{ $id }}:checked {
-                background-color: {{ $color }} !important;
-                border-color: {{ $color }} !important;
-            }
-
-            #{{ $id }}::before {
-                background-color: {{ $color }};
-            }
-        @endforeach
-    </style>
-@endif
-
+                    @if (!empty($employeeData['incidentTypeColorCodes']))
+                        <style>
+                            .custom-radio {
+                                position: relative;
+                                cursor: pointer;
+                            }
+                            @foreach ($employeeData['incidentTypeColorCodes'] as $label => $color)
+                                @php $id = \Illuminate\Support\Str::slug($label); @endphp
+                                #{{ $id }}:checked {
+                                    background-color: {{ $color }} !important;
+                                    border-color: {{ $color }} !important;
+                                }                            
+                                #{{ $id }}::before {
+                                    background-color: {{ $color }};
+                                }
+                            @endforeach
+                        </style>
+                    @endif
                     <div class="row">
                         <!-- Left Column -->
                         <div class="col-md-6">
@@ -495,7 +477,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div class="mb-4">
                                 <label class="form-label text-primary mb-2"
                                     style="font-size: 15px; color: #6c5ce7 !important; font-weight: 500;">
@@ -506,7 +487,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div class="mb-4">
                                 <label class="form-label text-primary mb-2"
                                     style="font-size: 15px; color: #6c5ce7 !important; font-weight: 500;">
@@ -595,8 +575,9 @@
                             <textarea class="form-control" rows="2" id="medicalHistory"></textarea>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-link">View Past
-                                History</button>
+                            <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;">
+                                View Past History
+                            </button>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -755,7 +736,6 @@
                                 <input type="number" id="odometerIn" class="form-control" placeholder="Enter Odometer In">
                             </div>
                         </div>
-
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="timeOut" class="form-label">Time Out</label>
@@ -778,22 +758,11 @@
     </div>
 </div>
 <script>
-    document.getElementById('vehicleType').addEventListener('change', function () {
-        const ambulanceFields = document.getElementById('ambulanceFields');
-        if (this.value === 'ambulance') {
-            ambulanceFields.classList.remove('hidden');
-        } else {
-            ambulanceFields.classList.add('hidden');
-        }
-    });
-
     function formatTime(dateTime) {
         if (!dateTime) return '';
         const date = new Date(dateTime);
         return date.toISOString().substr(11, 5);
     }
-
-
     function initializeSiteOfInjuryCheckboxes(opRegistry) {
         let siteOfInjuryObj;
         if (typeof opRegistry['site_of_injury'] === 'string') {
@@ -812,7 +781,6 @@
             console.error("Could not get valid site_of_injury data");
         }
     }
-
     function formatDate(dateTimeStr) {
         try {
             if (dateTimeStr.includes('.')) {
@@ -833,8 +801,6 @@
             return '';
         }
     }
-
-
     function toggleIncidentFields() {
         const incidentType = document.getElementById('incidentType').value;
         const medicalFields = document.getElementById('medicalFields');
@@ -853,7 +819,6 @@
             siteOfInjury.style.display = 'none';
         }
     }
-
     function populateSelect(selectId, data) {
         const selectElement = document.getElementById(selectId);
         if (!selectElement) return;
@@ -868,7 +833,6 @@
             $(selectElement).trigger('change');
         }
     }
-
     function selectValues(selectId, selectedValues = []) {
         const selectElement = document.getElementById(selectId);
         if (!selectElement) return;
@@ -882,7 +846,6 @@
             $(selectElement).trigger('change');
         }
     }
-
     function formatDateForInput(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -891,7 +854,6 @@
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
-
     function validateFields(fields) {
         for (const [id, label] of Object.entries(fields)) {
             const value = document.getElementById(id)?.value.trim() || '';
@@ -902,7 +864,6 @@
         }
         return true;
     }
-
     function toggleCheckbox(selectedId) {
         const checkboxes = document.querySelectorAll('.site-of-injury');
         checkboxes.forEach(checkbox => {
@@ -911,7 +872,6 @@
             }
         });
     }
-
     function handleIncidentType() {
         const incidentType = document.getElementById('incidentType').value;
         const doctorSelect = document.getElementById('doctorSelect').value;
@@ -932,7 +892,6 @@
         };
         return true;
     }
-
     function handleObservations() {
         const observations = {
             doctorNotes: $('#doctorNotes').val(),
@@ -988,7 +947,6 @@
         }
         return true;
     }
-
     function sendHealthRegistryData(close = false, onSuccessCallback = () => { }) {
         Swal.fire({
             title: "Are you sure?",
@@ -1132,7 +1090,8 @@
                 });
             }
         });
-    } function populateAddedOutpatientData() {
+    }
+    function populateAddedOutpatientData() {
         const fieldMapping = {
             167: 'vpTemperature_167',
             168: 'vpSystolic_168',
@@ -1243,6 +1202,8 @@
         }
         var type_of_incident = opRegistry.type_of_incident;
         if (type_of_incident === 'medicalIllness') {
+            const medicalFields = document.getElementById('medicalFields');
+            const industrialFields = document.getElementById('industrialFields');
             medicalFields.style.display = 'block';
             industrialFields.style.display = 'none';
             document.getElementById('incidentType').value = 'medicalIllness';
@@ -1251,6 +1212,9 @@
             selectValues('select2Primary_medical_system', opRegistry.medical_system);
             selectValues('select2Primary_diagnosis', opRegistry.diagnosis);
         } else if (type_of_incident === 'industrialAccident') {
+            const medicalFields = document.getElementById('medicalFields');
+            const industrialFields = document.getElementById('industrialFields');
+            const siteOfInjury = document.getElementById('siteOfInjury');
             medicalFields.style.display = 'none';
             industrialFields.style.display = 'block';
             siteOfInjury.style.display = 'flex';
@@ -1274,6 +1238,9 @@
             initializeCheckboxes();
             initializeSiteOfInjuryCheckboxes(opRegistry);
         } else if (type_of_incident === 'outsideAccident') {
+            const medicalFields = document.getElementById('medicalFields');
+            const industrialFields = document.getElementById('industrialFields');
+            const siteOfInjury = document.getElementById('siteOfInjury');
             medicalFields.style.display = 'none';
             industrialFields.style.display = 'block';
             siteOfInjury.style.display = 'none';
@@ -1294,7 +1261,6 @@
                     }
                 });
             }
-
             initializeCheckboxes();
             initializeSiteOfInjuryCheckboxes(opRegistry);
         }
@@ -1302,7 +1268,6 @@
         if (doctorId > 0) {
             document.getElementById('doctorSelect').value = doctorId;
         }
-
         function initializeCheckboxes() {
             let bodySideObj;
             if (typeof opRegistry['body_side'] === 'string') {
@@ -1322,6 +1287,14 @@
             }
         }
     }
+    document.getElementById('vehicleType').addEventListener('change', function () {
+        const ambulanceFields = document.getElementById('ambulanceFields');
+        if (this.value === 'ambulance') {
+            ambulanceFields.classList.remove('hidden');
+        } else {
+            ambulanceFields.classList.add('hidden');
+        }
+    });
     $(document).ready(function () {
         document.getElementById("saveChangesModal").addEventListener("click", function () {
             let hospitalNameInput = document.getElementById("hospitalName").value.trim();
@@ -1402,18 +1375,15 @@
         document.getElementById('backToList').addEventListener('click', () => {
             window.location = "/ohc/health-registry/list-registry";
         });
-
         document.getElementById('addTest').addEventListener('click', () => {
             if (!handleIncidentType()) return;
             if (!handleObservations()) return;
-
             const redirectAfterSave = () => {
                 const employeeId = $('#employeeId').val().toString().toLowerCase();
                 window.location = '/ohc/health-registry/add-test/' + employeeId + '/op/' + employeeData.op_registry_datas?.op_registry?.op_registry_id;
             };
             sendHealthRegistryData(false, redirectAfterSave);
         });
-
         document.getElementById('saveClose').addEventListener('click', () => {
             if (!handleIncidentType()) return;
             if (!handleObservations()) return;
@@ -1421,7 +1391,6 @@
                 window.location = '/ohc/health-registry/list-registry';
             });
         });
-
         document.getElementById('saveHR').addEventListener('click', () => {
             if (!handleIncidentType()) return;
             if (!handleObservations()) return;
@@ -1430,87 +1399,127 @@
                 window.location = '/ohc/health-registry/edit-registry/edit-outpatient/' + employeeId + '/op/' + opRegistryId;
             });
         });
-
         const spinnerLabel = document.getElementById('spinnerLabeltext');
         const spinner = document.getElementById('add-registry-spinner');
         const registryCard = document.getElementById('add-registry-card');
-        const apiSteps = [{
-            url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllSymptoms',
-            message: 'Retrieving Symptoms...',
-            selectId: 'select2Primary_symptoms'
-        },
-        {
-            url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllDiagnosis',
-            message: 'Retrieving Diagnosis...',
-            selectId: 'select2Primary_diagnosis'
-        },
-        {
-            url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllMedicalSystem',
-            message: 'Retrieving Medical Systems...',
-            selectId: 'select2Primary_medical_system'
-        },
-        {
-            url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllBodyParts',
-            message: 'Retrieving Body Parts...',
-            selectId: ['select2Primary_body_part', 'select2Primary_body_part_IA']
-        },
-        {
-            url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllNatureOfInjury',
-            message: 'Retrieving Nature of Injury...',
-            selectId: 'select2Primary_nature_of_injury'
-        },
-        {
-            url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllInjuryMechanism',
-            message: 'Retrieving Injury Mechanism...',
-            selectId: 'select2Primary_injury_mechanism'
-        },
-        {
-            url: 'https://login-users.hygeiaes.com/ohc/health-registry/getMRNumber',
-            message: 'Fetching MR Number...',
-            isMRNumber: true
+        let loadedCount = 0;
+        const totalSteps = 7;
+        function updateProgress(message) {
+            loadedCount++;
+            spinnerLabel.textContent = `${message} (${loadedCount}/${totalSteps})`;
         }
+        const apiConfigs = [
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllSymptoms',
+                message: 'Loading Symptoms',
+                selectId: 'select2Primary_symptoms'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllDiagnosis',
+                message: 'Loading Diagnosis',
+                selectId: 'select2Primary_diagnosis'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllMedicalSystem',
+                message: 'Loading Medical Systems',
+                selectId: 'select2Primary_medical_system'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllBodyParts',
+                message: 'Loading Body Parts',
+                selectId: ['select2Primary_body_part', 'select2Primary_body_part_IA']
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllNatureOfInjury',
+                message: 'Loading Nature of Injury',
+                selectId: 'select2Primary_nature_of_injury'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllInjuryMechanism',
+                message: 'Loading Injury Mechanism',
+                selectId: 'select2Primary_injury_mechanism'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getMRNumber',
+                message: 'Loading MR Number',
+                isMRNumber: true
+            }
         ];
-        const apiPromises = apiSteps.map((step, index) => {
+        function createApiRequest(config) {
             return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    spinnerLabel.textContent = step.message;
-                    apiRequest({
-                        url: step.url,
-                        onSuccess: function (response) {
-                            if (response.result && response.message) {
-                                if (step.isMRNumber) {
-                                    // document.getElementById('mrNumber').textContent = response.message;
-                                } else if (Array.isArray(step.selectId)) {
-                                    step.selectId.forEach(id => populateSelect(id, response.message));
-                                } else {
-                                    populateSelect(step.selectId, response.message);
-                                }
+                const timeoutId = setTimeout(() => {
+                    reject(new Error(`Timeout: ${config.message} took too long`));
+                }, 10000);
+                apiRequest({
+                    url: config.url,
+                    timeout: 8000,
+                    onSuccess: function (response) {
+                        clearTimeout(timeoutId);
+                        if (response.result && response.message) {
+                            if (config.isMRNumber) {
+                            } else if (Array.isArray(config.selectId)) {
+                                config.selectId.forEach(id => populateSelect(id, response.message));
+                            } else {
+                                populateSelect(config.selectId, response.message);
                             }
-                            resolve();
-                        },
-                        onError: function (error) {
-                            console.error(`Error fetching ${step.message}:`, error);
-                            showToast('error', 'Error', `Failed to load ${step.message}`);
-                            reject(error);
                         }
-                    });
-                }, index * 500);
+                        updateProgress(config.message + ' ✓');
+                        resolve(config);
+                    },
+                    onError: function (error) {
+                        clearTimeout(timeoutId);
+                        console.warn(`Warning: ${config.message} failed, continuing...`, error);
+                        updateProgress(config.message + ' ⚠');
+                        resolve(config);
+                    }
+                });
             });
-        });
-        Promise.all(apiPromises)
-            .then(() => {
-                if (isOutPatientAdded) {
-                    populateAddedOutpatientData()
+        }
+        spinnerLabel.textContent = 'Initializing data load...';
+        const startTime = Date.now();
+        const allRequests = apiConfigs.map(config => createApiRequest(config));
+        Promise.allSettled(allRequests)
+            .then((results) => {
+                const loadTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                console.log(`All API requests completed in ${loadTime}s`);
+                const successful = results.filter(r => r.status === 'fulfilled').length;
+                const failed = results.filter(r => r.status === 'rejected').length;
+                if (failed > 0) {
+                    console.warn(`${failed} out of ${totalSteps} requests failed`);
+                    showToast('warning', 'Partial Load', `${successful}/${totalSteps} data sources loaded successfully`);
                 }
-                spinnerLabel.textContent = "Preparing Outpatient Data...";
+                spinnerLabel.textContent = 'Finalizing setup...';
                 setTimeout(() => {
+                    if (isOutPatientAdded) {
+                        populateAddedOutpatientData();
+                    }
                     spinner.style.display = 'none';
                     registryCard.style.display = 'block';
-                }, 1000);
+                    console.log('Page ready for user interaction');
+                }, 200);
             })
             .catch((error) => {
-                console.error('One or more API requests failed:', error);
+                console.error('Unexpected error in parallel loading:', error);
+                setTimeout(() => {
+                    if (isOutPatientAdded) {
+                        populateAddedOutpatientData();
+                    }
+                    spinner.style.display = 'none';
+                    registryCard.style.display = 'block';
+                    showToast('warning', 'Load Issues', 'Some data may be missing, but you can continue');
+                }, 1000);
             });
+        const fallbackTimer = setTimeout(() => {
+            if (spinner.style.display !== 'none') {
+                console.log('Showing form early due to slow network');
+                spinner.style.display = 'none';
+                registryCard.style.display = 'block';
+                showToast('info', 'Loading...', 'Form ready, data still loading in background');
+            }
+        }, 3000);
+        Promise.allSettled(allRequests).then(() => {
+            clearTimeout(fallbackTimer);
+        });
     });
 </script>
 @endsection

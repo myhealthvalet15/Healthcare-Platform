@@ -118,7 +118,6 @@
     var employeeData = <?php echo json_encode($employeeData); ?>;
 </script>
 <?php
-// print_r($employeeData);
 ?>
 <div class="add-registry-spinner" id="add-registry-spinner" style="display: block;">
     <div class="spinner-card">
@@ -576,8 +575,9 @@
                             <textarea class="form-control" rows="2" id="medicalHistory"></textarea>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-link">View Past
-                                History</button>
+                            <button class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;">
+                                View Past History
+                            </button>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -734,7 +734,6 @@
                                 <input type="number" id="odometerIn" class="form-control" placeholder="Enter Odometer In">
                             </div>
                         </div>
-
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="timeOut" class="form-label">Time Out</label>
@@ -820,7 +819,7 @@
             document.getElementById('lostHours').value = lostHours;
         }
         var outTime = opRegistryTimes.out_date_time;
-        if (outTime) { 
+        if (outTime) {
             document.getElementById('outTime').value = formatDate(outTime);
         }
         var doctorNotes = opRegistry.doctor_notes;
@@ -857,12 +856,6 @@
             $('#addPrescription').removeClass('btn-warning');
             $('#addPrescription').addClass('btn-secondary');
         }
-        // var isTestAdded = employeeData.isTestAdded;
-        // if (isTestAdded) {
-        //     $('#addTest').text('View Test');
-        //     $('#addTest').removeClass('btn-warning');
-        //     $('#addTest').addClass('btn-secondary');
-        // }
         var type_of_incident = opRegistry.type_of_incident;
         if (type_of_incident === 'medicalIllness') {
             medicalFields.style.display = 'block';
@@ -1270,6 +1263,116 @@
             }
         });
     }
+    function loadDataInParallel() {
+        const spinnerLabel = document.getElementById('spinnerLabeltext');
+        const spinner = document.getElementById('add-registry-spinner');
+        const registryCard = document.getElementById('add-registry-card');
+        const apiConfigs = [
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllSymptoms',
+                name: 'Symptoms',
+                selectId: 'select2Primary_symptoms'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllDiagnosis',
+                name: 'Diagnosis',
+                selectId: 'select2Primary_diagnosis'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllMedicalSystem',
+                name: 'Medical Systems',
+                selectId: 'select2Primary_medical_system'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllBodyParts',
+                name: 'Body Parts',
+                selectId: ['select2Primary_body_part', 'select2Primary_body_part_IA']
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllNatureOfInjury',
+                name: 'Nature of Injury',
+                selectId: 'select2Primary_nature_of_injury'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllInjuryMechanism',
+                name: 'Injury Mechanism',
+                selectId: 'select2Primary_injury_mechanism'
+            },
+            {
+                url: 'https://login-users.hygeiaes.com/ohc/health-registry/getMRNumber',
+                name: 'MR Number',
+                isMRNumber: true
+            }
+        ];
+        let completedRequests = 0;
+        let loadedData = {};
+        function updateSpinner() {
+            const loadingItems = Object.keys(loadedData).filter(key => loadedData[key] === 'loading');
+            const completedItems = Object.keys(loadedData).filter(key => loadedData[key] === 'completed');
+            if (loadingItems.length > 0) {
+                spinnerLabel.textContent = `Loading ${loadingItems.join(', ')}... (${completedItems.length}/${apiConfigs.length} completed)`;
+            } else if (completedItems.length === apiConfigs.length) {
+                spinnerLabel.textContent = "Finalizing data...";
+            } else {
+                spinnerLabel.textContent = "Initializing...";
+            }
+        }
+        const apiPromises = apiConfigs.map((config) => {
+            loadedData[config.name] = 'loading';
+            updateSpinner();
+            return new Promise((resolve, reject) => {
+                apiRequest({
+                    url: config.url,
+                    onSuccess: function (response) {
+                        if (response.result && response.message) {
+                            if (config.isMRNumber) {
+                            } else if (Array.isArray(config.selectId)) {
+                                config.selectId.forEach(id => populateSelect(id, response.message));
+                            } else {
+                                populateSelect(config.selectId, response.message);
+                            }
+                        }
+                        loadedData[config.name] = 'completed';
+                        completedRequests++;
+                        updateSpinner();
+                        resolve({ config, response });
+                    },
+                    onError: function (error) {
+                        console.error(`Error fetching ${config.name}:`, error);
+                        showToast('error', 'Error', `Failed to load ${config.name}`);
+                        loadedData[config.name] = 'error';
+                        completedRequests++;
+                        updateSpinner();
+                        resolve({ config, error: true });
+                    }
+                });
+            });
+        });
+        Promise.allSettled(apiPromises)
+            .then((results) => {
+                const isOutPatientAdded = $('#isOutPatientAdded').val();
+                if (isOutPatientAdded) {
+                    spinnerLabel.textContent = "Loading existing patient data...";
+                    setTimeout(() => {
+                        populateAddedOutpatientData();
+                        finalizeLoading();
+                    }, 200);
+                } else {
+                    finalizeLoading();
+                }
+            })
+            .catch((error) => {
+                console.error('Critical error in API loading:', error);
+                finalizeLoading();
+            });
+        function finalizeLoading() {
+            spinnerLabel.textContent = "Ready!";
+            setTimeout(() => {
+                spinner.style.display = 'none';
+                registryCard.style.display = 'block';
+            }, 300);
+        }
+    }
     $(document).ready(function () {
         document.getElementById("saveChangesModal").addEventListener("click", function () {
             let hospitalNameInput = document.getElementById("hospitalName").value.trim();
@@ -1380,59 +1483,7 @@
                 window.location = '/ohc/health-registry/edit-registry/edit-outpatient/' + employeeId + '/op/' + opRegistryId;
             });
         });
-        const spinnerLabel = document.getElementById('spinnerLabeltext');
-        const spinner = document.getElementById('add-registry-spinner');
-        const registryCard = document.getElementById('add-registry-card');
-        const apiSteps = [
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllSymptoms', message: 'Retrieving Symptoms...', selectId: 'select2Primary_symptoms' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllDiagnosis', message: 'Retrieving Diagnosis...', selectId: 'select2Primary_diagnosis' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllMedicalSystem', message: 'Retrieving Medical Systems...', selectId: 'select2Primary_medical_system' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllBodyParts', message: 'Retrieving Body Parts...', selectId: ['select2Primary_body_part', 'select2Primary_body_part_IA'] },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllNatureOfInjury', message: 'Retrieving Nature of Injury...', selectId: 'select2Primary_nature_of_injury' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getAllInjuryMechanism', message: 'Retrieving Injury Mechanism...', selectId: 'select2Primary_injury_mechanism' },
-            { url: 'https://login-users.hygeiaes.com/ohc/health-registry/getMRNumber', message: 'Fetching MR Number...', isMRNumber: true }
-        ];
-        const apiPromises = apiSteps.map((step, index) => {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    spinnerLabel.textContent = step.message;
-                    apiRequest({
-                        url: step.url,
-                        onSuccess: function (response) {
-                            if (response.result && response.message) {
-                                if (step.isMRNumber) {
-                                    // document.getElementById('mrNumber').textContent = response.message;
-                                } else if (Array.isArray(step.selectId)) {
-                                    step.selectId.forEach(id => populateSelect(id, response.message));
-                                } else {
-                                    populateSelect(step.selectId, response.message);
-                                }
-                            }
-                            resolve();
-                        },
-                        onError: function (error) {
-                            console.error(`Error fetching ${step.message}:`, error);
-                            showToast('error', 'Error', `Failed to load ${step.message}`);
-                            reject(error);
-                        }
-                    });
-                }, index * 500);
-            });
-        });
-        Promise.all(apiPromises)
-            .then(() => {
-                if (isOutPatientAdded) {
-                    populateAddedOutpatientData()
-                }
-                spinnerLabel.textContent = "Preparing Outpatient Data...";
-                setTimeout(() => {
-                    spinner.style.display = 'none';
-                    registryCard.style.display = 'block';
-                }, 1000);
-            })
-            .catch((error) => {
-                console.error('One or more API requests failed:', error);
-            });
+        loadDataInParallel();
     });
 </script>
 @endsection

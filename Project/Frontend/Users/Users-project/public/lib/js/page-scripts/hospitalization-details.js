@@ -167,7 +167,7 @@ function prefillHospitalizationForm(data) {
     // Dates
     $('input[name="from_date"]').val(formatDateTime(data.from_datetime));
     $('input[name="to_date"]').val(formatDateTime(data.to_datetime));
-
+    
     // Condition
     if (data.condition_id) {
         let conditionArray;
@@ -194,16 +194,25 @@ function prefillHospitalizationForm(data) {
         }
 
         // Test Reports
-        const testReports = JSON.parse(data.attachment_test_reports || '[]');
-        if (Array.isArray(testReports)) {
-            testReports.forEach((img, index) => {
-                renderAttachmentPreview(
-                    'summary_reports_preview',
-                    `Test Report ${index + 1}`,
-                    img
-                );
-            });
-        }
+       const testReports = JSON.parse(data.attachment_test_reports || '[]');
+if (Array.isArray(testReports)) {
+    $('#summary_reports_count').text(testReports.length); 
+
+    const container = $('#summary_reports_preview');
+    container.empty(); // clear previous previews if needed
+
+    testReports.forEach((img, index) => {
+        renderAttachmentPreview(
+            'summary_reports_preview',
+            `Test Report ${index + 1}`,
+            img
+        );
+
+        // Add a line break after each preview button
+        container.append('<br>');
+    });
+}
+
     } catch (e) {
         console.warn('Attachment parsing failed:', e);
     }

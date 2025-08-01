@@ -395,8 +395,6 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
         <textarea name="description" class="form-control" rows="3" placeholder="Enter description here..."></textarea>
     </div>
 </div>
-
-
                 <!-- Row 4: File Uploads -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
@@ -405,9 +403,11 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
                          <div id="discharge_summary_preview" class="mt-2"></div>
                      </div>
                     <div class="col-md-6">
-                        <label class="form-label">Test Reports (up to 3 files)</label>
+                        <label class="form-label">Test Reports (Files)</label><span class="badge bg-primary ms-2" id="summary_reports_count">0</span>
+
                         <input type="file" name="summary_reports[]" class="form-control" multiple accept=".pdf,.jpg,.png">
                         <div id="summary_reports_preview" class="mt-2"></div>
+
                     </div>
                 </div>
 

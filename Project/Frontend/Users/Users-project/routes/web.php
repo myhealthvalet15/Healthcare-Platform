@@ -187,6 +187,7 @@ use App\Http\Controllers\otc\otcController;
 use App\Http\Controllers\components\mhc\HealthRiskAssessment;
 use App\Http\Controllers\components\events\EventsController;
 use App\Http\Controllers\PreEmployment\PreEmploymentController;
+use App\Http\Controllers\components\mhc\reports\MhcReportsController;
 use Illuminate\Http\Request;
 
 // icons
@@ -258,6 +259,11 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/mhc/health-risk-assessment/getAllLocations', [HealthRiskAssessment::class, 'getAllLocations'])->name('health-risk-assessment-templates');
     Route::post('/mhc/health-risk-assessment/assignHraTemplate', [HealthRiskAssessment::class, 'assignHRATemplate'])->name('health-risk-assessment-templates');
     Route::put('/mhc/health-risk-assessment/updateAssignedHraTemplate', [HealthRiskAssessment::class, 'updateAssignedHraTemplate'])->name('health-risk-assessment-templates');
+
+     //Reports
+    Route::get('/mhc/reports/health-risk', [MhcReportsController::class, 'index'])->name('health-risk-reports');
+    Route::get('mhc/reports/event-chart-data', [MhcReportsController::class, 'getChartData'])->name('event.chart.data');
+
 
     // Events store and update routes
     Route::post('/mhc/events/store-events', [EventsController::class, 'storeEvents'])->name('events-store-events');

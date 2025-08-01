@@ -870,24 +870,24 @@ class corporateEmployees extends Controller
             $basicInfo['employee_is_outpatient_open'] = -1;
             $showWhiteStrip = false;
         }
-        // $basicInfo['incidentTypeColorCodes'] = OhcComponents::with([
-        //     'incidentType:incident_type_id,incident_type_name'
-        // ])
-        //     ->where('corporate_id', $corporateId)
-        //     ->get(['incident_type_id', 'injury_color_types'])
-        //     ->map(function ($item) {
-        //         return [
-        //             'incident_type_id' => $item->incident_type_id,
-        //             'incident_type_name' => optional($item->incidentType)->incident_type_name,
-        //             'injury_color_types' => is_string($item->injury_color_types)
-        //                 ? json_decode($item->injury_color_types, true)
-        //                 : $item->injury_color_types,
-        //         ];
-        //     })
-        //     ->toArray();
-        $basicInfo['incidentTypeColorCodes'] = OhcComponents::where('corporate_id', $corporateId)
-                ->get(['incident_type_id', 'injury_color_types'])
-                ->toArray();
+        $basicInfo['incidentTypeColorCodes'] = OhcComponents::with([
+            'incidentType:incident_type_id,incident_type_name'
+        ])
+            ->where('corporate_id', $corporateId)
+            ->get(['incident_type_id', 'injury_color_types'])
+            ->map(function ($item) {
+                return [
+                    'incident_type_id' => $item->incident_type_id,
+                    'incident_type_name' => optional($item->incidentType)->incident_type_name,
+                    'injury_color_types' => is_string($item->injury_color_types)
+                        ? json_decode($item->injury_color_types, true)
+                        : $item->injury_color_types,
+                ];
+            })
+            ->toArray();
+        // $basicInfo['incidentTypeColorCodes'] = OhcComponents::where('corporate_id', $corporateId)
+        //         ->get(['incident_type_id', 'injury_color_types'])
+        //         ->toArray();
         $basicInfo['incidentTypeColorCodesAdded'] = $opRegistry->injury_color_text ?? null;
         $basicInfo['showWhiteStrip'] = $showWhiteStrip;
         $healthParameters = HealthParameters::where('user_id', $userId)->first();
@@ -1394,7 +1394,7 @@ class corporateEmployees extends Controller
     ): bool {
         $ohcId = $validatedData['ohcId'];
         $editExistingOne = $validatedData['editExistingOne'] ?? null;
-        $isFollowup = $validatedData['isFollowup'] ?? null;
+        $isFollowup = $validatedData['isFollowup'] ?? null; 
         $opRegistryData = [
             'master_user_id' => $employeeInfo['masterUserId'],
             'corporate_id' => $employeeInfo['corporateId'],

@@ -44,19 +44,23 @@
         background-color: #0d6efd;
         border-color: #0d6efd;
     }
+
     /* Warning color for Moderate */
     .moderate-radio:checked {
         background-color: #ffc107;
         border-color: #ffc107;
     }
+
     /* Danger color for Severe */
     .severe-radio:checked {
         background-color: #dc3545;
         border-color: #dc3545;
     }
+
     .hidden {
         display: none;
     }
+
     /* Centering the Spinner Container */
     .add-registry-spinner {
         display: flex;
@@ -68,6 +72,7 @@
         transform: translate(-50%, -50%);
         z-index: 1050;
     }
+
     /* Spinner Card Background */
     .spinner-card {
         background: white;
@@ -81,17 +86,20 @@
         min-width: 180px;
         text-align: center;
     }
+
     /* Existing Spinner Styles */
     .spinner-container {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
+
     .sk-bounce {
         display: flex;
         justify-content: space-between;
         width: 50px;
     }
+
     .sk-bounce-dot {
         width: 30px;
         height: 30px;
@@ -100,13 +108,16 @@
         border-radius: 50%;
         animation: sk-bounce 1.4s infinite ease-in-out both;
     }
+
     @keyframes sk-bounce {
+
         0%,
         80%,
         100% {
             transform: scale(0);
             opacity: 0.3;
         }
+
         40% {
             transform: scale(1);
             opacity: 1;
@@ -118,6 +129,7 @@
     var employeeData = <?php echo json_encode($employeeData); ?>;
 </script>
 <?php
+// print_r($employeeData); // exit;
 ?>
 <div class="add-registry-spinner" id="add-registry-spinner" style="display: block;">
     <div class="spinner-card">
@@ -147,10 +159,15 @@
                                 value="{{ $employeeData['employee_is_outpatient_added'] ?? '' }}">
                             <input type="hidden" name="isOutPatientAddedAndOpen" id="isOutPatientAddedAndOpen"
                                 value="{{ $employeeData['employee_is_outpatient_open'] ?? '' }}">
-                            {{ strtoupper($employeeData['employee_firstname'] ?? '') }}
-                            {{ strtoupper($employeeData['employee_lastname'] ?? '') }} -
+                            {{ strtoupper($employeeData['employee_firstname'] ??
+                            '') }}
+                            {{ strtoupper($employeeData['employee_lastname'] ??
+                            '') }} -
                             {{ $employeeData['employee_id'] ?? '' }} -
-                            {{ ($employeeData['followUpCount'] ?? 0) > 0 ? 'Follow Up ' . ($employeeData['followUpCount'] ?? 0) : 'New Follow Up' }}
+                            {{ ($employeeData['followUpCount'] ?? 0) > 0 ?
+                            'Follow Up ' .
+                            ($employeeData['followUpCount'] ?? 0) :
+                            'New Follow Up' }}
                         </h6>
                         <p class="mb-1">
                             {{ $employeeData['employee_age'] ?? 'N/A' }} / {{
@@ -165,9 +182,9 @@
                             ?? 'N/A')) }}
                         </p>
                     </div>
-                    <div class="position-absolute end-0 top-0 bottom-0 d-flex flex-column justify-content-end me-4 py-2">
-                        <button type="button" 
-                            class="btn btn-sm"
+                    <div
+                        class="position-absolute end-0 top-0 bottom-0 d-flex flex-column justify-content-end me-4 py-2">
+                        <button type="button" class="btn btn-sm"
                             style="background-color: #ffffff; color: #6a0dad; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; width: auto;">
                             Edit Profile
                         </button>
@@ -368,6 +385,88 @@
                             </div>
                         </div>
                     </div>
+                    <style>
+                    .custom-radio-wrapper {
+                        position: relative;
+                        display: inline-block;
+                        margin-right: 20px;
+                    }
+
+                    .custom-radio-wrapper input[type="radio"] {
+                        appearance: none;
+                        -webkit-appearance: none;
+                        width: 20px;
+                        height: 20px;
+                        border: 2px solid #ddd;
+                        border-radius: 50%;
+                        margin-right: 8px;
+                        cursor: pointer;
+                        position: relative;
+                        vertical-align: middle;
+                    }
+
+                    .custom-radio-wrapper input[type="radio"]:checked {
+                        border-color: var(--radio-color);
+                    }
+
+                    .custom-radio-wrapper input[type="radio"]:checked::after {
+                        content: '';
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 50%;
+                        background-color: var(--radio-color);
+                    }
+
+                    .custom-radio-wrapper label {
+                        cursor: pointer;
+                        font-size: 14px;
+                        color: #333;
+                        user-select: none;
+                        vertical-align: middle;
+                    }
+                    </style>
+
+                    <?php
+                    $selectedColorCode = $employeeData['incidentTypeColorCodesAdded'] ?? '';
+                    $injuryColors = [];
+                    foreach ($employeeData['incidentTypeColorCodes'] as $incidentType) {
+                        if ($incidentType['incident_type_id'] == 20) { // Medical Illness
+                            $injuryColors = $incidentType['injury_color_types'];
+                            break;
+                        }
+                    }
+                    ?>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <label class="form-label text-primary mb-3" style="font-size: 15px;">
+                                <strong>Injury Color Type</strong>
+                            </label>
+                        </div>
+                        <div class="col-md-9">
+                            <?php foreach ($injuryColors as $label => $color): 
+                                $value = "{$label}_{$color}";
+                                $checked = ($selectedColorCode === $value) ? 'checked' : '';
+                                $radioId = 'injury_' . str_replace([' ', '-'], '_', strtolower($label));
+                            ?>
+                                <div class="custom-radio-wrapper">
+                                    <input type="radio" 
+                                        name="injury_color_type" 
+                                        id="<?= $radioId ?>" 
+                                        value="<?= htmlspecialchars($value) ?>" 
+                                        style="--radio-color: <?= $color ?>;"
+                                        <?= $checked ?> 
+                                        disabled>
+                                    <label for="<?= $radioId ?>">
+                                        <?= htmlspecialchars($label) ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card shadow-sm" id="industrialFields" style="display: none;">
@@ -378,15 +477,17 @@
                                 position: relative;
                                 cursor: pointer;
                             }
-                            @foreach ($employeeData['incidentTypeColorCodes'] as $label => $color)
-                                @php $id = \Illuminate\Support\Str::slug($label); @endphp
-                                #{{ $id }}:checked {
-                                    background-color: {{ $color }} !important;
-                                    border-color: {{ $color }} !important;
-                                }                            
-                                #{{ $id }}::before {
-                                    background-color: {{ $color }};
-                                }
+                            @foreach ($employeeData['incidentTypeColorCodes'] as $group)
+                                @foreach ($group['injury_color_types'] as $label => $color)
+                                    @php $id = \Illuminate\Support\Str::slug($label); @endphp
+                                    #{{ $id }}:checked {
+                                        background-color: {{ $color }} !important;
+                                        border-color: {{ $color }} !important;
+                                    }
+                                    #{{ $id }}::before {
+                                        background-color: {{ $color }};
+                                    }
+                                @endforeach
                             @endforeach
                         </style>
                     @endif
@@ -398,9 +499,16 @@
                                     style="font-size: 15px; color: #6c5ce7 !important; font-weight: 500;">
                                     <strong>Injury Color</strong>
                                 </label>
-                                @if (!empty($employeeData['incidentTypeColorCodes']))
+                                @php
+                                $selectedIncidentId = $employeeData['op_registry_datas']['op_registry']['incident_id']
+                                ?? null;
+                                @endphp
+
+                                @if (!empty($employeeData['incidentTypeColorCodes']) && $selectedIncidentId)
+                                @foreach ($employeeData['incidentTypeColorCodes'] as $group)
+                                @if ($group['incident_type_id'] == $selectedIncidentId)
                                 <div class="d-flex flex-wrap">
-                                    @foreach ($employeeData['incidentTypeColorCodes'] as $label => $color)
+                                    @foreach ($group['injury_color_types'] as $label => $color)
                                     @php
                                     $id = \Illuminate\Support\Str::slug($label);
                                     $selected = old('injury_color_text') ??
@@ -418,6 +526,8 @@
                                     </div>
                                     @endforeach
                                 </div>
+                                @endif
+                                @endforeach
                                 @endif
                             </div>
                             <div class="mb-4">
@@ -440,8 +550,9 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div id="siteOfInjury">
-                                <div class="mb-4" >
+                                <div class="mb-4">
                                     <label class="form-label text-primary mb-2"
                                         style="font-size: 15px; color: #6c5ce7 !important; font-weight: 500;">
                                         <strong>Site of Injury</strong>
@@ -458,13 +569,15 @@
                                                 <input class="form-check-input site-of-injury" type="checkbox"
                                                     id="nonShopFloor" style="width: 14px; height: 14px;"
                                                     onclick="toggleCheckbox('nonShopFloor')">
-                                                <label class="form-check-label" for="nonShopFloor">Non-Shop Floor</label>
+                                                <label class="form-check-label" for="nonShopFloor">Non-Shop
+                                                    Floor</label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <!-- Right Column -->
                         <div class="col-md-6">
                             <div class="mb-4">
@@ -477,16 +590,18 @@
                                     </select>
                                 </div>
                             </div>
+
                             <div class="mb-4">
                                 <label class="form-label text-primary mb-2"
                                     style="font-size: 15px; color: #6c5ce7 !important; font-weight: 500;">
-                                <strong>Body Part</strong>
+                                    <strong>Body Part</strong>
                                 </label>
                                 <div class="select2-primary body-part-injury">
                                     <select id="select2Primary_body_part_IA" class="select2 form-select" multiple>
                                     </select>
                                 </div>
                             </div>
+
                             <div class="mb-4">
                                 <label class="form-label text-primary mb-2"
                                     style="font-size: 15px; color: #6c5ce7 !important; font-weight: 500;">
@@ -499,6 +614,7 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- Description field spanning both columns -->
                     <div class="row mt-2">
                         <div class="col-12">
@@ -512,6 +628,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div class="row mb-4">
@@ -548,8 +665,7 @@
                             <label class="form-label">Out Time</label>
                         </div>
                         <div class="col-md-8">
-                            <input class="form-control" id="outTime" type="datetime-local"
-                                value="" />
+                            <input class="form-control" id="outTime" type="datetime-local" value="" />
                         </div>
                     </div>
                 </div>
@@ -606,7 +722,10 @@
                                         </div> -->
                                         <div>
                                             <!-- <strong>MR # <span id="mrNumber"></span></strong> -->
-                                            <strong><div id="outsideReferralHospitalName" style="font-weight: bold; cursor: pointer;"></div></strong>
+                                            <strong>
+                                                <div id="outsideReferralHospitalName"
+                                                    style="font-weight: bold; cursor: pointer;"></div>
+                                            </strong>
                                         </div>
                                     </div>
                                 </div>
@@ -727,11 +846,13 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="odometerOut" class="form-label">Odometer Out</label>
-                                <input type="number" id="odometerOut" class="form-control" placeholder="Enter Odometer Out">
+                                <input type="number" id="odometerOut" class="form-control"
+                                    placeholder="Enter Odometer Out">
                             </div>
                             <div class="col-md-6">
                                 <label for="odometerIn" class="form-label">Odometer In</label>
-                                <input type="number" id="odometerIn" class="form-control" placeholder="Enter Odometer In">
+                                <input type="number" id="odometerIn" class="form-control"
+                                    placeholder="Enter Odometer In">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -756,6 +877,7 @@
     </div>
 </div>
 <script>
+    let incidentTypeId = {{ $employeeData['op_registry_datas']['op_registry']['incident_id'] ?? 0 }};
     document.getElementById('vehicleType').addEventListener('change', function () {
         const ambulanceFields = document.getElementById('ambulanceFields');
         if (this.value === 'ambulance') {
@@ -857,7 +979,7 @@
             $('#addPrescription').addClass('btn-secondary');
         }
         var type_of_incident = opRegistry.type_of_incident;
-        if (type_of_incident === 'medicalIllness') {
+        if (type_of_incident === 'medicalIllness' || type_of_incident === 'Medical Illness') {
             medicalFields.style.display = 'block';
             industrialFields.style.display = 'none';
             document.getElementById('incidentType').value = 'medicalIllness';
@@ -865,7 +987,7 @@
             selectValues('select2Primary_symptoms', opRegistry.symptoms);
             selectValues('select2Primary_medical_system', opRegistry.medical_system);
             selectValues('select2Primary_diagnosis', opRegistry.diagnosis);
-        } else if (type_of_incident === 'industrialAccident') {
+        } else if (type_of_incident === 'industrialAccident' || type_of_incident === 'Industrial Accident') {
             medicalFields.style.display = 'none';
             industrialFields.style.display = 'block';
             siteOfInjury.style.display = 'flex';
@@ -888,7 +1010,7 @@
             }
             initializeCheckboxes();
             initializeSiteOfInjuryCheckboxes();
-        } else if (type_of_incident === 'outsideAccident') {
+        } else if (type_of_incident === 'outsideAccident' || type_of_incident === 'Outside Accident') {
             medicalFields.style.display = 'none';
             industrialFields.style.display = 'block';
             siteOfInjury.style.display = 'none';
@@ -1128,7 +1250,7 @@
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes, submit it!"
-        }).then((result) => {
+        }).then((result) => { 
             if (result.isConfirmed) {
                 const healthRegistryData = {
                     employeeId: $('#employeeId').val(),
@@ -1142,6 +1264,7 @@
                         vpRandomGlucose_173: $('#vpRandomGlucose_173').val()
                     },
                     incidentType: $('#incidentType').val(),
+                    incidentTypeId: incidentTypeId,
                     observations: {
                         doctorNotes: $('#doctorNotes').val(),
                         medicalHistory: $('#medicalHistory').val(),
@@ -1178,7 +1301,8 @@
                         bodyPart: $('#select2Primary_body_part').val(),
                         symptoms: $('#select2Primary_symptoms').val(),
                         medicalSystem: $('#select2Primary_medical_system').val(),
-                        diagnosis: $('#select2Primary_diagnosis').val()
+                        diagnosis: $('#select2Primary_diagnosis').val(),
+                        injuryColor: $('input[name="injury_color_text"]:checked').val(),
                     };
                 } else if (healthRegistryData.incidentType === "industrialAccident") {
                     healthRegistryData.industrialFields = {

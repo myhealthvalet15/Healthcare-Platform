@@ -20,10 +20,6 @@
     font-size: 14px;
     flex-wrap: wrap;
   }
-  .custom-legend span {
-    display: flex;
-    align-items: center;
-  }
   .legend-dot {
     width: 14px;
     height: 14px;
@@ -31,13 +27,8 @@
     margin-right: 6px;
     display: inline-block;
   }
-  .form-label i {
-    margin-right: 5px;
-  }
-  .form-section {
-    margin-bottom: 25px;
-  }
 </style>
+
 
 <div class="container-fluid">
   <!-- Filters Card -->
@@ -97,34 +88,31 @@
 
   <!-- Chart Card -->
   <div class="card">
-  <div class="card-body">
-   <div style="position: relative; height: 400px;">
-  <canvas id="eventLineChart"></canvas>
+    <div class="card-body">
+     <div style="position: relative; height: 400px;">
+  <canvas id="eventAreaChart"></canvas>
 </div>
 <div class="custom-legend mt-3">
   <span><span class="legend-dot" style="background-color: #FFBABA;"></span>Low</span>
   <span><span class="legend-dot" style="background-color: #B9FBC0;"></span>Normal</span>
   <span><span class="legend-dot" style="background-color: #FFF3B0;"></span>High</span>
 </div>
-
-    <!-- 🔽 Add this -->
-   <div id="range-info" class="text-center mt-3" style="font-size: 15px; font-weight: 500;"></div>
+<div id="range-info" class="text-center mt-3" style="font-size: 15px; font-weight: 500;"></div>    </div>
   </div>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-let lineChartInstance = null;
+let areaChartInstance = null;
 
 function userdata() {
-  const ctx = document.getElementById('eventLineChart').getContext('2d');
+  const ctx = document.getElementById('eventAreaChart').getContext('2d');
   const testId = document.getElementById('medtest').value;
 
   const dataMap = {
     '51': {
       label: 'RBC Count',
-      data: [2.5, 4.3, 3.3, 4.2, 4.5, 1.6, 4.8],
+      data: [3.8, 4.3, 3.3, 4.2, 4.5, 4.6, 4.8],
       normal: [4.0, 4.6],
       high: 4.8
     },
@@ -145,22 +133,25 @@ function userdata() {
   const selected = dataMap[testId];
   const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
 
-  const lineData = {
+  // Dynamic point colors
+  const pointColors = selected.data.map(val => {
+    if (val < selected.normal[0]) return '#FFBABA';   // Low
+    if (val > selected.normal[1]) return '#FFF3B0';   // High
+    return '#B9FBC0';                                 // Normal
+  });
+
+  const areaChartData = {
     labels: labels,
     datasets: [{
       label: selected.label,
       data: selected.data,
-      fill: false,
+      fill: true,
+      backgroundColor: 'rgba(75, 139, 190, 0.1)',
       borderColor: '#4B8BBE',
-      backgroundColor: '#4B8BBE',
       tension: 0.3,
-      pointRadius: 5,
-      pointHoverRadius: 6,
-      pointBackgroundColor: selected.data.map(val => {
-        if (val < selected.normal[0]) return '#FFBABA';
-        if (val > selected.normal[1]) return '#FFF3B0';
-        return '#B9FBC0';
-      })
+      pointRadius: 6,
+      pointBackgroundColor: pointColors,
+      pointHoverRadius: 7
     }]
   };
 
@@ -171,14 +162,14 @@ function userdata() {
     <span style="color:#ffc107;">High:</span> More than ${selected.normal[1]}
   `;
 
-  const lineOptions = {
+  const areaChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       title: {
         display: true,
-        text: selected.label + ' Trend Over Months',
+        text: selected.label + ' Area Chart',
         font: { size: 18, weight: '600' },
         padding: { bottom: 10 }
       },
@@ -192,20 +183,19 @@ function userdata() {
       y: {
         beginAtZero: true,
         suggestedMax: selected.high + 2,
-        ticks: { stepSize: 1 },
-        grid: { color: 'rgba(0,0,0,0.05)' }
+        grid: { color: 'rgba(0,0,0,0.05)' },
+        ticks: { stepSize: 1 }
       },
       x: { grid: { display: false } }
     }
   };
 
-  // Destroy previous chart
-  if (lineChartInstance) lineChartInstance.destroy();
+  if (areaChartInstance) areaChartInstance.destroy();
 
-  lineChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: lineData,
-    options: lineOptions
+  areaChartInstance = new Chart(ctx, {
+    type: 'line', // still 'line', but with `fill: true` for area
+    data: areaChartData,
+    options: areaChartOptions
   });
 }
 

@@ -237,7 +237,7 @@ var employeeData = <?php echo json_encode($employeeData); ?>;
                                 class="select2 form-select" multiple></select></div>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row">
                     <div class="col-md-3"><label class="form-label text-primary mb-3"
                             style="font-size:15px;"><strong>Diagnosis</strong></label></div>
                     <div class="col-md-9">
@@ -245,12 +245,12 @@ var employeeData = <?php echo json_encode($employeeData); ?>;
                                 class="select2 form-select" multiple></select></div>
                     </div>
                 </div>
-            <div class="row mb-3" id="medicalInjuryColor" style="display: none;">
-                <div class="col-md-3">
-                    <label class="form-label text-primary mb-3" style="font-size:15px;"><strong>Injury Color</strong></label>
-                </div>
-                <div class="col-md-9">
-                    <div class="pt-1" id="medicalInjuryColorOptions"></div>
+                <div class="row mt-3" id="medicalInjuryColor" style="display: none;">
+                    <div class="col-md-3">
+                        <label class="form-label text-primary mb-3" style="font-size:15px;"><strong>Injury Color</strong></label>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="pt-1" id="medicalInjuryColorOptions"></div>
                 </div>
             </div>
 

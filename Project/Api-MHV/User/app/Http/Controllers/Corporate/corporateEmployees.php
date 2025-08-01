@@ -870,9 +870,24 @@ class corporateEmployees extends Controller
             $basicInfo['employee_is_outpatient_open'] = -1;
             $showWhiteStrip = false;
         }
+        // $basicInfo['incidentTypeColorCodes'] = OhcComponents::with([
+        //     'incidentType:incident_type_id,incident_type_name'
+        // ])
+        //     ->where('corporate_id', $corporateId)
+        //     ->get(['incident_type_id', 'injury_color_types'])
+        //     ->map(function ($item) {
+        //         return [
+        //             'incident_type_id' => $item->incident_type_id,
+        //             'incident_type_name' => optional($item->incidentType)->incident_type_name,
+        //             'injury_color_types' => is_string($item->injury_color_types)
+        //                 ? json_decode($item->injury_color_types, true)
+        //                 : $item->injury_color_types,
+        //         ];
+        //     })
+        //     ->toArray();
         $basicInfo['incidentTypeColorCodes'] = OhcComponents::where('corporate_id', $corporateId)
-            // TODO: ->where('location_id', $location_id)  @Not Needed as per Developer: Praveen
-            ->value('injury_color_types');
+                ->get(['incident_type_id', 'injury_color_types'])
+                ->toArray();
         $basicInfo['incidentTypeColorCodesAdded'] = $opRegistry->injury_color_text ?? null;
         $basicInfo['showWhiteStrip'] = $showWhiteStrip;
         $healthParameters = HealthParameters::where('user_id', $userId)->first();
@@ -1100,6 +1115,7 @@ class corporateEmployees extends Controller
             'vitalParameters.vpSPO2_172' => 'nullable|string',
             'vitalParameters.vpRandomGlucose_173' => 'nullable|string',
             'incidentType' => 'required|string|in:industrialAccident,medicalIllness,outsideAccident',
+            'incidentTypeId' => 'required|integer',
             'doctor' => 'sometimes|array',
             'doctor.doctorId' => 'nullable|string',
             'doctor.doctorName' => 'nullable|string|not_in:Select Doctor',
@@ -1157,6 +1173,7 @@ class corporateEmployees extends Controller
             $rules = [
                 'medicalFields' => 'required|array',
                 'medicalFields.bodyPart' => 'nullable|array',
+                'medicalFields.injuryColor' => 'required|string',
                 'medicalFields.bodyPart.*' => 'string',
                 'medicalFields.symptoms' => 'nullable|array',
                 'medicalFields.symptoms.*' => 'string',
@@ -1397,14 +1414,17 @@ class corporateEmployees extends Controller
             'physiotherapy' => $validatedData['physiotherapy'],
             'fitness_certificate' => $validatedData['fitnessCert'],
             // TODO: To if it is a follow up then simply copy paste the "Types of incident" mother data to follow up
-            'type_of_incident' => $validatedData['incidentType'],
+            'type_of_incident' => ucfirst(preg_replace('/(?<!^)([A-Z])/', ' $1', $validatedData['incidentType'])),
+            'incident_id' => $validatedData['incidentTypeId'],
             'nature_injury' => json_encode($validatedData['industrialFields']['natureOfInjury'] ?? []),
             'body_side' => json_encode($validatedData['industrialFields']['sideOfBody'] ?? []),
             'mechanism_injury' => json_encode($validatedData['industrialFields']['injuryMechanism'] ?? []),
             'type_of_injury' => null,
             'site_of_injury' => json_encode($validatedData['industrialFields']['siteOfInjury'] ?? []),
             'place_of_accident' => null,
-            'injury_color_text' => $validatedData['incidentType'] === 'medicalIllness' ? 'MedicalIllness_#006600' : $validatedData['industrialFields']['injuryColor'] ?? null,
+            'injury_color_text' => isset($validatedData['industrialFields']['injuryColor'])
+                ? $validatedData['industrialFields']['injuryColor']
+                : ($validatedData['medicalFields']['injuryColor'] ?? null),
             'incident_occurance' => null,
             'symptoms' => json_encode($validatedData['medicalFields']['symptoms'] ?? []),
             'medical_system' => json_encode($validatedData['medicalFields']['medicalSystem'] ?? []),
@@ -1589,9 +1609,6 @@ class corporateEmployees extends Controller
                 }
             }
             // TODO:
-            // if ($isOpRegistry === null && $isPrescription === null && $employee_id) {
-            //     return response()->json(['result' => false, 'message' => 'Request praveen to unlock the access to this api ...'], 422);
-            // }
             $employee = EmployeeUserMapping::where('corporate_id', $validatedData['corporateId'])
                 ->where('location_id', $locationId)
                 ->where('employee_id', $validatedData['employeeId'])
@@ -2822,12 +2839,6 @@ class corporateEmployees extends Controller
             ], 500);
         }
     }
-    /**
-     * Validate and process file data
-     *
-     * @param array $validatedData
-     * @return array|false|null
-     */
     private function validateAndProcessFileData($validatedData)
     {
         if (empty($validatedData['document_file']) || empty($validatedData['document_filename'])) {
@@ -2871,23 +2882,10 @@ class corporateEmployees extends Controller
             'extension' => $extension
         ];
     }
-    /**
-     * Check if string is valid base64
-     *
-     * @param string $data
-     * @return bool
-     */
     private function isValidBase64($data)
     {
         return base64_encode(base64_decode($data, true)) === $data;
     }
-    /**
-     * Get MIME type from file content and extension
-     *
-     * @param string $content
-     * @param string $extension
-     * @return string
-     */
     private function getMimeTypeFromContent($content, $extension)
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
@@ -2904,13 +2902,6 @@ class corporateEmployees extends Controller
             ? $detectedMimeType
             : $expectedMimeType;
     }
-    /**
-     * Validate file signature (magic bytes)
-     *
-     * @param string $content
-     * @param string $extension
-     * @return bool
-     */
     private function isValidFileSignature($content, $extension)
     {
         if (strlen($content) < 8) {
@@ -2943,7 +2934,6 @@ class corporateEmployees extends Controller
             return response()->json(['result' => false, 'message' => 'Invalid Request'], 400);
         }
         $incidentTypeColorCodes = OhcComponents::where('corporate_id', $corporate_id)
-            // TODO: ->where('location_id', $location_id)  @Not Needed as per Developer: Praveen
             ->value('injury_color_types');
         return response()->json([
             'result' => true,
@@ -3094,201 +3084,161 @@ class corporateEmployees extends Controller
             'data' => $colorCodes
         ], 200);
     }
-    public function getEmployeesDetailById ($userId){
-//return 'hello';
-       $employee = EmployeeUserMapping::with(['masterUser'])->where('employee_id', $userId)->first();
-    if (!$employee) {
-        return null;
-    }
-    //return $employee ;
-    $masterUser = $employee->masterUser;
-    $employeeFirstname = $this->aes256DecryptData($masterUser->first_name ?? '');
-    $employeeLastname = $this->aes256DecryptData($masterUser->last_name ?? '');
-   
-    $employeeGender = $this->aes256DecryptData($masterUser->gender ?? '');
-     
-    $dob = $this->aes256DecryptData($masterUser->dob ?? '');
-    
-    $employeeAge = $this->calculateAge($dob);
-    
-    $employeeEmail = $this->aes256DecryptData($masterUser->email ?? '');
-   
-    $employeeMobile = $this->aes256DecryptData($masterUser->mob_num ?? '');
-   
-   // $employeeAadharId = $this->aes256DecryptData($masterUser->aadhar_id ?? '');
-     //return $employeeAadharId;
-    $employeeAbhaId = isset($masterUser->abha_id) ? $this->aes256DecryptData($masterUser->abha_id) : null;
-    $employeeArea = isset($masterUser->area) ? $this->aes256DecryptData($masterUser->area) : null;
-    $employeeZipcode = isset($masterUser->zipcode) ? $this->aes256DecryptData($masterUser->zipcode) : null;
-    $employeeAlternativeEmail = isset($masterUser->alternative_email) ? $this->aes256DecryptData($masterUser->alternative_email) : null;
-
-    $dateOfJoining = optional($employee->from_date)
-        ? \Carbon\Carbon::parse($employee->from_date)->format('d-m-Y')
-        : null;
-
-    $employeeCorporateName = MasterCorporate::where('corporate_id', $employee->corporate_id)->value('corporate_name');
-    $employeeLocationName = MasterCorporate::where('corporate_id', $employee->corporate_id)
-        ->where('location_id', $employee->location_id)->value('display_name');
-    $employeeDepartmentId = $employee->hl1_id;
-    $employeeDepartmentName = CorporateHl1::where('hl1_id', $employeeDepartmentId)->value('hl1_name');
-
-    $employeeTypeId = $employee->employee_type_id;
-    $employeeTypeName = DB::table('employee_type')->where('employee_type_id', $employeeTypeId)->value('employee_type_name');
-    $employee_userId = $employee->user_id;
-    return [
-        'employee_id'               => $employee->employee_id,
-        'employee_firstname'        => $employeeFirstname,
-        'employee_lastname'         => $employeeLastname,
-        'employee_email'            => $employeeEmail,
-        'employee_contact_number'   => $employeeMobile,
-        'employee_corporate_name'   => $employeeCorporateName,
-        'employee_location_name'    => $employeeLocationName,
-        'employee_designation'      => $employee->designation,
-        'employee_department_id'    => $employeeDepartmentId,
-        'employee_department_name'  => $employeeDepartmentName,
-        'employee_type_id'          => $employeeTypeId,
-        'employee_type_name'        => $employeeTypeName,
-        'employee_gender'           => $employeeGender,
-        'employee_age'              => $employeeAge,
-        'employee_dob'              => $dob,
-        'dateOfJoining'             => $dateOfJoining,
-        'profile_pic'               => $masterUser->user_profile_img ?? null,
-        'banner'                    => $masterUser->user_banner_img ?? null,
-       // 'aadhar_id'                 => $employeeAadharId,
-        'abha_id'                   => $employeeAbhaId,
-        'area'                      => $employeeArea,
-        'zipcode'                   => $employeeZipcode,
-        'alternative_email'         => $employeeAlternativeEmail,
-        'employee_user_id'          => $employee_userId
-    ];
-
-    }
-
-
-public function updateHospitalizationDetailsByEmpId(Request $request)
-{
-    $request->validate([
-        'employee_id' => 'required|string',
-        'from_date' => 'required|date',
-        'to_date' => 'required|date|after_or_equal:from_date',
-        'description' => 'nullable|string',
-        'doctor_id' => 'nullable|integer',
-        'doctor_name' => 'nullable|string',
-        'hospital_id' => 'nullable|integer',
-        'hospital_name' => 'nullable|string',
-        'condition' => 'nullable|array',
-        'discharge_summary_base64' => 'nullable|string',
-        'summary_reports_base64' => 'nullable|array',
-        'employee_user_id' => 'required|string|alpha_num',
-        'op_registry_id' => 'nullable|integer'
-    ]);
-
-    try {
-        $masterUserId = $request->employee_user_id;
-
-        $existing = DB::table('hospitalization_details')
-            ->where('master_user_id', $masterUserId)
-            ->where('op_registry_id', $request->op_registry_id)
-            ->where('role_id', 4)
-            ->first();
-
-        $data = [
-            'op_registry_id' => $request->op_registry_id,
-            'doctor_id' => $request->doctor_id,
-            'doctor_name' => $request->doctor_name,
-            'master_user_id' => $masterUserId,
-            'hospital_id' => $request->hospital_id,
-            'hospital_name' => $request->hospital_name,
-            'from_datetime' => $request->from_date,
-            'to_datetime' => $request->to_date,
-            'description' => $request->description,
-            'condition_id' => json_encode($request->condition),
-            'other_condition_name' => null,
-            'role_id' => 4,
-            'attachment_discharge' => $request->discharge_summary_base64,
-            'attachment_test_reports' => json_encode($request->summary_reports_base64),
-            'updated_at' => now(),
+    public function getEmployeesDetailById($userId)
+    {
+        $employee = EmployeeUserMapping::with(['masterUser'])->where('employee_id', $userId)->first();
+        if (!$employee) {
+            return null;
+        }
+        $masterUser = $employee->masterUser;
+        $employeeFirstname = $this->aes256DecryptData($masterUser->first_name ?? '');
+        $employeeLastname = $this->aes256DecryptData($masterUser->last_name ?? '');
+        $employeeGender = $this->aes256DecryptData($masterUser->gender ?? '');
+        $dob = $this->aes256DecryptData($masterUser->dob ?? '');
+        $employeeAge = $this->calculateAge($dob);
+        $employeeEmail = $this->aes256DecryptData($masterUser->email ?? '');
+        $employeeMobile = $this->aes256DecryptData($masterUser->mob_num ?? '');
+        $employeeAbhaId = isset($masterUser->abha_id) ? $this->aes256DecryptData($masterUser->abha_id) : null;
+        $employeeArea = isset($masterUser->area) ? $this->aes256DecryptData($masterUser->area) : null;
+        $employeeZipcode = isset($masterUser->zipcode) ? $this->aes256DecryptData($masterUser->zipcode) : null;
+        $employeeAlternativeEmail = isset($masterUser->alternative_email) ? $this->aes256DecryptData($masterUser->alternative_email) : null;
+        $dateOfJoining = optional($employee->from_date)
+            ? \Carbon\Carbon::parse($employee->from_date)->format('d-m-Y')
+            : null;
+        $employeeCorporateName = MasterCorporate::where('corporate_id', $employee->corporate_id)->value('corporate_name');
+        $employeeLocationName = MasterCorporate::where('corporate_id', $employee->corporate_id)
+            ->where('location_id', $employee->location_id)->value('display_name');
+        $employeeDepartmentId = $employee->hl1_id;
+        $employeeDepartmentName = CorporateHl1::where('hl1_id', $employeeDepartmentId)->value('hl1_name');
+        $employeeTypeId = $employee->employee_type_id;
+        $employeeTypeName = DB::table('employee_type')->where('employee_type_id', $employeeTypeId)->value('employee_type_name');
+        $employee_userId = $employee->user_id;
+        return [
+            'employee_id'               => $employee->employee_id,
+            'employee_firstname'        => $employeeFirstname,
+            'employee_lastname'         => $employeeLastname,
+            'employee_email'            => $employeeEmail,
+            'employee_contact_number'   => $employeeMobile,
+            'employee_corporate_name'   => $employeeCorporateName,
+            'employee_location_name'    => $employeeLocationName,
+            'employee_designation'      => $employee->designation,
+            'employee_department_id'    => $employeeDepartmentId,
+            'employee_department_name'  => $employeeDepartmentName,
+            'employee_type_id'          => $employeeTypeId,
+            'employee_type_name'        => $employeeTypeName,
+            'employee_gender'           => $employeeGender,
+            'employee_age'              => $employeeAge,
+            'employee_dob'              => $dob,
+            'dateOfJoining'             => $dateOfJoining,
+            'profile_pic'               => $masterUser->user_profile_img ?? null,
+            'banner'                    => $masterUser->user_banner_img ?? null,
+            'abha_id'                   => $employeeAbhaId,
+            'area'                      => $employeeArea,
+            'zipcode'                   => $employeeZipcode,
+            'alternative_email'         => $employeeAlternativeEmail,
+            'employee_user_id'          => $employee_userId
         ];
-
-        if ($existing) {
-            // Update
-            DB::table('hospitalization_details')
-                ->where('master_user_id', $existing->master_user_id)
-                ->where('op_registry_id', $existing->op_registry_id)
-                ->where('role_id', 4)
-                ->update($data);
-
-            $message = 'Hospitalization details updated successfully.';
-        } else {
-            // Insert
-            $data['created_by'] = auth('api')->id();
-            $data['created_at'] = now();
-
-            DB::table('hospitalization_details')->insert($data);
-            $message = 'Hospitalization details saved successfully.';
-        }
-
-        return response()->json([
-            'result' => true,
-            'message' => $message,
+    }
+    public function updateHospitalizationDetailsByEmpId(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required|string',
+            'from_date' => 'required|date',
+            'to_date' => 'required|date|after_or_equal:from_date',
+            'description' => 'nullable|string',
+            'doctor_id' => 'nullable|integer',
+            'doctor_name' => 'nullable|string',
+            'hospital_id' => 'nullable|integer',
+            'hospital_name' => 'nullable|string',
+            'condition' => 'nullable|array',
+            'discharge_summary_base64' => 'nullable|string',
+            'summary_reports_base64' => 'nullable|array',
+            'employee_user_id' => 'required|string|alpha_num',
+            'op_registry_id' => 'nullable|integer'
         ]);
-    } catch (\Exception $e) {
-        Log::error('Failed to save/update hospitalization details', ['error' => $e->getMessage()]);
-        return response()->json([
-            'result' => false,
-            'message' => 'Failed to process hospitalization details: ' . $e->getMessage(),
-        ], 500);
-    }
-}
-public function getHospitalizationDetailsById($employee_user_Id, $opRegistryId = null)
-{
-    $query = DB::table('hospitalization_details')
-        ->where('master_user_id', $employee_user_Id)
-        ->where('role_id', 4);
-
-    if ($opRegistryId) {
-        $query->where('op_registry_id', $opRegistryId);
-    }
-
-    $details = $query->get();
-
-    if ($details->isEmpty()) {
-        return response()->json(['result' => false, 'message' => 'No hospitalization details found'], 404);
-    }
-
-    // Fetch all conditions as ['id' => 'condition_name']
-    $allConditions = DB::table('medical_condition')
-        ->pluck('condition_name', 'condition_id')
-        ->toArray();
-
-    // Attach condition_name to each record
-    $details->transform(function ($item) use ($allConditions) {
-        $conditionName = null;
-
-        // If condition_id is JSON-encoded (array), decode and map
-        if (!empty($item->condition_id)) {
-            $conditionIds = json_decode($item->condition_id, true);
-
-            if (is_array($conditionIds)) {
-                $names = [];
-                foreach ($conditionIds as $id) {
-                    if (isset($allConditions[$id])) {
-                        $names[] = $allConditions[$id];
-                    }
-                }
-                $conditionName = $names;
-            } elseif (isset($allConditions[$item->condition_id])) {
-                // else if it's a single ID
-                $conditionName = [$allConditions[$item->condition_id]];
+        try {
+            $masterUserId = $request->employee_user_id;
+            $existing = DB::table('hospitalization_details')
+                ->where('master_user_id', $masterUserId)
+                ->where('op_registry_id', $request->op_registry_id)
+                ->where('role_id', 4)
+                ->first();
+            $data = [
+                'op_registry_id' => $request->op_registry_id,
+                'doctor_id' => $request->doctor_id,
+                'doctor_name' => $request->doctor_name,
+                'master_user_id' => $masterUserId,
+                'hospital_id' => $request->hospital_id,
+                'hospital_name' => $request->hospital_name,
+                'from_datetime' => $request->from_date,
+                'to_datetime' => $request->to_date,
+                'description' => $request->description,
+                'condition_id' => json_encode($request->condition),
+                'other_condition_name' => null,
+                'role_id' => 4,
+                'attachment_discharge' => $request->discharge_summary_base64,
+                'attachment_test_reports' => json_encode($request->summary_reports_base64),
+                'updated_at' => now(),
+            ];
+            if ($existing) {
+                DB::table('hospitalization_details')
+                    ->where('master_user_id', $existing->master_user_id)
+                    ->where('op_registry_id', $existing->op_registry_id)
+                    ->where('role_id', 4)
+                    ->update($data);
+                $message = 'Hospitalization details updated successfully.';
+            } else {
+                $data['created_by'] = auth('api')->id();
+                $data['created_at'] = now();
+                DB::table('hospitalization_details')->insert($data);
+                $message = 'Hospitalization details saved successfully.';
             }
+            return response()->json([
+                'result' => true,
+                'message' => $message,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to save/update hospitalization details', ['error' => $e->getMessage()]);
+            return response()->json([
+                'result' => false,
+                'message' => 'Failed to process hospitalization details: ' . $e->getMessage(),
+            ], 500);
         }
-
-        $item->condition_names = $conditionName ?? [];
-
-        return $item;
-    });
-
-    return response()->json(['result' => true, 'data' => $details], 200);
-}
-
+    }
+    public function getHospitalizationDetailsById($employee_user_Id, $opRegistryId = null)
+    {
+        $query = DB::table('hospitalization_details')
+            ->where('master_user_id', $employee_user_Id)
+            ->where('role_id', 4);
+        if ($opRegistryId) {
+            $query->where('op_registry_id', $opRegistryId);
+        }
+        $details = $query->get();
+        if ($details->isEmpty()) {
+            return response()->json(['result' => false, 'message' => 'No hospitalization details found'], 404);
+        }
+        $allConditions = DB::table('medical_condition')
+            ->pluck('condition_name', 'condition_id')
+            ->toArray();
+        $details->transform(function ($item) use ($allConditions) {
+            $conditionName = null;
+            if (!empty($item->condition_id)) {
+                $conditionIds = json_decode($item->condition_id, true);
+                if (is_array($conditionIds)) {
+                    $names = [];
+                    foreach ($conditionIds as $id) {
+                        if (isset($allConditions[$id])) {
+                            $names[] = $allConditions[$id];
+                        }
+                    }
+                    $conditionName = $names;
+                } elseif (isset($allConditions[$item->condition_id])) {
+                    $conditionName = [$allConditions[$item->condition_id]];
+                }
+            }
+            $item->condition_names = $conditionName ?? [];
+            return $item;
+        });
+        return response()->json(['result' => true, 'data' => $details], 200);
+    }
 }

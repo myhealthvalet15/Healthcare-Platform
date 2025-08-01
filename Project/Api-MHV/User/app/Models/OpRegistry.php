@@ -13,7 +13,6 @@ class OpRegistry extends Model
 
     // Table name
     protected $table = 'op_registry';
-
     // Primary key
     protected $primaryKey = 'op_registry_id';
 
@@ -35,6 +34,7 @@ class OpRegistry extends Model
         'shift',
         'created_date_time',
         'type_of_incident',
+        'incident_id',
         'nature_injury',
         'body_part',
         'body_side',

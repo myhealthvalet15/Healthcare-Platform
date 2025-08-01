@@ -22,9 +22,8 @@ return new class () extends Migration {
             $table->integer('ohc_id');
             $table->string('shift', 10)->nullable();
             $table->date('created_date_time');
-            $table->enum('type_of_incident', ['outsideAccident', 'industrialAccident', 'medicalIllness'])
-            ->default('medicalIllness')
-            ->change();
+            $table->integer('incident_id');
+            $table->string('type_of_incident', 255)->nullable();
             $table->string('nature_injury')->nullable();
             $table->string('body_part')->nullable();
             $table->string('body_side')->nullable();

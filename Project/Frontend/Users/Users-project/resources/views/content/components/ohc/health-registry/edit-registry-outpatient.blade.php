@@ -118,6 +118,7 @@
     var employeeData = <?php echo json_encode($employeeData); ?>;
 </script>
 <?php
+print_r($employeeData); exit;
 ?>
 <div class="add-registry-spinner" id="add-registry-spinner" style="display: block;">
     <div class="spinner-card">

@@ -263,7 +263,8 @@ Route::middleware([Authcheck::class])->group(function () {
      //Reports
     Route::get('/mhc/reports/health-risk', [MhcReportsController::class, 'index'])->name('health-risk-reports');
     Route::get('mhc/reports/event-chart-data', [MhcReportsController::class, 'getChartData'])->name('event.chart.data');
-
+    Route::get('/mhc/reports/getEmployeeType', [corporateHealthPlans::class, 'getAllMasterTestsBySubGroup']);
+    
 
     // Events store and update routes
     Route::post('/mhc/events/store-events', [EventsController::class, 'storeEvents'])->name('events-store-events');

@@ -1,100 +1,149 @@
-let chartInstance = null;
+let areaChartInstance = null;
 
 function userdata() {
-  const ctx = document.getElementById('eventChart').getContext('2d');
-  const testId = document.getElementById('medtest').value;
+  const ctx = document.getElementById('eventBarChart').getContext('2d');
 
-  const dataMap = {
-    '51': {
-      label: 'RBC Count',
-      data: [3.8, 4.3, 3.3, 4.2, 4.5, 4.6, 4.8],
-      normal: [4.0, 4.6],
-      high: 4.8
-    },
-    '52': {
-      label: 'Haemoglobin',
-      data: [11.5, 13.2, 13.8, 13.6, 14.0, 13.9, 15.8],
-      normal: [12.5, 15.5],
-      high: 16.0
-    },
-    '53': {
-      label: 'Hct (PCV)',
-      data: [36, 43, 41, 44, 45, 46, 48],
-      normal: [38, 47],
-      high: 49
-    }
-  };
+  // Dummy sample data — replace with AJAX or dynamic logic
+  const labels = ['20-30', '30-40', '40-50', '50+'];
+  const lowData = [15, 40, 1, 0];
+  const normalData = [88, 285, 13, 10];
+  const highData = [1, 4, 0, 0];
 
-  const selected = dataMap[testId];
-  const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-
-  const barColors = selected.data.map(val => {
-    if (val < selected.normal[0]) return '#FFBABA';
-    if (val > selected.normal[1]) return '#FFF3B0';
-    return '#B9FBC0';
-  });
-
-  const chartData = {
+  const barChartData = {
     labels: labels,
-    datasets: [{
-      label: selected.label,
-      data: selected.data,
-      backgroundColor: barColors,
-      borderRadius: 6,
-      borderSkipped: false,
-      barPercentage: 0.65,
-      categoryPercentage: 0.65
-    }]
+    datasets: [
+      {
+        label: 'Low',
+        data: lowData,
+        backgroundColor: '#FFBABA',
+        stack: 'health'
+      },
+      {
+        label: 'Normal',
+        data: normalData,
+        backgroundColor: '#B9FBC0',
+        stack: 'health'
+      },
+      {
+        label: 'High',
+        data: highData,
+        backgroundColor: '#FFF3B0',
+        stack: 'health'
+      }
+    ]
   };
 
-  const chartOptions = {
+  const barChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
       title: {
         display: true,
-        text: selected.label + ' Trend Over Months',
+        text: 'Age-wise Distribution of Health Parameters',
         font: { size: 18, weight: '600' },
-        padding: { bottom: 15 }
+        padding: { bottom: 10 }
       },
       tooltip: {
         callbacks: {
-          label: context => `${selected.label}: ${context.raw}`
-        }
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        suggestedMax: selected.high + 2,
-        ticks: {
-          stepSize: 1
-        },
-        grid: {
-          color: 'rgba(0, 0, 0, 0.05)'
+          label: context => `${context.dataset.label}: ${context.raw}`
         }
       },
+      legend: { display: false }
+    },
+    scales: {
       x: {
-        grid: { display: false }
+        stacked: true,
+        title: {
+          display: true,
+          text: 'Age Group'
+        }
+      },
+      y: {
+        stacked: true,
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Employees'
+        }
       }
     }
   };
-// Set range description
-const rangeInfo = document.getElementById('range-info');
-rangeInfo.innerHTML = `
-  <span style="color:#dc3545;">Low:</span> Less than ${selected.normal[0]} &nbsp; | 
-  <span style="color:#28a745;">Normal:</span> ${selected.normal[0]} to ${selected.normal[1]} &nbsp; | 
-  <span style="color:#ffc107;">High:</span> More than ${selected.normal[1]}
-`;
 
-  if (chartInstance) chartInstance.destroy();
+  document.getElementById('range-info').innerHTML = `
+    <span style="color:#dc3545;">Low:</span> Below normal range &nbsp; |
+    <span style="color:#28a745;">Normal:</span> Within normal range &nbsp; |
+    <span style="color:#ffc107;">High:</span> Above normal range
+  `;
 
-  chartInstance = new Chart(ctx, {
+  if (areaChartInstance) areaChartInstance.destroy();
+
+  areaChartInstance = new Chart(ctx, {
     type: 'bar',
-    data: chartData,
-    options: chartOptions
+    data: barChartData,
+    options: barChartOptions
   });
 }
+function loadMedicalConditions() {
+  apiRequest({
+    url: 'https://login-users.hygeiaes.com/mhc/diagnostic-assessment/getAllSubGroup',
+    method: 'GET',
+    onSuccess: function (response) {
+      if (response.result && response.data && Array.isArray(response.data.subgroups)) {
+        const medtest = document.getElementById('medtest');
+        medtest.innerHTML = ''; // Clear existing options
+        const allTests = new Set();
 
-document.addEventListener('DOMContentLoaded', userdata);
+        response.data.subgroups.forEach(subgroup => {
+          // Direct tests
+          if (Array.isArray(subgroup.tests)) {
+            subgroup.tests.forEach(test => addUniqueOption(test));
+          }
+
+          // Nested sub-subgroups
+          if (Array.isArray(subgroup.subgroups)) {
+            subgroup.subgroups.forEach(subSubgroup => {
+              if (Array.isArray(subSubgroup.tests)) {
+                subSubgroup.tests.forEach(test => addUniqueOption(test));
+              }
+            });
+          }
+        });
+
+        function addUniqueOption(test) {
+          if (!allTests.has(test.master_test_id)) {
+            const option = document.createElement('option');
+            option.value = test.master_test_id;
+            option.text = test.test_name; // ✅ Corrected here
+            medtest.appendChild(option);
+            allTests.add(test.master_test_id);
+          }
+        }
+
+        // Optional: Re-initialize select2
+        if (window.jQuery && jQuery().select2) {
+          $('#medtest').select2({
+            placeholder: 'Select a medical condition',
+            allowClear: true,
+            width: '100%'
+          });
+        }
+
+        // Initial chart update with first available test
+        userdata();
+      } else {
+        console.warn('Unexpected API format:', response);
+      }
+    },
+    onError: function (error) {
+      console.error('API Error:', error);
+    }
+  });
+}
+//document.addEventListener('DOMContentLoaded', userdata);
+document.addEventListener('DOMContentLoaded', function () {
+  loadMedicalConditions();
+  loadEmployeeType();
+  loadDepartment();
+  loadLocation();
+  userdata(); // Draw chart
+});

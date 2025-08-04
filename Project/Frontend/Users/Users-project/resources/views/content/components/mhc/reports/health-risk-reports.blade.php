@@ -8,6 +8,7 @@
 @section('page-script')
   @vite(['resources/assets/js/charts-chartjs.js'])
 @endsection
+<script src="{{ asset('lib/js/page-scripts/health-risk-report.js') }}?v={{ time() }}"></script>
 
 @section('content')
 
@@ -46,22 +47,16 @@
           <div class="col-md-3">
             <label class="form-label"><i class="fa fa-user"></i>Employee Type</label>
             <select class="form-select select2" id="jobvalue" onchange="userdata()">
-              <option value="0">All Employees</option>
-              <option value="3">Contract</option>
-              <option value="4">Executive</option>
-              <option value="5">Apprentice</option>
-              <option value="7">NEEM</option>
+              <!-- Will be populated via JS -->
             </select>
+
           </div>
           <div class="col-md-3">
             <label class="form-label"><i class="fa fa-sitemap"></i>Department</label>
-            <select class="form-select select2" id="department" onchange="userdata()">
-              <option value="0">All Departments</option>
-              <option value="311087">Accounts</option>
-              <option value="310908">Admin</option>
-              <option value="311407">All BU</option>
-              <option value="311409">All Plant</option>
-            </select>
+           <select class="form-select select2" id="department" onchange="userdata()">
+            <!-- Options will be populated dynamically -->
+          </select>
+
           </div>
           <div class="col-md-3">
             <label class="form-label"><i class="fa fa-calendar"></i>From Date</label>
@@ -78,18 +73,19 @@
           </select>
 
           </div>
-          <div class="col-md-3">
-            <label class="form-label"><i class="fa fa-map-marker"></i>Location</label>
-            <select class="form-select select2" id="location" onchange="userdata()">
-              <option value="0">All Locations</option>
-              <option value="1">Plant 1</option>
-              <option value="2">Plant 2</option>
-              <option value="3">Head Office</option>
+         
+  <div class="col-md-3">
+            <label class="form-label"><i class="fa fa-users"></i>Age Group</label>
+            <select class="form-select select2" id="age" onchange="userdata()">
+              <option value="">All Age Groups</option>
+              <option value="20.0 and 30.0">20-30</option>
+              <option value="30.1 and 40.0">31-40</option>
+              <option value="40.1 and 50.0">41-50</option>
+              <option value="50.1 and 60">51-60</option>
             </select>
           </div>
-
           <!-- Additional filters -->
-          <div class="col-md-3">
+          <div class="col-md-5">
             <label class="form-label"><i class="fa fa-bar-chart"></i>Report Type</label>
             <select class="form-select select2" name="reppag" onchange="userdata()" style="background-color: #fff;">
               <option value="1">Agewise Distribution of Health Parameters</option>
@@ -100,16 +96,7 @@
              
             </select>
           </div>
-          <div class="col-md-3">
-            <label class="form-label"><i class="fa fa-users"></i>Age Group</label>
-            <select class="form-select select2" id="age" onchange="userdata()">
-              <option value="">All Age Groups</option>
-              <option value="20.0 and 30.0">20-30</option>
-              <option value="30.1 and 40.0">31-40</option>
-              <option value="40.1 and 50.0">41-50</option>
-              <option value="50.1 and 60">51-60</option>
-            </select>
-          </div>
+        
         </div>
       </form>
     </div>

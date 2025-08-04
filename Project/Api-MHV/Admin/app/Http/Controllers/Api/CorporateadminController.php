@@ -16,8 +16,8 @@ use Carbon\Carbon;
 
 // TODO: FIRST_NAME_HASH, LAST_NAME_HASH, MOBILE_HASH, EMAIL_HASH shld be stored as aes256EncryptDataWeak data
 // TODO: ALSO CHANGE This HASH LOGIN Process
-// TODOINFO: As of now FIRST_NAME_HASH, LAST_NAME_HASH, MOBILE_HASH are saved as aes256EncryptDataWeak hash data in db but the emailhash is stored as hash sha-256 in adduserexcel and addsingleuser
-// TODOINFO: As of now FIRST_NAME_HASH, LAST_NAME_HASH, MOBILE_HASH, EMAIL_HASH is stored as hash sha-256 in adduserexcel and addsingleuser
+// TODO: As of now FIRST_NAME_HASH, LAST_NAME_HASH, MOBILE_HASH are saved as aes256EncryptDataWeak hash data in db but the emailhash is stored as hash sha-256 in adduserexcel and addsingleuser
+// TODO: As of now FIRST_NAME_HASH, LAST_NAME_HASH, MOBILE_HASH, EMAIL_HASH is stored as hash sha-256 in adduserexcel and addsingleuser
 class CorporateadminController extends Controller
 {
     private function aes256EncryptDataWeak($data)

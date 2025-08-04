@@ -13,6 +13,12 @@ class MhcReportsController extends Controller
     {
         $headerData = "Health Risk Assessment Reports";
         return view('content.components.mhc.reports.health-risk-reports', ['HeaderData' => $headerData]);
+    } 
+    public function graphBasedonFilter(Request $request)
+    {
+        $headerData = "Health Risk Assessment Reports";
+        return view('content.components.mhc.reports.health-risk-reports-filter', ['HeaderData' => $headerData]);
     }
+
     
 }

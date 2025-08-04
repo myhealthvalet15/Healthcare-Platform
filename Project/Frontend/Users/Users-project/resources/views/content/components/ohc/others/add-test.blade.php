@@ -1,6 +1,5 @@
 @extends('layouts/layoutMaster')
 @section('title', 'Add Test')
-<!-- Vendor Styles -->
 @section('vendor-style')
 @vite([
 'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
@@ -13,7 +12,6 @@
 'resources/assets/vendor/libs/spinkit/spinkit.scss'
 ])
 @endsection
-<!-- Vendor Scripts -->
 @section('vendor-script')
 @vite([
 'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
@@ -43,7 +41,6 @@
                             Employees</button>
                     </div>
                 </div>
-                <!-- Search Spinner -->
                 <div id="searchSpinner" class="row mt-4" style="display: none;">
                     <div class="col d-flex flex-column align-items-center justify-content-center">
                         <div class="sk-bounce sk-primary mb-2">
@@ -59,7 +56,6 @@
     </div>
 </div>
 <hr>
-<!-- DataTable with Buttons -->
 <div id="resultsCard" class="card" style="display: none;">
     <div class="card-datatable table-responsive pt-0">
         <table id="employeeTable" class="datatables-basic table">
@@ -74,12 +70,10 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Data will be populated here -->
             </tbody>
         </table>
     </div>
 </div>
-
 @endsection
 <script>
     var ohcRights = {!! json_encode($ohcRights)!!};
@@ -163,6 +157,14 @@
             }
         });
         $('#searchBtn').on('click', function () {
+            performSearch();
+        });
+        $('#searchEmployees').on('keypress', function (e) {
+            if (e.which === 13) {
+                performSearch();
+            }
+        });
+        function performSearch() {
             const searchValue = $('#searchEmployees').val().trim();
             if (searchValue === '') {
                 showToast("error", "Please enter a search term");
@@ -172,48 +174,28 @@
                 showToast("error", "Please enter at least 3 characters for search");
                 return;
             }
-
             $('#searchSpinner').show();
             $('#resultsCard').hide();
             const spinnerStartTime = Date.now();
             const minSpinnerTime = 1500;
-
-            fetch(`https://login-users.hygeiaes.com/ohc/health-registry/add-registry/search/${searchValue}`)
-                .then(response => response.json())
+            employeeTable.clear().draw();
+            fetch(`https://login-users.hygeiaes.com/ohc/health-registry/add-registry/search/${encodeURIComponent(searchValue)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const contentType = response.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        throw new Error("Response is not JSON");
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    employeeTable.clear();
                     const elapsedTime = Date.now() - spinnerStartTime;
                     const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
-
                     setTimeout(() => {
                         $('#searchSpinner').hide();
-
-                        if (data.result && data.message && data.message.length > 0) {
-                            data.message.forEach(employee => {
-                                const fullName = `${employee.first_name} ${employee.last_name}`;
-                                const initials = getInitials(fullName);
-
-                                const addButton = (healthRegistryPermission === 2)
-                                    ? '<button class="btn btn-primary btn-sm add-employee" data-employee-id="' + employee.employee_id + '">Add</button>'
-                                    : '';
-                                employeeTable.row.add([
-                                    createEmployeeIdCell(employee.employee_id, initials),
-                                    createEmployeeNameCell(employee.first_name, employee.last_name, employee.designation),
-                                    employee.hl1_name || 'N/A',
-                                    createContactDetailsCell(employee.email, employee.mob_num),
-                                    employee.employee_type_name || 'N/A',
-                                    addButton
-                                ]);
-                            });
-
-                            employeeTable.draw();
-                            $('#resultsCard').show();
-                            showToast("success", `Data retrieved successfully. Found ${data.message.length} employee(s).`);
-                        } else {
-                            $('#resultsCard').show();
-                            employeeTable.clear().draw();
-                            showToast("info", "No employees found matching your search criteria.");
-                        }
+                        handleSearchResponse(data);
                     }, remainingTime);
                 })
                 .catch(error => {
@@ -222,11 +204,88 @@
                     const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
                     setTimeout(() => {
                         $('#searchSpinner').hide();
-                        showToast('error', 'An error occurred while searching for employees. Please try again.');
+                        handleSearchError(error);
                     }, remainingTime);
                 });
-        });
-
+        }
+        function handleSearchResponse(data) {
+            try {
+                if (!data.hasOwnProperty('result')) {
+                    throw new Error("Invalid response format");
+                }
+                if (!data.result) {
+                    $('#resultsCard').show();
+                    showToast("error", data.message || "Search failed");
+                    return;
+                }
+                if (data.result === true) {
+                    if (Array.isArray(data.message)) {
+                        if (data.message.length > 0) {
+                            populateEmployeeTable(data.message);
+                            $('#resultsCard').show();
+                            showToast("success", `Data retrieved successfully. Found ${data.message.length} employee(s).`);
+                        } else {
+                            $('#resultsCard').show();
+                            showToast("info", "No employees found matching your search criteria.");
+                        }
+                    }
+                    else if (typeof data.message === 'string') {
+                        $('#resultsCard').show();
+                        if (data.message.toLowerCase().includes('no matching') ||
+                            data.message.toLowerCase().includes('not found') ||
+                            data.message.toLowerCase().includes('no data') ||
+                            data.message.toLowerCase().includes('no employee')) {
+                            showToast("info", data.message);
+                        } else {
+                            showToast("warning", data.message);
+                        }
+                    }
+                    else {
+                        $('#resultsCard').show();
+                        showToast("warning", "Unexpected response format. Please try again.");
+                    }
+                }
+            } catch (error) {
+                console.error('Error handling search response:', error);
+                $('#resultsCard').show();
+                showToast("error", "Error processing search results. Please try again.");
+            }
+        }
+        function handleSearchError(error) {
+            $('#resultsCard').show();
+            if (error.message.includes('Failed to fetch')) {
+                showToast('error', 'Network error. Please check your internet connection and try again.');
+            } else if (error.message.includes('HTTP error')) {
+                showToast('error', 'Server error. Please try again later.');
+            } else if (error.message.includes('not JSON')) {
+                showToast('error', 'Invalid server response. Please try again.');
+            } else {
+                showToast('error', 'An error occurred while searching for employees. Please try again.');
+            }
+        }
+        function populateEmployeeTable(employees) {
+            employeeTable.clear();
+            employees.forEach(employee => {
+                try {
+                    const fullName = `${employee.first_name || ''} ${employee.last_name || ''}`.trim();
+                    const initials = getInitials(fullName);
+                    const addButton = (healthRegistryPermission === 2)
+                        ? `<button class="btn btn-primary btn-sm add-employee" data-employee-id="${employee.employee_id || ''}">Add</button>`
+                        : '<span class="text-muted">No Permission</span>';
+                    employeeTable.row.add([
+                        createEmployeeIdCell(employee.employee_id || 'N/A', initials),
+                        createEmployeeNameCell(employee.first_name || '', employee.last_name || '', employee.designation || ''),
+                        employee.hl1_name || 'N/A',
+                        createContactDetailsCell(employee.email || '', employee.mob_num || ''),
+                        employee.employee_type_name || 'N/A',
+                        addButton
+                    ]);
+                } catch (error) {
+                    console.error('Error adding employee row:', error, employee);
+                }
+            });
+            employeeTable.draw();
+        }
         function createEmployeeIdCell(userId, initials) {
             const stateNum = Math.floor(Math.random() * 6);
             const states = ['success', 'danger', 'warning', 'info', 'primary', 'secondary'];
@@ -243,11 +302,10 @@
                 </div>`;
         }
         function createEmployeeNameCell(firstName, lastName, designation) {
-            const fullName = `${firstName} ${lastName}`;
-            const initials = getInitials(fullName);
+            const fullName = `${firstName} ${lastName}`.trim();
             return `<div class="d-flex justify-content-start align-items-center user-name">
                     <div class="d-flex flex-column">
-                        <span class="emp_name text-truncate">${fullName}</span>
+                        <span class="emp_name text-truncate">${fullName || 'N/A'}</span>
                         <small class="text-muted">${designation || 'N/A'}</small>
                     </div>
                 </div>`;
@@ -259,18 +317,20 @@
                 </div>`;
         }
         function getInitials(name) {
+            if (!name || name.trim() === '') {
+                return 'NA';
+            }
             const matches = name.match(/\b\w/g) || [];
             return ((matches.shift() || '') + (matches.pop() || '')).toUpperCase();
         }
         $(document).on('click', '.add-employee', function () {
-            const employeeId = $(this).data('employee-id').toString().toLowerCase();
-            window.location = '/ohc/add-test/' + employeeId;
-        });
-
-        $('#searchEmployees').on('keypress', function (e) {
-            if (e.which === 13) {
-                $('#searchBtn').click();
+            const employeeId = $(this).data('employee-id');
+            if (!employeeId) {
+                showToast("error", "Employee ID not found");
+                return;
             }
+            const employeeIdString = employeeId.toString().toLowerCase();
+            window.location = '/ohc/add-test/' + employeeIdString;
         });
     });
 </script>

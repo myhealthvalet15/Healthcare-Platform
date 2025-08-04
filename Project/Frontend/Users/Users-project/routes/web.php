@@ -260,11 +260,11 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/mhc/health-risk-assessment/assignHraTemplate', [HealthRiskAssessment::class, 'assignHRATemplate'])->name('health-risk-assessment-templates');
     Route::put('/mhc/health-risk-assessment/updateAssignedHraTemplate', [HealthRiskAssessment::class, 'updateAssignedHraTemplate'])->name('health-risk-assessment-templates');
 
-     //Reports
+    //Reports
     Route::get('/mhc/reports/health-risk', [MhcReportsController::class, 'index'])->name('health-risk-reports');
     Route::get('mhc/reports/event-chart-data', [MhcReportsController::class, 'getChartData'])->name('event.chart.data');
     Route::get('/mhc/reports/getEmployeeType', [corporateHealthPlans::class, 'getAllMasterTestsBySubGroup']);
-    
+
 
     // Events store and update routes
     Route::post('/mhc/events/store-events', [EventsController::class, 'storeEvents'])->name('events-store-events');
@@ -278,10 +278,11 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::get('/ohc/add-test/{employee_id}', [health_registry::class, 'displayAddTestPage'])->name('health-registry-add-registry');
     Route::post('/ohc/add-test/{employee_id}', [health_registry::class, 'addTestForEmployee']);
     Route::get('/ohc/add-test', function () {
-        return view('content.components.ohc.others.add-test');
+        $headerData = "Add Test";
+        return view('content.components.ohc.others.add-test', ['HeaderData' => $headerData]);
     });
     Route::get('/ohc/health-registry/add-registry', [health_registry::class, 'displayAddRegistryPage'])->name('health-registry-add-registry');
-    Route::get('/ohc/health-registry/add-registry/search/{keyword}', [health_registry::class, 'getDataByKeywordForAddRegistryPage'])->name('health-registry-add-registry');
+    Route::get('/ohc/health-registry/add-registry/search/{keyword}', [health_registry::class, 'getEmployeeSearchDataByKeyword'])->name('health-registry-add-registry');
     Route::get('/ohc/health-registry/add-registry/add-outpatient/{employee_id}', [health_registry::class, 'displayRegistryOutpatientPage'])->name('health-registry-add-registry');
     Route::get('/ohc/health-registry/add-test/{employee_id}/op/{op_registry_id}', [health_registry::class, 'displayAddTestPage'])->name('health-registry-add-registry');
     Route::get('/ohc/health-registry/add-test/{employee_id}', [health_registry::class, 'displayAddTestPage'])->name('health-registry-add-registry');
@@ -300,8 +301,8 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/ohc/health-registry/update-hospitalization-by-id', [health_registry::class, 'updateHospitalizationDetailsById'])->name('health-registry-update-hospitalization-by-id');
     Route::get('/ohc/health-registry/get-hospitalization-by-id/{employee_user_id}/{op_registry_id}', [health_registry::class, 'getHospitalizationDetailsById']);
 
-    
-    
+
+
     Route::get('/ohc/test-list', [Tests::class, 'displayTestListPage'])->name('ohc-tests');
     Route::get('/ohc/test-details/{testCode}', [Tests::class, 'displayTestDetailsPage'])->name('ohc-tests');
     Route::get('/ohc/test-details', [Tests::class, 'displayTestDetailsPageDummy'])->name('ohc-tests');
@@ -667,7 +668,7 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/pre-employment/store', [PreEmploymentController::class, 'store'])->name('PreEmployment.store');
     Route::get('/pre-employment/pre-employment-edit/{id}', [PreEmploymentController::class, 'preEmploymentEdit'])->name('pre-employment-edit');
     Route::get('/pre-employment/pre-employment-upload-user', [PreEmploymentController::class, 'preEmploymentUploadUser'])->name('pre-employment-upload-user');
-    
+
     // employee routes below
     Route::get('/UserEmployee/user_dashboard', [EmployeeUserController::class, 'index'])->name('employee-user-dashboard-analytics');
     Route::get('/UserEmployee/userpersonalInformation', [EmployeeUserController::class, 'showPersonalInfo'])->name('employee-user-personal-info');
@@ -708,10 +709,10 @@ Route::middleware([Authcheck::class])->group(function () {
     //Hospitalization
     Route::get('/UserEmployee/add', [EmployeeUserController::class, 'addHospitalization'])->name('employee-hospitalization-add');
     Route::post('/UserEmployee/store', [EmployeeUserController::class, 'storeHospitalization'])->name('employee-hospitalization-store');
-    Route::get('/UserEmployee/list', [EmployeeUserController::class, 'hospitalization'])->name('hospitalization');   
-    Route::get('/UserEmployee/getHospitalizationDetails', [EmployeeUserController::class, 'getHospitalizationDetails'])->name('getHospitalizationDetails');   
-    Route::get('/UserEmployee/getMedicalCondition', [EmployeeUserController::class, 'getMedicalCondition'])->name('getMedicalCondition');   
-  
+    Route::get('/UserEmployee/list', [EmployeeUserController::class, 'hospitalization'])->name('hospitalization');
+    Route::get('/UserEmployee/getHospitalizationDetails', [EmployeeUserController::class, 'getHospitalizationDetails'])->name('getHospitalizationDetails');
+    Route::get('/UserEmployee/getMedicalCondition', [EmployeeUserController::class, 'getMedicalCondition'])->name('getMedicalCondition');
+
 
     Route::get('/UserEmployee/dashboard/templates/getAllAssignedTemplates', [EmployeeDashboard::class, 'getAllAssignedTemplates']);
     Route::get('/UserEmployee/dashboard/templates/hra-questionaire/template/{template_id}', [EmployeeDashboard::class, 'displayHraQuestionaireTemplate'])->name('hra-questionaire-template');

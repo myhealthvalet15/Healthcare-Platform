@@ -266,36 +266,30 @@
               <div class="mb-3">
                 <label for="searchInput" class="form-label">Employee Name /
                   Id</label>
-                <input type="text" id="searchInput" class="form-control"
-                  placeholder="Employee Name or Employee Id">
+                <input type="text" id="searchInput" class="form-control" placeholder="Employee Name or Employee Id">
               </div>
               <div class="mb-3">
                 <label for="fromDate" class="form-label">From Date</label>
-                <input class="form-control flatpickr-date small-date"
-                  type="text" id="fromDate"
+                <input class="form-control flatpickr-date small-date" type="text" id="fromDate"
                   placeholder="Select From Date" />
               </div>
               <div class="mb-3">
                 <label for="toDate" class="form-label">To Date</label>
-                <input class="form-control flatpickr-date small-date"
-                  type="text" id="toDate"
+                <input class="form-control flatpickr-date small-date" type="text" id="toDate"
                   placeholder="Select To Date" />
               </div>
               <div class="mb-3 wide-select">
                 <label for="filterTestSelect" class="form-label">Tests</label>
                 <div class="select2-primary">
-                  <select id="filterTestSelect" class="select2 form-select"
-                    multiple>
+                  <select id="filterTestSelect" class="select2 form-select" multiple>
                   </select>
                 </div>
               </div>
               <div class="mb-3 d-flex gap-2">
-                <button type="button" id="applyFilters"
-                  class="btn btn-primary btn-md">
+                <button type="button" id="applyFilters" class="btn btn-primary btn-md">
                   Apply Filters
                 </button>
-                <button type="button" id="clearFilters"
-                  class="btn btn-outline-secondary btn-md">
+                <button type="button" id="clearFilters" class="btn btn-outline-secondary btn-md">
                   Clear Filters
                 </button>
               </div>
@@ -314,15 +308,12 @@
 </div>
 <div class="col-lg-4 col-md-6">
   <div class="mt-4">
-    <div class="modal fade" id="prescriptionModal" tabindex="-1"
-      aria-hidden="true">
+    <div class="modal fade" id="prescriptionModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-xl custom-modal-width" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title"
-              id="prescriptionModalLabel1">Prescriptions</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"
-              aria-label="Close"></button>
+            <h5 class="modal-title" id="prescriptionModalLabel1">Prescriptions</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="prescription-container">
@@ -396,8 +387,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-label-secondary"
-              data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -413,7 +403,7 @@
           <th>Name (Age) - Employee ID</th>
           <th>Department</th>
           <th>Test List</th>
-          <th>Observation</th>
+          <th>Test Results</th>
         </tr>
       </thead>
       <tbody class="table-border-bottom-0"></tbody>
@@ -512,29 +502,17 @@
         url: 'https://login-users.hygeiaes.com/ohc/getAllTests',
         method: 'GET',
         onSuccess: function (response) {
-          if (response.result === true) {
-            if (Array.isArray(response.data) && response.data.length > 0) {
-              originalTestsData = response.data;
-              filteredTestsData = [...response.data];
-              populateTestTable(filteredTestsData);
-            } else if (Array.isArray(response.data) && response.data.length === 0) {
-              originalTestsData = [];
-              filteredTestsData = [];
-              showErrorInTable('No tests found');
-            } else {
-              showErrorInTable('Invalid data format received');
-            }
-          } else if (response.result === false) {
-            const message = response.data || response.message || 'No data available';
-            originalTestsData = [];
-            filteredTestsData = [];
-            showErrorInTable(message);
+          if (response.result && Array.isArray(response.data)) {
+            originalTestsData = response.data;
+            filteredTestsData = [...response.data];
+            populateTestTable(filteredTestsData);
           } else {
-            showErrorInTable('Unexpected response format');
+            showErrorInTable('Invalid data format received');
+            console.warn('Error: ', response);
           }
         },
         onError: function (error) {
-          showErrorInTable(error);
+          showErrorInTable('Error loading data: ' + error.message);
           showToast('error', "Failed to load tests: " + error);
         }
       });
@@ -564,7 +542,7 @@
         }
         let dateMatch = true;
         if (fromDateInput || toDateInput) {
-          if (test.reporting_date_time && test.reporting_date_time !== 'N/A') {
+          if (test.reporting_date_time && test.reporting_date_time !== 'Test Results') {
             const testDate = new Date(test.reporting_date_time);
             if (fromDateInput && toDateInput) {
               const fromDate = new Date(fromDateInput);
@@ -957,7 +935,32 @@
       }
       observationCell.appendChild(prescriptionIcon);
       row.appendChild(observationCell);
-
+      const statusCell = document.createElement('td');
+      const statusBadge = document.createElement('span');
+      const icon = document.createElement('i');
+      const status = test.healthplan_status || 'Unknown';
+      if (status === 'Pending' || status === 'Cancelled') {
+        statusBadge.className = 'badge bg-label-danger d-inline-flex align-items-center gap-1 px-3 py-2 fs-6 status-badge';
+        icon.className = status === 'Pending' ? 'fa-solid fa-pencil' : 'fa-solid fa-ban';
+      } else if (status === 'Schedule' || status === 'In Process') {
+        statusBadge.className = 'badge bg-label-warning d-inline-flex align-items-center gap-1 px-3 py-2 fs-6 status-badge';
+        icon.className = 'fa-solid fa-clock';
+      } else if (['Test Completed', 'Result Ready', 'No Show', 'Certified'].includes(status)) {
+        statusBadge.className = 'badge bg-label-success d-inline-flex align-items-center gap-1 px-3 py-2 fs-6 status-badge';
+        icon.className = status === 'Result Ready' ? 'fa-solid fa-binoculars' : 'fa-solid fa-check';
+      } else {
+        statusBadge.className = 'badge bg-label-info d-inline-flex align-items-center gap-1 px-3 py-2 fs-6 status-badge';
+        icon.className = 'fa-solid fa-info-circle';
+      }
+      statusBadge.appendChild(icon);
+      statusBadge.appendChild(document.createTextNode(' ' + status));
+      statusBadge.dataset.testCode = test.test_code;
+      statusBadge.title = "Click to view test details";
+      statusBadge.addEventListener('click', function () {
+        navigateToTestDetails(this.dataset.testCode);
+      });
+      statusCell.appendChild(statusBadge);
+      row.appendChild(statusCell);
       return row;
     }
     function showPrescriptionModal(test) {

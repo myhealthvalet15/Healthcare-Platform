@@ -91,6 +91,7 @@ class corporateEmployees extends Controller
     }
     private function aes256EncryptDataWeak($corporate_id = null, $location_id = null, $keyword)
     {
+        Log::info("Hash: " . hash('sha256', $keyword));
         $key = hex2bin(env('AES_256_ENCRYPTION_KEY'));
         $results = collect();
         $employeeUserQuery = DB::table('employee_user_mapping')
@@ -156,7 +157,7 @@ class corporateEmployees extends Controller
         }
         $employees = $this->aes256EncryptDataWeak($corporate_id, $location_id, $keyword);
         if ($employees->isEmpty()) {
-            return response()->json(['result' => false, 'message' => 'No matching employee data found'], 404);
+            return response()->json(['result' => true, 'message' => 'No matching employee data found'], 404);
         }
         return response()->json(['result' => true, 'message' => $employees]);
     }
@@ -1394,7 +1395,7 @@ class corporateEmployees extends Controller
     ): bool {
         $ohcId = $validatedData['ohcId'];
         $editExistingOne = $validatedData['editExistingOne'] ?? null;
-        $isFollowup = $validatedData['isFollowup'] ?? null; 
+        $isFollowup = $validatedData['isFollowup'] ?? null;
         $opRegistryData = [
             'master_user_id' => $employeeInfo['masterUserId'],
             'corporate_id' => $employeeInfo['corporateId'],

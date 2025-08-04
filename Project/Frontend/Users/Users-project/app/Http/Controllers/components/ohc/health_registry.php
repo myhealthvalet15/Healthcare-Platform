@@ -63,13 +63,12 @@ class health_registry extends Controller
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
         ])->get($url);
-        return $response;
         if ($response->successful()) {
             return response()->json(['result' => true, 'data' => $response['data']]);
         }
         return response()->json(['result' => false, 'message' => 'Invalid Request'], $response->status());
     }
-    public function getDataByKeywordForAddRegistryPage($keyword, Request $request)
+    public function getEmployeeSearchDataByKeyword($keyword, Request $request)
     {
         try {
             $corporateId = session('corporate_id');
@@ -85,10 +84,7 @@ class health_registry extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/getEmployeeData/' . $corporateId . '/' . $locationId . '/' . $keyword);
-            if ($response->successful()) {
-                return response()->json(['result' => true, 'message' => $response['message']]);
-            }
-            return response()->json(['result' => false, 'message' => 'Invalid Request'], $response->status());
+            return $response->json();
         } catch (\Exception $e) {
             return response()->json(['result' => false, 'message' => 'Internal Server Error'], 500);
         }
@@ -434,7 +430,7 @@ class health_registry extends Controller
             'lostHours' => $request->lostHours,
             'industrialFields' => $request->industrialFields,
             'medicalFields' => $request->medicalFields,
-        ]);  
+        ]);
         if ($response->successful()) {
             return response()->json(['result' => true, 'message' => $response['message'], 'op_registry_id' => $response['op_registry_id']]);
         }

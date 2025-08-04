@@ -50,38 +50,3 @@ async function apiRequest({ url, method = 'GET', data = null, headers = {}, onSu
         console.error('API Request Error:', error);
     }
 }
-
-var toastCount = 0;
-var $toastlast;
-
-var getMessage = function (type) {
-    if (type === 'success') {
-        return "Operation was successful!";
-    } else if (type === 'error') {
-        return "An error occurred!";
-    } else {
-        return type;
-    }
-    return "";
-};
-
-
-function showToast(type, message) {
-    type = type.toLowerCase();
-    var msg = message ? message : getMessage(type);
-    toastr.options = {
-        closeButton: true,
-        progressBar: true,
-        positionClass: 'toast-top-right',
-        showDuration: 300,
-        hideDuration: 1000,
-        timeOut: 5000,
-        extendedTimeOut: 1000,
-        showEasing: 'swing',
-        hideEasing: 'linear',
-        showMethod: 'fadeIn',
-        hideMethod: 'fadeOut'
-    };
-    var $toast = toastr[type](msg);
-    $toastlast = $toast;
-}

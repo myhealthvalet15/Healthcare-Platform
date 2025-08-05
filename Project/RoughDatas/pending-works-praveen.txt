@@ -1,4 +1,6 @@
-email, phone, first and last name hash or encrypt data hash thing 
+email, phone, first and last name hash or encrypt data hash thing  - Pending
+Test List popup Malformed Data - Pending
+Test Details - Malformed Data
 type of incident shld be dynamic in edit page alone - Pending
 view past history - Pending
 edit question bug - Pending

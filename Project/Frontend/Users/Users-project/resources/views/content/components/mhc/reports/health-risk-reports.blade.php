@@ -120,4 +120,6 @@
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 @endsection

@@ -28,7 +28,7 @@ function o($x)
     )));
 
     $now = time();
-    $claimSet = base64url_encode(json_encode(array(
+    $claimSet = base64url_encode(json_encode(array(/
         "iss" => $creds['client_email'],
         "scope" => "https://www.googleapis.com/auth/cloud-platform",
         "aud" => "https://oauth2.googleapis.com/token",

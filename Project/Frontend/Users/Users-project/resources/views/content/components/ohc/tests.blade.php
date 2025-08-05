@@ -296,7 +296,6 @@
             </div>
           </form>
         </div>
-
         <div class="mb-3 d-flex justify-content-end me-3">
           <a href="/ohc/add-test" class="btn btn-primary btn-md" id="addtest">
             Add Test
@@ -410,20 +409,6 @@
     </table>
   </div>
 </div>
-<script>
-  var SubModulePermission = 1;
-  if (typeof $apiMenuData !== 'undefined') {
-    $apiMenuData.forEach(function (module) {
-      if (module.module_name === 'OHC') {
-        module.submodules.forEach(function (submodule) {
-          if (submodule.sub_module_name === 'Test') {
-            SubModulePermission = submodule.permission;
-          }
-        });
-      }
-    });
-  }
-</script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const tableBody = document.querySelector('.table-border-bottom-0');
@@ -783,8 +768,8 @@
     function populateTestTable(testsData) {
       clearTable();
       testsData.sort((a, b) => {
-        const dateA = new Date(a.reporting_date_time);
-        const dateB = new Date(b.reporting_date_time);
+        const dateA = new Date(a.created_on);
+        const dateB = new Date(b.created_on);
         return dateB - dateA;
       });
       if (testsData.length > 0) {
@@ -800,13 +785,20 @@
       const noDataCell = document.createElement('td');
       noDataCell.setAttribute('colspan', '6');
       noDataCell.className = 'text-center py-4';
-      noDataCell.innerHTML = `
-    <div class="text-muted">
-      <i class="fa-solid fa-search mb-2" style="font-size: 2rem;"></i>
-      <p class="mb-0">No records found matching your search criteria</p>
-      <small>Try adjusting your filters or search terms</small>
-    </div>
-  `;
+      const container = document.createElement('div');
+      container.className = 'text-muted';
+      const icon = document.createElement('i');
+      icon.className = 'fa-solid fa-search mb-2';
+      icon.style.fontSize = '2rem';
+      const message = document.createElement('p');
+      message.className = 'mb-0';
+      message.textContent = 'No records found matching your search criteria';
+      const suggestion = document.createElement('small');
+      suggestion.textContent = 'Try adjusting your filters or search terms';
+      container.appendChild(icon);
+      container.appendChild(message);
+      container.appendChild(suggestion);
+      noDataCell.appendChild(container);
       noDataRow.appendChild(noDataCell);
       tableBody.appendChild(noDataRow);
     }
@@ -857,8 +849,8 @@
       const dateCell = document.createElement('td');
       const dateSpan = document.createElement('span');
       dateSpan.className = 'fw-medium';
-      if (test.reporting_date_time && test.reporting_date_time !== 'N/A') {
-        const testDate = new Date(test.reporting_date_time);
+      if (test.created_on && test.created_on !== 'N/A') {
+        const testDate = new Date(test.created_on);
         const formattedDate = `${testDate.getDate().toString().padStart(2, '0')}-${(testDate.getMonth() + 1).toString().padStart(2, '0')}-${testDate.getFullYear().toString().substring(2)}`;
         dateSpan.textContent = formattedDate;
       } else {
@@ -909,29 +901,41 @@
       const observationCell = document.createElement('td');
       const observationIcon = document.createElement('i');
       observationIcon.className = 'fa-solid fa-stethoscope';
-      observationIcon.style.cursor = 'pointer';
       observationIcon.style.marginRight = '10px';
-      observationIcon.title = "Click to view medical observations";
-      observationIcon.addEventListener('click', function () {
-        showObservationModal(test);
-      });
-      observationCell.appendChild(observationIcon);
-      const prescriptionIcon = document.createElement('i');
-      const hasPrescription = test.prescription_data && test.prescription_data.prescription;
-      if (hasPrescription) {
-        prescriptionIcon.className = 'ti ti-prescription';
-        prescriptionIcon.style.cursor = 'pointer';
-        prescriptionIcon.style.marginLeft = '10px';
-        prescriptionIcon.title = "Click to view prescriptions";
-        prescriptionIcon.addEventListener('click', function () {
-          showPrescriptionModal(test);
+      if (test.fromOp !== 0) {
+        observationIcon.style.cursor = 'pointer';
+        observationIcon.style.color = '#696cff';
+        observationIcon.title = "Click to view medical observations";
+        observationIcon.addEventListener('click', function () {
+          showObservationModal(test);
         });
       } else {
-        prescriptionIcon.className = 'ti ti-prescription';
-        prescriptionIcon.style.color = '#c9c9c9';
+        observationIcon.style.cursor = 'default';
+        observationIcon.style.color = '#c9c9c9';
+        observationIcon.title = "Not available";
+      }
+      observationCell.appendChild(observationIcon);
+      const prescriptionIcon = document.createElement('i');
+      prescriptionIcon.className = 'ti ti-prescription';
+      prescriptionIcon.style.marginLeft = '10px';
+      if (test.fromOp !== 0) {
+        const hasPrescription = test.prescription_data && test.prescription_data.prescription;
+        if (hasPrescription) {
+          prescriptionIcon.style.cursor = 'pointer';
+          prescriptionIcon.style.color = '#696cff';
+          prescriptionIcon.title = "Click to view prescriptions";
+          prescriptionIcon.addEventListener('click', function () {
+            showPrescriptionModal(test);
+          });
+        } else {
+          prescriptionIcon.style.cursor = 'default';
+          prescriptionIcon.style.color = '#c9c9c9';
+          prescriptionIcon.title = "No prescription available";
+        }
+      } else {
         prescriptionIcon.style.cursor = 'default';
-        prescriptionIcon.style.marginLeft = '10px';
-        prescriptionIcon.title = "No prescription available";
+        prescriptionIcon.style.color = '#c9c9c9';
+        prescriptionIcon.title = "Not available";
       }
       observationCell.appendChild(prescriptionIcon);
       row.appendChild(observationCell);
@@ -1287,5 +1291,19 @@
       tableBody.appendChild(errorRow);
     }
   });
+</script>
+<script>
+  var SubModulePermission = 1;
+  if (typeof $apiMenuData !== 'undefined') {
+    $apiMenuData.forEach(function (module) {
+      if (module.module_name === 'OHC') {
+        module.submodules.forEach(function (submodule) {
+          if (submodule.sub_module_name === 'Test') {
+            SubModulePermission = submodule.permission;
+          }
+        });
+      }
+    });
+  }
 </script>
 @endsection

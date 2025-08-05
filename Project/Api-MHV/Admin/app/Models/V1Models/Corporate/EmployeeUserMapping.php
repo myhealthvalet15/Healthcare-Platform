@@ -26,5 +26,23 @@ class EmployeeUserMapping extends Model
         'corporate_id',
         'isactive',
         'created_by',
-    ];
+    ]; public function corporateHL1()
+    {
+        return $this->belongsTo(\App\Models\Department\CorporateHl1::class, 'hl1_id', 'hl1_id');
+    }
+
+
+    public function masterUser()
+    {
+        return $this->belongsTo(
+            \App\Models\Corporate\MasterUser::class,
+            'user_id',
+            'user_id'
+        );
+    }
+    public function employeeType()
+    {
+        return $this->belongsTo(EmployeeType::class, 'employee_type_id', 'employee_type_id');
+    }
+
 }

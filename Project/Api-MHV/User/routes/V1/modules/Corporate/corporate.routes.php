@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Corporate\CorporateStubs;
 use App\Http\Controllers\Corporate\corporateEmployees;
 use App\Http\Controllers\Corporate\events\EventsController;
+//use App\Http\Controllers\Corporate\reports\MhcReportsController;
+use App\Http\Controllers\Corporate\reports\MhcReportsController;
+
+
 use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth:api'])->group(function () {
@@ -56,6 +60,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/destroy/{deleteId}', [EventsController::class, 'destroyEvents']);
     Route::get('/getEventsById/{id}/{corporate_id}', [EventsController::class, 'editEventsById']);
     Route::put('/updateEvents/{id}', [EventsController::class, 'updateEventsById']);
+
+
+    //Reports
+    
+    Route::get('/getHealthData/{location_id}/{corporate_id}', [MhcReportsController::class, 'getEmployeeHealthData']);
+
+
 });
 Route::middleware(['authGuard.corporate.employee'])->group(function () {
     // Here include the routes which can be accessed by both corporate and employees

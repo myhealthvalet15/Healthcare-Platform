@@ -1,0 +1,19 @@
+    .highlight-row {
+    background-color: #ffeb3b !important; /* Yellow background color */
+    color: #000; /* Black text color */
+
+}
+.modal-body {
+    max-height: 400px; /* Limit the height of the modal body */
+    overflow-y: auto;  /* Add vertical scrolling */
+}
+
+.table {
+    margin-bottom: 0; /* Remove bottom margin to fit better in the modal */
+    width: 100%;
+}
+
+#prescriptionTemplateTableBody {
+    overflow-y: auto;
+}
+

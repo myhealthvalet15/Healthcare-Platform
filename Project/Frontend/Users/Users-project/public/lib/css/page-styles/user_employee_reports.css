@@ -1,0 +1,4 @@
+#testResultTable table.table-striped tbody tr:nth-child(odd),
+#testResultTable table.table-striped tbody tr:nth-child(even) {
+    background-color: #fff !important;
+}

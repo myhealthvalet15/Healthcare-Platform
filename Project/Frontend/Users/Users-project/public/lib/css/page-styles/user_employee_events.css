@@ -1,0 +1,83 @@
+  #employeeSummary i {
+    color: #0d6efd;
+    margin-right: 6px;
+  }
+
+  #employeeSummary .text-end p {
+    text-align: right;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+    background: linear-gradient(to right, #fdfdff, #f2f6fc);
+    border-radius: 12px;
+  }
+
+  .datatables-basic td {
+    vertical-align: top !important;
+  }
+
+  .card-body {
+    background: linear-gradient(to right, #fdfdff, #f2f6fc);
+    border-radius: 12px;
+  }
+
+  .card .btn {
+    font-weight: 500;
+  }
+
+  .toast {
+    min-width: 280px;
+  }
+
+  #eventList .card {
+    background-color: #f2f6fc
+      /* Light cream */
+      border: 1px solid #f3e5c3;
+    border-radius: 12px;
+  }
+
+  #eventList .card-body {
+    background: transparent;
+    padding: 1.5rem;
+  }
+
+  #eventList h5 {
+    color: #333;
+  }
+
+  #eventList .btn {
+    font-weight: 500;
+  }
+
+  body {
+    background-color: #f8f9fa;
+    /* optional: light page background outside content section */
+  }
+
+  .event-card.even {
+    background-color: #f9fdfe;
+    /* Light cream */
+    border: 1px solid #f9fdfe;
+    border-radius: 12px;
+  }
+
+  .event-card.odd {
+    background-color: #eaf6ff;
+    /* Light blue tint */
+    border: 1px solid #c9e6f3;
+    border-radius: 12px;
+  }
+
+  .event-card .card-body {
+    background: transparent;
+    padding: 1.5rem;
+  }
+
+  .event-card h5 {
+    color: #333;
+  }
+
+  .event-card .btn {
+    font-weight: 500;
+  }

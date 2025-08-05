@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             $horizontalMenuJson = file_get_contents(base_path('resources/menu/horizontalMenu.json'));
             $horizontalMenuData = json_decode($horizontalMenuJson, true);
             $menuData = [$verticalMenuData, $horizontalMenuData];
-          
+
 
             $corporateId = Session('corporate_id');
             if ($corporateId) {
@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
                     'Accept' => 'application/json',
                     'Authorization' => 'Bearer ' . request()->cookie('access_token'),
                 ])->get("https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllComponent/accessRights/corpId/{$corporateId}");
-           // return $response;
+                // return $response;
                 if ($response->successful() && !empty($response['data'])) {
 
 
@@ -257,9 +257,9 @@ class AppServiceProvider extends ServiceProvider
                                     ];
                                 }
                             }
-                if ($moduleName === 'pre-employment') {
-                        
-                }
+                            if ($moduleName === 'pre-employment') {
+
+                            }
 
                             // Add all submodules to final vertical menu
                             foreach ($moduleSubmodules as $submodule) {
@@ -271,7 +271,7 @@ class AppServiceProvider extends ServiceProvider
                     $verticalMenuData = json_decode(json_encode($verticalMenuData));
                     $horizontalMenuData = json_decode(json_encode($horizontalMenuData));
                     $menuData = [$verticalMenuData, $horizontalMenuData];
-                  // print_r($menuData);
+                    // print_r($menuData);
                     View::share('ohcRights', $ohcRights);
                     View::share('mhcRights', $mhcRights);
                 } View::share('menuData', $menuData);

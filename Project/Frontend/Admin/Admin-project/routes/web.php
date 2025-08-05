@@ -1,6 +1,5 @@
 <?php
 
-// use App\Http\Controllers\V1Controllers\HraController\Factors\FactorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\hra\factorController;
 use App\Http\Controllers\hra\questionController;
@@ -309,7 +308,8 @@ Route::middleware([Authcheck::class])->group(function () {
     Route::post('/corporate/editIncidentType/{id}', [IncidentTypeController::class, 'editIncidentType']);
     Route::delete('/corporate/deleteIncidentType/{id}', [IncidentTypeController::class, 'deleteIncidentType']);
 
-    Route::get('/corporate/assign-incident-types/{corporate_id}', [IncidentTypeController::class, 'displayAssignIncidentTypePage'])->name('corporate.assignIncidentTypes');;
+    Route::get('/corporate/assign-incident-types/{corporate_id}', [IncidentTypeController::class, 'displayAssignIncidentTypePage'])->name('corporate.assignIncidentTypes');
+    ;
     Route::get('/corporate/getAllAssignedIncidentTypes/{corporate_id}', [IncidentTypeController::class, 'getAllAssignedIncidentTypes']);
     Route::post('/corporate/assignIncidentTypes/{corporate_id}', [IncidentTypeController::class, 'assignIncidentTypes']);
     // ------------------------------------------------------------------------------------------------------------------------------

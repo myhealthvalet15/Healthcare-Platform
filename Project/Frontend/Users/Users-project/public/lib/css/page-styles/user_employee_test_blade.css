@@ -1,0 +1,220 @@
+/*User Employee Test Blade*/
+  .test-list-clickable {
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    display: inline-block;
+  }
+
+  .test-list-clickable:hover {
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .test-list-clickable i {
+    margin-right: 5px;
+    color: #696cff;
+  }
+
+  .test-group-title {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #9D94F4;
+  }
+
+  .test-subgroup-title {
+    font-weight: 600;
+    margin-top: 5px;
+    margin-bottom: 3px;
+    margin-left: 15px;
+    color: #78DBC7;
+  }
+
+  .test-subsubgroup-title {
+    font-weight: normal;
+    font-style: italic;
+    margin-top: 3px;
+    margin-bottom: 2px;
+    margin-left: 30px;
+    color: #DCDBE0;
+  }
+
+  .test-item {
+    margin-left: 15px;
+    color: #000000;
+  }
+
+  .subgroup-test-item,
+  .subsubgroup-test-item {
+    margin-left: 30px;
+    color: #000000;
+  }
+
+  .subsubgroup-test-item {
+    margin-left: 45px;
+  }
+
+  /* Modal and header styles */
+  .modal-header-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 15px;
+  }
+
+  .employee-info,
+  .date-info {
+    font-weight: 500;
+  }
+
+  .date-info {
+    text-align: right;
+  }
+
+  .status-badge {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .status-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Icon styles */
+  .icon-base {
+    font-size: 1.2rem;
+    margin: 0 4px;
+    vertical-align: middle;
+  }
+
+  /* Badge styles */
+  .badge.bg-label-success {
+    background-color: rgba(40, 199, 111, 0.12) !important;
+    color: #28c76f !important;
+  }
+
+  .badge.bg-label-danger {
+    background-color: rgba(234, 84, 85, 0.12) !important;
+    color: #ea5455 !important;
+  }
+
+  /* Table styles */
+  .table-custom-striped thead tr {
+    background-color: #e0dee8;
+  }
+
+  .table-custom-striped tbody tr:nth-child(odd) {
+    background-color: #fbfbfb;
+  }
+
+  .table-custom-striped tbody tr:nth-child(even) {
+    background-color: #f1f2f3;
+  }
+
+  /* Body styles */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f4f4;
+  }
+
+  /* Prescription styles */
+  .prescription-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .doctor-header {
+    background: #6b1bc7;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .prescription-id {
+    font-weight: bold;
+    color: #fcd34d;
+  }
+
+  .patient-info {
+    background: #d4d4d4;
+    padding: 10px 15px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .icons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .icons i {
+    cursor: pointer;
+    color: #333;
+  }
+
+  /* Table styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: #f3e8ff;
+    color: #333;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+
+  td:first-child,
+  th:first-child {
+    text-align: center;
+  }
+
+  .drug-name i {
+    margin-left: 5px;
+    color: #555;
+  }#employeeSummary p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+#employeeSummary i {
+    color: #0d6efd;
+    margin-right: 6px;
+}
+
+#employeeSummary .text-end p {
+    text-align: right;
+}
+
+.card-body {
+    padding: 1.5rem;
+    background: linear-gradient(to right, #fdfdff, #f2f6fc);
+    border-radius: 12px;
+}
+
+
+// User Employee 

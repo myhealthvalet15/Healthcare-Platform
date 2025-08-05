@@ -4,43 +4,30 @@ namespace App\Http\Controllers\doctor_qualification;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use GuzzleHttp\Client;
-use App\Services\GuzzleHttpClient;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Facades\Http;
 
 class DoctorController extends Controller
 {
-    protected $httpClient;
-
-    public function __construct(GuzzleHttpClient $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
-
     public function index(Request $request)
     {
         try {
-            $response = $this->httpClient->request('POST', 'api/doctor/index', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-                ],
+            $apiResponse = Http::post('https://api-admin.hygeiaes.com/api/doctor/index', [
+                'access_token' => $request->cookie('access_token')
             ]);
-            $data = $response['data'];
 
-            $doctors = (isset($data) ? $data : []);
+            $data = $apiResponse->json('data');
+            $doctors = $data ?? [];
+
             return view('content.doctor_qualifications.doctor_qualification', compact('doctors'));
         } catch (\Exception $e) {
+            Log::error('Doctor index error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to load doctor qualifications.');
         }
     }
+
     public function store(Request $request)
     {
-
-
-        // Log::info('request_sts', $request->all());
-
         $request->validate([
             'qualification_name' => 'required|string|max:255',
             'qualification_type' => 'required',
@@ -48,66 +35,46 @@ class DoctorController extends Controller
         ]);
 
         try {
-            $response = $this->httpClient->request('POST', '/api/doctor/add', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'qualification_name' => $request->input('qualification_name'),
-                    'qualification_type' => $request->input('qualification_type'),
-                    'active_status' => $request->input('active_status'),
-                ],
+            $apiResponse = Http::post('https://api-admin.hygeiaes.com/api/doctor/add', [
+                'qualification_name' => $request->qualification_name,
+                'qualification_type' => $request->qualification_type,
+                'active_status' => $request->active_status,
+                'access_token' => $request->cookie('access_token'),
             ]);
 
-
-            if ($response['success']) {
-
-                return back()->route('doctor.index')->with('success', 'Doctor qualification added successfully!');
+            if ($apiResponse->json('success')) {
+                return redirect()->route('doctor.index')->with('success', 'Doctor qualification added successfully!');
             } else {
-                return back()->with('error', 'Failed to add Doctor qualification. Status code: ');
+                return back()->with('error', 'Failed to add Doctor qualification.');
             }
         } catch (\Exception $e) {
-            Log::error('Add doctot qualification  API Error: ' . $e->getMessage());
+            Log::error('Add doctor qualification error: ' . $e->getMessage());
             return back()->with('error', 'Unable to add Doctor qualification. Please try again later.');
         }
     }
+
     public function update(Request $request)
     {
+        $request->validate([
+            'qualification_name' => 'required|string|max:255',
+            'qualification_id' => 'required',
+            'active_status' => 'required',
+        ]);
 
         try {
-
-            // Log::info('Request data:', $request->all());
-            $request->validate([
-                'qualification_name' => 'required|string|max:255',
-                'qualification_id' => 'required',
-                'active_status' => 'required',
-            ]);
-            $qualification_id = $request->qualification_id;
-
-            $response = $this->httpClient->request('POST', "/api/doctor/update/{$qualification_id}", [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'qualification_name' => $request->input('qualification_name'),
-                    'active_status' => $request->input('active_status'),
-
-                ],
+            $apiResponse = Http::post("https://api-admin.hygeiaes.com/api/doctor/update/{$request->qualification_id}", [
+                'qualification_name' => $request->qualification_name,
+                'active_status' => $request->active_status,
+                'access_token' => $request->cookie('access_token'),
             ]);
 
-            //$data = json_decode($response->getBody()->getContents(), true);
-            if ($response['success']) {
-                return response()->json(['message' => 'doctor qualification updated successfully!']);
+            if ($apiResponse->json('success')) {
+                return response()->json(['message' => 'Doctor qualification updated successfully!']);
             } else {
-                return back()->with('error', 'Failed to add Doctor qualification. Status code: ' . $response->getStatusCode());
+                return response()->json(['error' => 'Failed to update Doctor qualification.'], 400);
             }
         } catch (\Exception $e) {
-
-            Log::error('Error creating doctor qualification: ' . $e->getMessage());
-
-
+            Log::error('Update doctor qualification error: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to update doctor qualification.'], 500);
         }
     }

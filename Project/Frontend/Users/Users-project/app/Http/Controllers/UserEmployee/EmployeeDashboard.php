@@ -35,7 +35,7 @@ class EmployeeDashboard extends Controller
         $headerData = 'HRA Questionnaire Template';
         $response = $this->checkTemplateAccess($request, $templateId);
         if ($response['result']) {
-            return view('content.UserEmployee.HRA.hra_questionaire_template', [
+            return view('content.HRA.hra_questionaire_template', [
                 'templateDetails' => $response['data'],
                 'HeaderData' => $headerData,
                 'isQuestionsAvailableForThisTemplate' => $response['data']['is_questions_available'] ? 1 : 0,

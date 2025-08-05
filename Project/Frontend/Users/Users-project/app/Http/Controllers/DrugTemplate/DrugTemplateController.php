@@ -5,7 +5,6 @@ namespace App\Http\Controllers\DrugTemplate;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Services\GuzzleHttpClient;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cookie;
@@ -15,11 +14,6 @@ use Carbon\Carbon;
 
 class DrugTemplateController extends Controller
 {
-    protected $httpClient;
-    public function __construct(GuzzleHttpClient $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
     public function drugTemplateList(Request $request)
     {
         $corporate_id = session('corporate_id');

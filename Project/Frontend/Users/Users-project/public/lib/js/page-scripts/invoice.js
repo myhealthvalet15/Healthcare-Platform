@@ -1,6 +1,4 @@
- var ohcRights = {!! json_encode($ohcRights) !!};
-
-  var invoicePermission = 1;
+ var invoicePermission = 1;
     // Get permission directly from ohcRights
     if (typeof ohcRights !== 'undefined' && ohcRights.invoice !== undefined) {
         invoicePermission = parseInt(ohcRights.invoice);

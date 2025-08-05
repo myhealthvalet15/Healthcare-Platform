@@ -1,0 +1,13 @@
+
+   .error {
+        border: 2px solid red !important;
+        /* Red border for the dropdown */
+    }
+
+    .error-message {
+        color: red;
+        /* Red text for the error message */
+        font-size: 14px;
+        margin-top: 5px;
+        /* Space between dropdown and error message */
+    }

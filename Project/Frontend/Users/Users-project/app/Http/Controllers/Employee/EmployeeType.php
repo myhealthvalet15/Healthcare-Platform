@@ -5,14 +5,8 @@ namespace App\Http\Controllers\Employee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Services\GuzzleHttpClient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
-
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Session;
-use Carbon\Carbon;
 
 class EmployeeType extends Controller
 {

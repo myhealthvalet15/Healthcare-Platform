@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>You're Invited</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+ 
   <script>
     const eventId = '{{ $eventId }}';
     const userId = '{{ $userId }}';
   </script>
 </head>
+
 <body style="background: #f7f7f9; padding: 2rem;">
   <div id="eventContainer" class="container"></div>
 
@@ -27,18 +28,18 @@
           response: choice
         })
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.result) {
-          alert(`✅ Your response "${choice}" for "${eventName}" has been recorded.`);
-          loadEvent(); // Reload to reflect changes
-        } else {
-          alert('⚠️ Failed to record your response.');
-        }
-      })
-      .catch(() => {
-        alert('❌ Error sending your response.');
-      });
+        .then(res => res.json())
+        .then(data => {
+          if (data.result) {
+            alert(`✅ Your response "${choice}" for "${eventName}" has been recorded.`);
+            loadEvent(); // Reload to reflect changes
+          } else {
+            alert('⚠️ Failed to record your response.');
+          }
+        })
+        .catch(() => {
+          alert('❌ Error sending your response.');
+        });
     }
 
     function loadEvent() {
@@ -110,4 +111,5 @@
     window.onload = loadEvent;
   </script>
 </body>
+
 </html>

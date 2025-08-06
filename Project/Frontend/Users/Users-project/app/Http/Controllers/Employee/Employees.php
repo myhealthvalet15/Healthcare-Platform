@@ -10,7 +10,7 @@ class Employees extends Controller
     public function displayEmployeeListPage(Request $request)
     {
         $headerData = "EMPLOYEE'S LIST";
-        return view('content.Employee.list', [
+        return view('content.Employee.employee-list', [
             'HeaderData' => $headerData,
         ]);
     }

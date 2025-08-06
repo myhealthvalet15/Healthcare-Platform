@@ -30,7 +30,7 @@ class EmployeeType extends Controller
             $emptype = $data['data'] ?? [];
     
             // Pass data to the Blade view
-            return view('content.Employee.EmployeeType.index', compact('emptype', 'corporate_id'));
+            return view('content.Employee.employee-type', compact('emptype', 'corporate_id'));
         }
     
         // Handle failure (you could log or handle errors as needed)

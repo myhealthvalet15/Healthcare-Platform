@@ -22,7 +22,7 @@
 'resources/assets/vendor/libs/@form-validation/auto-focus.js',
 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
-<link rel="stylesheet" href="/lib/css/page-styles/prescription-view.css?v=time()">
+<link rel="stylesheet" href="/lib/css/page-styles/prescription-view.css">
 <script>
     var ohcRights = {!! json_encode($ohcRights) !!};
 </script>
@@ -93,7 +93,7 @@
 </div>
 
 
-<script src="/lib/js/page-scripts/prescription-view.js?v=time()"></script>
+<script src="/lib/js/page-scripts/prescription-view.js"></script>
 
 
 @endsection

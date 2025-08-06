@@ -22,7 +22,7 @@
 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
 @section('content')
-<link rel="stylesheet" href="/lib/css/page-styles/complete-requests.css?v=time()">
+<link rel="stylesheet" href="/lib/css/page-styles/complete-requests.css">
 <div id="issueModal" class="modal" style="display:none;">
   <div class="modal-content">
     <h3>Confirm Prescription Issue</h3>
@@ -50,5 +50,5 @@
   </div>
 </div>
 <hr class="my-12">
-<script src="/lib/js/page-scripts/complete-requests.js?v=time()"></script>
+<script src="/lib/js/page-scripts/complete-requests.js"></script>
 @endsection

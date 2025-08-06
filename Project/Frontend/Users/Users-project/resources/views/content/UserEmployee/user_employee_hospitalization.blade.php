@@ -69,5 +69,5 @@
     </div>
   </div>
 </div>
-<script src="/lib/js/page-scripts/hospitalization-details.js?v=time()"></script>
+<script src="/lib/js/page-scripts/hospitalization-details.js"></script>
 @endsection

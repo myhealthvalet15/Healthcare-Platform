@@ -110,7 +110,8 @@
                 <div id="prescriptionHeader">
                     <div style="padding-right:15px;padding-top:15px;float:right;width:5%;">
 
-                        <img class="retina-ready" width="60" height="60" alt="" src="https://www.hygeiaes.co/img/logo-big.png">
+                        <img class="retina-ready" width="60" height="60" alt=""
+                            src="https://www.hygeiaes.co/img/logo-big.png">
                     </div>
                     <div style="padding:15px 10px 0px 20px;float:left;width:35%;">
 
@@ -125,30 +126,34 @@
 
                         </div>
                     </div>
+                </div>
+                <div class="box-top"
+                    style="width: 98%; float: left; margin-top: 200px; margin: 1%; border-bottom: 2px solid #199bbf; border-top: 2px solid #199bbf; padding: 5px 0;">
+                    <div id="patientName" style="width: 33%; float: left; padding-top: 3px;"></div>
+                    <div id="patientInfo" style="width: 30%; float: left; padding-top: 3px;" align="center"></div>
+                    <div id="prescriptionDate"
+                        style="width: 36%; float: right; padding-top: 3px; text-align: right; vertical-align: middle;">
                     </div>
-                    <div class="box-top" style="width: 98%; float: left; margin-top: 200px; margin: 1%; border-bottom: 2px solid #199bbf; border-top: 2px solid #199bbf; padding: 5px 0;">
-                        <div id="patientName" style="width: 33%; float: left; padding-top: 3px;"></div>
-                        <div id="patientInfo" style="width: 30%; float: left; padding-top: 3px;" align="center"></div>
-                        <div id="prescriptionDate" style="width: 36%; float: right; padding-top: 3px; text-align: right; vertical-align: middle;"></div>
-                    </div>
+                </div>
 
-                    <div style="width: 98%; float: left; margin: 0% 1% 1% 1%; border-bottom: 1px solid #ccc; text-align: right; padding-bottom: 10px; font-size: 11px;">
-                        <div style="width: auto; float: right;">
-                            <div style="width: auto; float: left; text-align: center !important; padding-right: 15px;">
-                                <img src='https://www.hygeiaes.co/img/Morning.png'> Morning
-                            </div>
-                            <div style="width: auto; float: left; text-align: center !important; padding-right: 15px;">
-                                <img src='https://www.hygeiaes.co/img/Noon.png'> Afternoon
-                            </div>
-                            <div style="width: auto; float: left; text-align: center !important; padding-right: 15px;">
-                                <img src='https://www.hygeiaes.co/img/Evening.png'> Evening
-                            </div>
-                            <div style="width: auto; float: left; text-align: center !important; padding-right: 15px;">
-                                <img src='https://www.hygeiaes.co/img/Night.png'> Night
-                            </div>
+                <div
+                    style="width: 98%; float: left; margin: 0% 1% 1% 1%; border-bottom: 1px solid #ccc; text-align: right; padding-bottom: 10px; font-size: 11px;">
+                    <div style="width: auto; float: right;">
+                        <div style="width: auto; float: left; text-align: center !important; padding-right: 15px;">
+                            <img src='https://www.hygeiaes.co/img/Morning.png'> Morning
+                        </div>
+                        <div style="width: auto; float: left; text-align: center !important; padding-right: 15px;">
+                            <img src='https://www.hygeiaes.co/img/Noon.png'> Afternoon
+                        </div>
+                        <div style="width: auto; float: left; text-align: center !important; padding-right: 15px;">
+                            <img src='https://www.hygeiaes.co/img/Evening.png'> Evening
+                        </div>
+                        <div style="width: auto; float: left; text-align: center !important; padding-right: 15px;">
+                            <img src='https://www.hygeiaes.co/img/Night.png'> Night
                         </div>
                     </div>
-                
+                </div>
+
 
                 <div style="float: left; width: 98%; margin: 0 1%;">
                     <table style="width: 90%;" class="drug-table" align="center">
@@ -157,10 +162,14 @@
                                 <th width="5%">#</th>
                                 <th width="20%" style="text-align: left; padding: 5px 0;">Drug Name</th>
                                 <th width="4%">Days</th>
-                                <th style="width: 5%; text-align: center !important;" title="drugmorning"><img src='https://www.hygeiaes.co/img/Morning.png'></th>
-                                <th style="width: 5%; text-align: center !important;" title="drugafternoon"><img src='https://www.hygeiaes.co/img/Noon.png'></th>
-                                <th style="width: 5%; text-align: center !important;" title="drugevening"><img src='https://www.hygeiaes.co/img/Evening.png'></th>
-                                <th style="width: 5%; text-align: center !important;" title="drugnight"><img src='https://www.hygeiaes.co/img/Night.png'></th>
+                                <th style="width: 5%; text-align: center !important;" title="drugmorning"><img
+                                        src='https://www.hygeiaes.co/img/Morning.png'></th>
+                                <th style="width: 5%; text-align: center !important;" title="drugafternoon"><img
+                                        src='https://www.hygeiaes.co/img/Noon.png'></th>
+                                <th style="width: 5%; text-align: center !important;" title="drugevening"><img
+                                        src='https://www.hygeiaes.co/img/Evening.png'></th>
+                                <th style="width: 5%; text-align: center !important;" title="drugnight"><img
+                                        src='https://www.hygeiaes.co/img/Night.png'></th>
                                 <th width="8%">AF/BF</th>
                                 <th>Remarks</th>
                             </tr>
@@ -174,7 +183,6 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         // Check URL and show content accordingly
         window.onload = function() {
@@ -182,7 +190,8 @@
             const printType = urlParams.get('print_type');
             const url = window.location.href;
             const prescriptionTemplateId = url.split('/').pop(); // Extract ID from URL
-            const reportUrl = `https://login-users.hygeiaes.com/prescription/getPrintPrescriptionById/${prescriptionTemplateId}`;
+            const reportUrl =
+                `https://login-users.hygeiaes.com/prescription/getPrintPrescriptionById/${prescriptionTemplateId}`;
             if (['a4h', 'a5h'].includes(printType)) {
                 // Hide the header if print_type is 'a4h' or 'a5h'
                 document.getElementById('prescriptionHeader').style.display = 'block';
@@ -211,30 +220,34 @@
                 method: 'GET',
                 dataType: 'json',
                 success: function(data) {
-  console.log("API Response:", data);
+                    console.log("API Response:", data);
 
-  if (data && data.prescription_details) {
-    const prescription = data.prescription;
-    const drugDetails = Object.values(data.prescription_details);
+                    if (data && data.prescription_details) {
+                        const prescription = data.prescription;
+                        const drugDetails = Object.values(data.prescription_details);
 
-    // Patient Info
-    document.getElementById('companyName').textContent = prescription.employee_corporate_name || '';
-    document.getElementById('patientName').innerHTML = `Name: <b>${prescription.employee_firstname || ''} ${prescription.employee_lastname || ''}</b>`;
-    document.getElementById('patientInfo').innerHTML = `Age: ${prescription.employee_age}, ${prescription.employee_gender}`;
+                        // Patient Info
+                        document.getElementById('companyName').textContent = prescription
+                            .employee_corporate_name || '';
+                        document.getElementById('patientName').innerHTML =
+                            `Name: <b>${prescription.employee_firstname || ''} ${prescription.employee_lastname || ''}</b>`;
+                        document.getElementById('patientInfo').innerHTML =
+                            `Age: ${prescription.employee_age}, ${prescription.employee_gender}`;
 
-    const date = new Date(prescription.prescription_date);
-    const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-    document.getElementById('prescriptionDate').innerHTML = `Date: <b>${formattedDate}</b>`;
+                        const date = new Date(prescription.prescription_date);
+                        const formattedDate =
+                            `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                        document.getElementById('prescriptionDate').innerHTML = `Date: <b>${formattedDate}</b>`;
 
-    // Render Table
-    const drugTableBody = document.getElementById('drugTableBody');
-    drugTableBody.innerHTML = ''; // Clear
+                        // Render Table
+                        const drugTableBody = document.getElementById('drugTableBody');
+                        drugTableBody.innerHTML = ''; // Clear
 
-    drugDetails.forEach((detail, index) => {
-      const af_bf_display = conditionMap[detail.intake_condition] || 'N/A';
+                        drugDetails.forEach((detail, index) => {
+                            const af_bf_display = conditionMap[detail.intake_condition] || 'N/A';
 
-      const row = document.createElement('tr');
-      row.innerHTML = `
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
         <td style="text-align:center;">${index + 1}</td>
         <td>${detail.drug_name || 'N/A'}</td>
         <td style="text-align:center;">${detail.prescribed_days}</td>
@@ -245,13 +258,12 @@
         <td style="text-align:center;">${af_bf_display}</td>
         <td style="text-align:center;">${detail.remarks || ''}</td>
       `;
-      drugTableBody.appendChild(row);
-    });
-  } else {
-    console.log("No prescription details found or invalid data.");
-  }
-}
-,
+                            drugTableBody.appendChild(row);
+                        });
+                    } else {
+                        console.log("No prescription details found or invalid data.");
+                    }
+                },
                 error: function(xhr, status, error) {
                     console.error('Error fetching prescription report: ' + error);
                 }

@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 @section('title', 'Test List')
-<link rel="stylesheet" href="/lib/css/page-styles/user_employee_test.css?v=time()">
+<link rel="stylesheet" href="/lib/css/page-styles/user_employee_test.css">
 @section('content')
 <div class="card">
   <div class="table-responsive text-nowrap">
@@ -167,5 +167,5 @@
   const employeeId = "{{ session('employee_id') }}";
   const employeeDetailsUrl = "{{ route('employee-user-details') }}?employee_id=" + employeeId;
 </script>
-<script src="/lib/js/page-scripts/user_employee_test.js?v=time()"></script>
+<script src="/lib/js/page-scripts/user_employee_test.js"></script>
 @endsection

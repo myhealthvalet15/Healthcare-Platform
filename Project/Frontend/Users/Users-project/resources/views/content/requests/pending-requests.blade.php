@@ -205,5 +205,5 @@
   </div>
 </div>
 <hr class="my-12">
-<script src="/lib/js/page-scripts/pending-requests.js?v=time()"></script>
+<script src="/lib/js/page-scripts/pending-requests.js"></script>
 @endsection

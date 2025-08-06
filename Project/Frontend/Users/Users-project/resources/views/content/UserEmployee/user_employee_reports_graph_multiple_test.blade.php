@@ -7,7 +7,7 @@
 @vite(['resources/assets/js/charts-chartjs.js'])
 @endsection
 @section('content')
-<link rel="stylesheet" href="/lib/css/page-styles/user_employee_reports_graph_multiple_test.css?v=time()">
+<link rel="stylesheet" href="/lib/css/page-styles/user_employee_reports_graph_multiple_test.css">
 <div class="mb-4">
   <label for="select2Primary_tests" class="form-label">Select Test</label>
   <select id="select2Primary_tests" class="form-select" style="width: 100%;">
@@ -31,5 +31,5 @@
     </div>
   </div>
 </div>
-<script src="/lib/js/page-scripts/user_employee_reports_graph_multiple_test.js?v=time()"></script>
+<script src="/lib/js/page-scripts/user_employee_reports_graph_multiple_test.js"></script>
 @endsection

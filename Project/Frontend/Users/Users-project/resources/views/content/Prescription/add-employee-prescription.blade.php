@@ -35,7 +35,7 @@
 'resources/assets/js/forms-tagify.js',
 'resources/assets/js/forms-typeahead.js',
 ])
-<link rel="stylesheet" href="/lib/css/page-styles/add-employee-prescription.css?v=time()">
+<link rel="stylesheet" href="/lib/css/page-styles/add-employee-prescription.css">
 @endsection
 
 @section('content')
@@ -556,6 +556,6 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
         </div>
     </div>
     
-    <script src="/lib/js/page-scripts/add-employee-prescription.js?v=time()"></script>
+    <script src="/lib/js/page-scripts/add-employee-prescription.js"></script>
 
     @endsection

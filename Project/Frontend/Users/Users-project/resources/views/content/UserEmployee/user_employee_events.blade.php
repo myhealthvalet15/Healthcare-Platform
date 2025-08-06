@@ -1,7 +1,7 @@
 @extends('layouts/layoutMaster')
 @section('title', 'Diagnostic Assessment')
 @section('page-script')
-    <link rel="stylesheet" href="/lib/css/page-styles/user_employee_events.css?v=time()">
+    <link rel="stylesheet" href="/lib/css/page-styles/user_employee_events.css">
     <script>
         const employeeId = @json(session('employee_id'));
         const employeeDetailsUrl = @json(route('employee-user-details'));
@@ -24,5 +24,5 @@
 
         </div>
     </div>
-    <script src="/lib/js/page-scripts/events.js?v=time()"></script>
+    <script src="/lib/js/page-scripts/events.js"></script>
 @endsection

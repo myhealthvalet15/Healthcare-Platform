@@ -1,0 +1,80 @@
+.medical-info-row {
+    display: flex;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.medical-info-column {
+    flex: 1;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+.medical-info-column:first-child {
+    padding-left: 35px;
+}
+
+.info-title {
+    color: #6B1BC7;
+    margin-bottom: 5px;
+}
+
+.info-content {
+    margin-top: 0;
+}
+
+.medical-info-wrapper {
+    position: relative;
+    background: #fff;
+    margin-top: -20px;
+    border-radius: 12px;
+    display: flex;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    align-items: center;
+}
+
+.severity-indicator-container {
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.severity-indicator {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    font-weight: bold;
+    color: #000;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.medical-info-row {
+    display: flex;
+    flex-wrap: nowrap;
+    flex: 1;
+}
+
+.medical-info-column {
+    flex: 1;
+    padding-right: 10px;
+}
+
+.info-title {
+    color: #6946C6;
+    font-size: 14px;
+    margin-bottom: 4px;
+    margin-top: 0;
+}
+
+.info-content {
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 0;
+}

@@ -78,5 +78,5 @@
         </table>
     </div>
 </div>
-<script src="/lib/js/page-scripts/prescription-add.js?v=time()"></script>
+<script src="/lib/js/page-scripts/prescription-add.js"></script>
 @endsection

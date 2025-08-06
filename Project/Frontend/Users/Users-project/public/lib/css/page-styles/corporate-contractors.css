@@ -1,0 +1,79 @@
+.form-check-input:checked {
+    background-color: green !important;
+}
+
+.form-check-input:checked+.form-check-label .status-label {
+    color: green;
+}
+
+.form-check-input:not(:checked) {
+    background-color: lightcoral !important;
+    /* Light red background */
+}
+
+.form-check-input:not(:checked)+.form-check-label .status-label {
+    color: lightcoral;
+    /* Light red text */
+}
+
+.deleteBtn {
+
+    color: red;
+    /* Custom red text */
+}
+
+/* Optional: Adding smooth transition for switch */
+.form-check-input {
+    transition: background-color 0.3s ease;
+}
+
+.dataTables_length {
+    position: absolute;
+    top: 1px;
+    right: 20px;
+    color: white;
+}
+
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Make sure the search input is aligned to the left */
+.search-container {
+    width: 100%;
+}
+
+/* Optional: Make sure the Add New button is aligned to the right */
+.position-relative {
+    width: 100%;
+}
+
+.dataTables_length label {
+    display: flex;
+    align-items: center;
+}
+
+.dataTables_length label::after {
+    content: '';
+    display: none;
+}
+
+.dataTables_length select {
+    color: black;
+}
+
+.card-body {
+    position: absolute;
+    top: 40px;
+    right: 200px;
+    color: white;
+}
+
+div.dataTables_wrapper div.dataTables_length select {
+    margin-left: .5rem;
+    margin-right: .5rem;
+    background-color: white;
+}

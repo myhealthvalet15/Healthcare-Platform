@@ -1,0 +1,277 @@
+.icon-base {
+    font-size: 1.2rem;
+    margin: 0 4px;
+    vertical-align: middle;
+}
+
+.badge.bg-label-success {
+    background-color: rgba(40, 199, 111, 0.12) !important;
+    color: #28c76f !important;
+}
+
+.badge.bg-label-danger {
+    background-color: rgba(234, 84, 85, 0.12) !important;
+    color: #ea5455 !important;
+}
+
+.table-custom-striped thead tr {
+    background-color: #e0dee8;
+}
+
+.table-custom-striped tbody tr:nth-child(odd) {
+    background-color: #fbfbfb;
+}
+
+.table-custom-striped tbody tr:nth-child(even) {
+    background-color: #f1f2f3;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f4f4;
+}
+
+.prescription-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-header {
+    background: #6b1bc7;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.prescription-id {
+    font-weight: bold;
+    color: #fcd34d;
+}
+
+.patient-info {
+    background: #d4d4d4;
+    padding: 10px 15px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.icons {
+    display: flex;
+    gap: 10px;
+}
+
+.icons i {
+    cursor: pointer;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f3e8ff;
+    color: #333;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+td:first-child,
+th:first-child {
+    text-align: left;
+}
+
+.drug-name i {
+    margin-left: 5px;
+    color: #555;
+}
+
+.test-list-clickable {
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.test-list-clickable:hover {
+    background-color: #e9ecef;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.test-list-clickable i {
+    margin-right: 5px;
+    color: #696cff;
+}
+
+.test-group-title {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #9D94F4;
+}
+
+.test-subgroup-title {
+    font-weight: 600;
+    margin-top: 5px;
+    margin-bottom: 3px;
+    margin-left: 15px;
+    color: #78DBC7;
+}
+
+.test-subsubgroup-title {
+    font-weight: normal;
+    font-style: italic;
+    margin-top: 3px;
+    margin-bottom: 2px;
+    margin-left: 30px;
+    color: #DCDBE0;
+}
+
+.test-item {
+    margin-left: 15px;
+    color: #000000;
+}
+
+.subgroup-test-item,
+.subsubgroup-test-item {
+    margin-left: 30px;
+    color: #000000;
+}
+
+.subsubgroup-test-item {
+    margin-left: 45px;
+}
+
+.modal-header-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 15px;
+}
+
+.employee-info,
+.date-info {
+    font-weight: 500;
+}
+
+.date-info {
+    text-align: right;
+}
+
+.status-badge {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove all borders and create clean row separation */
+#health-registry-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#health-registry-table th,
+#health-registry-table td {
+    text-align: left;
+    vertical-align: top;
+    padding: 12px 16px;
+    border: none;
+    /* Remove all borders */
+    border-bottom: 1px solid #e9ecef;
+    /* Only bottom border for row separation */
+}
+
+/* Remove border from last row */
+#health-registry-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Header styling */
+#health-registry-table thead th {
+    border-bottom: 2px solid #dee2e6;
+    /* Slightly thicker line under headers */
+    font-weight: 600;
+    background-color: transparent;
+}
+
+/* Specific column widths */
+#health-registry-table th:nth-child(1),
+#health-registry-table td:nth-child(1) {
+    width: 12%;
+    /* DATE column */
+}
+
+#health-registry-table th:nth-child(2),
+#health-registry-table td:nth-child(2) {
+    width: 25%;
+    /* NAME column */
+}
+
+#health-registry-table th:nth-child(3),
+#health-registry-table td:nth-child(3) {
+    width: 15%;
+    /* DEPARTMENT column */
+}
+
+#health-registry-table th:nth-child(4),
+#health-registry-table td:nth-child(4) {
+    width: 30%;
+    /* NATURE OF INJURY column */
+}
+
+#health-registry-table th:nth-child(5),
+#health-registry-table td:nth-child(5) {
+    width: 18%;
+    /* DETAILS column */
+}
+
+/* Optional: Add hover effect for better UX */
+#health-registry-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Remove any Bootstrap table classes that add borders */
+#health-registry-table.table-bordered {
+    border: none;
+}
+
+#health-registry-table.table-bordered th,
+#health-registry-table.table-bordered td {
+    border: none;
+    border-bottom: 1px solid #e9ecef;
+}
+
+#attachmentSection {
+    display: flex;
+    gap: 1rem;
+    /* space between cards */
+    flex-wrap: nowrap;
+    /* prevent wrapping, or change to wrap if you want */
+}

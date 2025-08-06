@@ -7,7 +7,7 @@
 @vite(['resources/assets/js/charts-chartjs.js'])
 @endsection
 @section('content')
-<link rel="stylesheet" href="/lib/css/page-styles/user_employee_reports.css?v=time()">
+<link rel="stylesheet" href="/lib/css/page-styles/user_employee_reports.css">
 <div class="mb-4">
   <label for="select2Primary_tests" class="form-label">Select Test</label>
   <select id="select2Primary_tests" class="form-select" style="width: 100%;">
@@ -37,5 +37,5 @@
 <script>
   const masterUserId = "{{ session('master_user_user_id') }}";
 </script>
-<script src="/lib/js/page-scripts/user_employee_reports_graph.js?v=time()"></script>
+<script src="/lib/js/page-scripts/user_employee_reports_graph.js"></script>
 @endsection

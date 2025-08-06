@@ -115,7 +115,7 @@
   </div>
   <div class="card-body">
     <form id="editProfileForm" enctype="multipart/form-data">
-      @csrf
+
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">First Name</label>
@@ -179,5 +179,5 @@
     </form>
   </div>
 </div>
-<script src="/lib/js/page-scripts/user_employee_personal_information.js?v=time()"></script>
+<script src="/lib/js/page-scripts/user_employee_personal_information.js"></script>
 @endsection

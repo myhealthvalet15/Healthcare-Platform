@@ -23,7 +23,7 @@
 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
 @section('content')
-<link rel="stylesheet" href="/lib/css/page-styles/user_employee_prescription.css?v=time()">
+<link rel="stylesheet" href="/lib/css/page-styles/user_employee_prescription.css">
 <div class="card">
   <div class="d-flex justify-content-between align-items-center mb-3 px-3" id="add-prescription-container"
     style="margin-top:12px;">

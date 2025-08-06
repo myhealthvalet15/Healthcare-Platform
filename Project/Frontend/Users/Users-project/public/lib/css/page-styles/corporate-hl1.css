@@ -1,0 +1,108 @@
+    .form-check-input:checked {
+        background-color: green !important;
+    }
+
+    .form-check-input:checked+.form-check-label .status-label {
+        color: green;
+    }
+
+    .form-check-input:not(:checked) {
+        background-color: lightcoral !important;
+        border: 2px solid lightcoral;
+    }
+
+    .form-check-input:not(:checked)+.form-check-label .status-label {
+        color: lightcoral;
+        /* Light red text */
+    }
+
+    .form-check-input {
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .side-panel {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 400px;
+        height: 100%;
+        background-color: #fff;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+        transition: right 0.3s ease-in-out;
+        z-index: 1050;
+        overflow-y: auto;
+    }
+
+    .side-panel.open {
+        right: 0;
+    }
+
+    .side-panel-header {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .side-panel-title {
+        margin: 0;
+    }
+
+    .side-panel-body {
+        padding: 15px;
+    }
+
+    .dataTables_length {
+        position: absolute;
+        top: 1px;
+        right: 20px;
+        color: white;
+    }
+
+    div.dataTables_wrapper div.dataTables_length select {
+        margin-left: .5rem;
+        margin-right: .5rem;
+        background-color: white;
+    }
+
+    .card-body {
+        position: absolute;
+        top: 40px;
+        right: 200px;
+        color: white;
+    }
+
+    .card-datatable {
+        padding-top: 5px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    .position-relative {
+        width: 100%;
+    }
+
+    /* Hide only the "entries" text */
+    .dataTables_length label {
+        display: flex;
+        align-items: center;
+    }
+
+    .dataTables_length label::after {
+        content: '';
+        display: none;
+    }
+
+    .dataTables_length select {
+        color: black;
+    }

@@ -11,7 +11,7 @@
 {{-- PAGE SCRIPTS --}}
 @section('page-script')
     @vite(['resources/assets/js/forms-selects.js', 'resources/assets/js/extended-ui-sweetalert2.js', 'resources/assets/js/forms-typeahead.js'])
-    <link rel="stylesheet" href="/lib/css/page-styles/user_employee_outpatient.css?v=time()">
+    <link rel="stylesheet" href="/lib/css/page-styles/user_employee_outpatient.css">
     <script>
         const employeeId = @json(session('employee_id'));
         const employeeDetailsUrl = @json(route('employee-user-details'));

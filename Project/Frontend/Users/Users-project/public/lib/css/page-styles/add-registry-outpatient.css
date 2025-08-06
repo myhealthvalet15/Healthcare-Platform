@@ -1,0 +1,68 @@
+.hidden {
+    display: none
+}
+
+.add-registry-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1050
+}
+
+.spinner-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+    text-align: center
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center
+}
+
+.sk-bounce {
+    display: flex;
+    justify-content: space-between;
+    width: 50px
+}
+
+.sk-bounce-dot {
+    width: 30px;
+    height: 30px;
+    margin: 0 5px;
+    background-color: #007bff;
+    border-radius: 50%;
+    animation: sk-bounce 1.4s infinite ease-in-out both
+}
+
+@keyframes sk-bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+        opacity: 0.3
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1
+    }
+}
+
+.custom-radio {
+    position: relative;
+    cursor: pointer
+}

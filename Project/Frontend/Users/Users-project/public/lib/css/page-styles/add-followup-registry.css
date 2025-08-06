@@ -1,0 +1,84 @@
+/* Primary color for First-Aid */
+.first-aid-radio:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Warning color for Moderate */
+.moderate-radio:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+/* Danger color for Severe */
+.severe-radio:checked {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Centering the Spinner Container */
+.add-registry-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1050;
+}
+
+/* Spinner Card Background */
+.spinner-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+    text-align: center;
+}
+
+/* Existing Spinner Styles */
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sk-bounce {
+    display: flex;
+    justify-content: space-between;
+    width: 50px;
+}
+
+.sk-bounce-dot {
+    width: 30px;
+    height: 30px;
+    margin: 0 5px;
+    background-color: #007bff;
+    border-radius: 50%;
+    animation: sk-bounce 1.4s infinite ease-in-out both;
+}
+
+@keyframes sk-bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+        opacity: 0.3;
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

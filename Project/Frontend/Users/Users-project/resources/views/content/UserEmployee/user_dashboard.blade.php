@@ -67,6 +67,6 @@
     </div>
   </div>
 </div>
-<script src="/lib/js/page-scripts/user_add_hospitalization.js?v=time()"></script>
-<script src="/lib/js/page-scripts/user_dashboard.js?v=time()"></script>
+<script src="/lib/js/page-scripts/user_add_hospitalization.js"></script>
+<script src="/lib/js/page-scripts/user_dashboard.js"></script>
 @endsection

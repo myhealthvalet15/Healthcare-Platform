@@ -114,5 +114,5 @@
 </script>
 
 
-<script src="/lib/js/page-scripts/inventory.js?v=time()"></script>
+<script src="/lib/js/page-scripts/inventory.js"></script>
 @endsection

@@ -7,7 +7,7 @@
     @vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js', 'resources/assets/vendor/libs/moment/moment.js', 'resources/assets/vendor/libs/flatpickr/flatpickr.js', 'resources/assets/vendor/libs/@form-validation/popular.js', 'resources/assets/vendor/libs/@form-validation/bootstrap5.js', 'resources/assets/vendor/libs/@form-validation/auto-focus.js', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
 @section('page-script')
-    <link rel="stylesheet" href="/lib/css/page-styles/user_employee_otc.css?v=time()">
+    <link rel="stylesheet" href="/lib/css/page-styles/user_employee_otc.css">
     <script>
         const employeeId = @json(session('employee_id'));
         const employeeDetailsUrl = @json(route('employee-user-details'));
@@ -56,6 +56,6 @@
             </table>
         </div>
     </div>
-    <script src="/lib/js/page-scripts/user_employee_employee-details.js?v=time()"></script>
-    <script src="/lib/js/page-scripts/user_employee_otc.js?v=time()"></script>
+    <script src="/lib/js/page-scripts/user_employee_employee-details.js"></script>
+    <script src="/lib/js/page-scripts/user_employee_otc.js"></script>
 @endsection

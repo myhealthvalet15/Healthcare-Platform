@@ -4,21 +4,17 @@ document.addEventListener('DOMContentLoaded', function () {
         'event_name', 'from_date', 'to_date', 'event_description',
         'guest_name', 'department', 'employee_type', 'test'
     ];
-
     function clearErrors() {
         errorFields.forEach(field => {
             document.getElementById(field + '_error').textContent = '';
         });
     }
-
     function showError(field, message) {
         document.getElementById(field + '_error').textContent = message;
     }
-
     function validateForm(data) {
         let valid = true;
         clearErrors();
-
         if (!data.event_name.trim()) {
             showError('event_name', 'Event name is required.');
             valid = false;
@@ -39,12 +35,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 valid = false;
             }
         }
-
-        // Optional: event_description and guest_name can be left blank
-
         return valid;
     }
-
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = {
@@ -57,38 +49,25 @@ document.addEventListener('DOMContentLoaded', function () {
             employee_type: $('#employee_type').val(),
             test: $('#test').val()
         };
-
         if (!validateForm(formData)) {
             return;
         }
-
-        fetch('/mhc/events/store-events', {
+        apiRequest({
+            url: '/mhc/events/store-events',
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-            },
-            body: JSON.stringify(formData)
-        })
-            .then(response => response.json())
-            .then(res => {
+            data: formData,
+            onSuccess: (res) => {
                 console.log('Response:', res);
                 if (res.result) {
                     form.reset();
-
-                    // Reset select2 fields if present
                     if (window.$ && $.fn.select2) {
                         $('#department').val('').trigger('change');
                         $('#employee_type').val('').trigger('change');
                         $('#test').val('').trigger('change');
                     }
-
-                    // Show toast success message using SweetAlert2 toast
                     toastr.success('Event created successfully!');
-                    // Redirect after a short delay
                     setTimeout(() => {
-                        // window.location.href = 'https://login-users.hygeiaes.com/mhc/events/list-events';
-                    }, 2100); // Wait until the toast finishes
+                    }, 2100);
                 } else if (res.errors) {
                     Object.keys(res.errors).forEach(field => {
                         if (document.getElementById(field + '_error')) {
@@ -98,10 +77,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     Swal.fire('Error', 'An error occurred. Please try again.', 'error');
                 }
-            })
-            .catch(() => {
+            },
+            onError: () => {
                 Swal.fire('Error', 'An error occurred. Please try again.', 'error');
-            });
+            }
+        });
     });
 });
 document.addEventListener('DOMContentLoaded', function () {
@@ -114,8 +94,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.$ && $.fn.select2) {
         $('.select2').select2();
     }
-    // Department
-    // Department (multiselect)
     const departmentSelect = document.getElementById('department');
     departmentSelect.setAttribute('multiple', 'multiple');
     apiRequest({
@@ -143,11 +121,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         onError: function (error) {
-            // Optionally handle error
         }
     });
-
-    // Employee Type (multiselect)
     const employeeTypeSelect = document.getElementById('employee_type');
     employeeTypeSelect.setAttribute('multiple', 'multiple');
     apiRequest({
@@ -175,10 +150,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         onError: function (error) {
-            // Optionally handle error
         }
     });
-    // Test (multiselect)
     const testSelect = document.getElementById('test');
     testSelect.setAttribute('multiple', 'multiple');
     apiRequest({
@@ -188,13 +161,10 @@ document.addEventListener('DOMContentLoaded', function () {
         onSuccess: function (response) {
             if (response.result && response.data) {
                 const selectElement = document.getElementById('test');
-                // Remove all options before adding new ones
                 selectElement.innerHTML = '';
-
                 const subgroupsOptgroup = document.createElement('optgroup');
                 subgroupsOptgroup.label = 'Test Groups';
                 const testsInSubSubgroups = new Set();
-
                 if (Array.isArray(response.data.subgroups)) {
                     response.data.subgroups.forEach(subgroup => {
                         if (Array.isArray(subgroup.subgroups)) {
@@ -208,17 +178,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 }
-
                 if (Array.isArray(response.data.subgroups)) {
                     response.data.subgroups.forEach(subgroup => {
-                        // Subgroup header
                         const subgroupOption = document.createElement('option');
                         subgroupOption.value = `sg_${subgroup.test_group_id}`;
                         subgroupOption.textContent = `${subgroup.mother_group}: ${subgroup.test_group_name}`;
                         subgroupOption.disabled = true;
                         subgroupsOptgroup.appendChild(subgroupOption);
-
-                        // Subgroup direct tests
                         if (Array.isArray(subgroup.tests) && subgroup.tests.length > 0) {
                             const filteredTests = subgroup.tests.filter(test =>
                                 !testsInSubSubgroups.has(test.master_test_id.toString())
@@ -229,23 +195,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                 option.textContent = `  — ${test.test_name}`;
                                 subgroupsOptgroup.appendChild(option);
                             });
-
                         }
-
-                        // Subsubgroups
                         if (Array.isArray(subgroup.subgroups)) {
                             subgroup.subgroups.forEach(subSubgroup => {
                                 if (!Array.isArray(subSubgroup.tests) || subSubgroup.tests.length === 0) {
                                     return;
                                 }
-                                // Subsubgroup header
                                 const subSubgroupOption = document.createElement('option');
                                 subSubgroupOption.value = `ssg_${subSubgroup.test_group_id}`;
                                 subSubgroupOption.textContent = `  — ${subSubgroup.test_group_name}`;
                                 subSubgroupOption.disabled = true;
                                 subgroupsOptgroup.appendChild(subSubgroupOption);
-
-                                // Subsubgroup tests
                                 subSubgroup.tests.forEach(test => {
                                     const option = document.createElement('option');
                                     option.value = test.master_test_id;
@@ -256,12 +216,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 }
-
                 if (subgroupsOptgroup.children.length > 0) {
                     selectElement.appendChild(subgroupsOptgroup);
                 }
-
-                // Individual tests
                 if (Array.isArray(response.data.individual_tests) && response.data.individual_tests.length > 0) {
                     const individualOptgroup = document.createElement('optgroup');
                     individualOptgroup.label = 'Individual Tests';
@@ -275,8 +232,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         selectElement.appendChild(individualOptgroup);
                     }
                 }
-
-                // Re-initialize select2 after updating options
                 if (window.$ && $.fn.select2) {
                     $('#test').select2('destroy');
                     $('#test').select2({
@@ -291,7 +246,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         onError: function (error) {
-            // Optionally handle error
         }
     });
 });

@@ -4,14 +4,17 @@
 @vite([
 'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
 'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
-'resources/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.scss'
+'resources/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.scss',
+'resources/assets/vendor/libs/flatpickr/flatpickr.scss',
 ])
 @endsection
 @section('page-style')
 @vite(['resources/assets/vendor/scss/pages/page-profile.scss'])
 @endsection
 @section('vendor-script')
-@vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js'])
+@vite(['resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
+'resources/assets/vendor/libs/flatpickr/flatpickr.js',
+])
 @endsection
 @section('page-script')
 @vite(['resources/assets/js/pages-profile.js'])
@@ -67,6 +70,5 @@
     </div>
   </div>
 </div>
-<script src="/lib/js/page-scripts/user_add_hospitalization.js"></script>
 <script src="/lib/js/page-scripts/user_dashboard.js"></script>
 @endsection

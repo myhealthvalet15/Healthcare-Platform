@@ -231,14 +231,6 @@ $(document).ready(function () {
         if ($('#dropzone-basic')[0].dropzone.files.length > 0) {
             formData.append('image', $('#dropzone-basic')[0].dropzone.files[0]);
         }
-        $.ajaxSetup({
-            headers: {
-                // 'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        // to start here 
         $.ajax({
             url: '/hra/add-question',
             type: 'POST',
@@ -286,7 +278,6 @@ $(document).ready(function () {
                 });
             }
         });
-        // to end here 
     });
 
 

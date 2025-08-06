@@ -28,7 +28,7 @@ $(function () {
         dt_row_grouping_table = $('.dt-row-grouping');
     var groupColumn = 0;
     var sortColumn = 1;
-    const employeeId = "{{ session('employee_id') }}";
+
     if (dt_row_grouping_table.length) {
         var groupingTable = dt_row_grouping_table.DataTable({
             ajax: {
@@ -154,7 +154,6 @@ $(function () {
                     const employeeName = firstValidRow.employee_name || 'N/A';
                     const employeeGender = firstValidRow.employee_gender || 'N/A';
                     const employeeAge = firstValidRow.employee_age || 'N/A';
-                    const employeeId = "{{ session('employee_id') }}".toLowerCase();
                     const addButton = `
       <a href="https://login-users.hygeiaes.com/prescription/add-employee-prescription/${employeeId}"
    class="btn btn-secondary add-new btn-primary waves-effect waves-light ms-3">
@@ -318,9 +317,9 @@ $(function () {
                 }
             }
         });
-        const employeeName = "{{ session('employee_name') ?? 'John Doe' }}";
-        const employeeGender = "{{ session('employee_gender') ?? 'Male' }}";
-        const employeeAge = "{{ session('employee_age') ?? '35' }}";
+        const employeeName = "{{ session('employee_name') }}";
+        const employeeGender = "{{ session('employee_gender') }}";
+        const employeeAge = "{{ session('employee_age') }}";
         const addButton = `
   <a href="https://login-users.hygeiaes.com/prescription/add-employee-prescription/${employeeId}"
      class="btn btn-secondary add-new btn-primary waves-effect waves-light ms-3">

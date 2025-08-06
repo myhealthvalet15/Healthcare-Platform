@@ -63,7 +63,6 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     Route::get('/getAllOHCDetails/{locationId}', [CorporateOhcController::class, 'getAllOHCDetails']);
-    Route::get('/getPharmacyDetails/{locationId}', [CorporateOhcController::class, 'getPharmacyDetails']);
     Route::post('/addPharmacyData', [CorporateOhcController::class, 'addPharmacyDataDetails']);
     Route::post('/addCorporateOHCData', [CorporateOhcController::class, 'addCorporateOHCDetails']);
     Route::put('/modifyCorporateOHC/{id}', [CorporateOhcController::class, 'updateCorporateOHCById']);
@@ -108,7 +107,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/addPrescriptionTemplate', [PrescriptionController::class, 'addPrescriptionTemplate'])->name('addPrescriptionTemplate');
     Route::get('/getPrescriptionTemplateById/{id}', [PrescriptionController::class, 'getPrescriptionTemplateById']);
     Route::put('/updatePrescriptionTemplate/{id}', [PrescriptionController::class, 'updatePrescriptionTemplate']);
-    Route::get('/getOnlyPrescriptionTemplate/{locationId}', [PrescriptionController::class, 'getOnlyPrescriptionTemplate']);
     Route::get('/getEmployeePrescription/{userId}', [PrescriptionController::class, 'getEmployeePrescription']);
     Route::get('/getStockByDrugId/{drugId}', [PrescriptionController::class, 'getStockByDrugId']);
     Route::get('/getStockByDrugIdAndPharmacyId/{drugId}/{pharmacyId}', [PrescriptionController::class, 'getStockByDrugIdAndPharmacyId']);
@@ -129,5 +127,7 @@ Route::middleware(['authGuard.corporate.employee'])->group(function () {
     Route::get('/getHealthPlan/{corporateId}/{healthplanId}', [_CorporateHealthplan::class, 'getHealthplan']);
     Route::get('/getPrintPrescriptionById/{id}', [PrescriptionController::class, 'getPrintPrescriptionById']);
     Route::post('/addPrescription', [PrescriptionController::class, 'addPrescription'])->name('addEmployeePrescription');
+   Route::get('/getOnlyPrescriptionTemplate/{locationId}', [PrescriptionController::class, 'getOnlyPrescriptionTemplate']);
+     Route::get('/getPharmacyDetails/{locationId}', [CorporateOhcController::class, 'getPharmacyDetails']);
    
 });

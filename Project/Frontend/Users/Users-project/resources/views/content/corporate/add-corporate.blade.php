@@ -132,5 +132,5 @@
         </div>
     </div>
 </div>
-<script src="/lib/js/page-scripts/add-excel.js"></script>
+<script src="/lib/js/page-scripts/add-excel.js?v=time()"></script>
 @endsection

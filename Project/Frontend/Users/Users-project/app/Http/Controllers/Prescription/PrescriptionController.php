@@ -205,7 +205,7 @@ class PrescriptionController extends Controller
                 return "Invalid Request";
             }
             if (!$employee_id || !ctype_alnum($employee_id)) {
-                return "Invalid Request";
+                return "Invalid Requests";
             }
             // return $employee_id;
             // Retrieve location ID from session
@@ -238,13 +238,13 @@ class PrescriptionController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . request()->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getOnlyPrescriptionTemplate/' . $locationId);
-          // return $prescriptionResponse;
+          //return $prescriptionResponse;
             $pharmacyResponse = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . request()->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getPharmacyDetails/' . $locationId);
-           // return $pharmacyResponse;
+          // return $pharmacyResponse;
             if ($employeeResponse->successful() && $prescriptionResponse->successful() && $pharmacyResponse->successful()) {
                 $employeeData = $employeeResponse->json();
                 $prescriptionData = $prescriptionResponse->json();

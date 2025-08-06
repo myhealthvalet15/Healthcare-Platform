@@ -9,7 +9,7 @@
 * @returns {Promise<void>} - Resolves when the request completes.
 */
 async function apiRequest({ url, method = 'GET', data = null, headers = {}, onSuccess, onError }) {
-    try {
+    try { 
         const defaultHeaders = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',

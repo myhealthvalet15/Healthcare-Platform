@@ -71,12 +71,15 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
     const bannerInput = document.getElementById('editBanner');
     const profilePic = profilePicInput.files[0];
     const banner = bannerInput.files[0];
+
     const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/tiff', 'image/webp'];
+
     if (!firstName) return showToast('error', 'Validation Error', 'First name is required.');
     if (!lastName) return showToast('error', 'Validation Error', 'Last name is required.');
     if (!dob) return showToast('error', 'Validation Error', 'Date of birth is required.');
     if (!gender) return showToast('error', 'Validation Error', 'Gender is required.');
     if (!phone) return showToast('error', 'Validation Error', 'Phone number is required.');
+
     if (profilePic) {
         if (!validImageTypes.includes(profilePic.type)) {
             return showToast('error', 'Invalid Image', 'Profile picture must be a valid image type.');
@@ -85,6 +88,7 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
             return showToast('error', 'File Too Large', 'Profile picture must be under 200KB.');
         }
     }
+
     if (banner) {
         if (!validImageTypes.includes(banner.type)) {
             return showToast('error', 'Invalid Image', 'Banner image must be a valid image type.');
@@ -93,6 +97,7 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
             return showToast('error', 'File Too Large', 'Banner image must be under 1MB.');
         }
     }
+
     function fileToBase64(file) {
         return new Promise((resolve, reject) => {
             if (!file) resolve(null);
@@ -102,6 +107,7 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
             reader.readAsDataURL(file);
         });
     }
+
     Swal.fire({
         title: "Are you sure?",
         text: "Do you want to update your profile?",
@@ -112,11 +118,13 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
         confirmButtonText: "Yes, update it!"
     }).then(async (result) => {
         if (!result.isConfirmed) return;
-        // const employeeId = "{{ session('employee_id') }}";
+
         const updateUrl = `/UserEmployee/updateProfileDetails/${employeeId}`;
+
         try {
             const profilePicBase64 = await fileToBase64(profilePic);
             const bannerBase64 = await fileToBase64(banner);
+
             const payload = {
                 first_name: firstName,
                 last_name: lastName,
@@ -131,23 +139,25 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
                 profile_pic: profilePicBase64,
                 banner: bannerBase64
             };
-            const response = await fetch(updateUrl, {
+
+            await apiRequest({
+                url: updateUrl,
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                data: payload,
+                onSuccess: (data) => {
+                    showToast('success', 'Success', 'Profile updated successfully!');
+                    fetchEmployeeDetails(employeeId);
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+                        if (modal) modal.hide();
+                        document.getElementById('editProfileCard').style.display = 'none';
+                    }, 400);
                 },
-                body: JSON.stringify(payload)
+                onError: (message) => {
+                    showToast('error', 'Error', message || 'Failed to update profile.');
+                }
             });
-            if (!response.ok) throw new Error('Server error');
-            const data = await response.json();
-            showToast('success', 'Success', 'Profile updated successfully!');
-            fetchEmployeeDetails(employeeId);
-            setTimeout(() => {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
-                if (modal) modal.hide();
-                document.getElementById('editProfileCard').style.display = 'none';
-            }, 400);
+
         } catch (error) {
             console.error('Error:', error);
             showToast('error', 'Error', 'Failed to update profile.');

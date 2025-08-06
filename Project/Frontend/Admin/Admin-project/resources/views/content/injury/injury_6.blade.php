@@ -1,5 +1,5 @@
 <head>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 </head>
 <div class="container" style="display: flex; flex-direction: column; gap: 30px; align-items: center;">
     <!-- Injury List Table -->
@@ -10,20 +10,22 @@
     </div>
 
     <!-- Left Table - Add Injury Form (Initially hidden) -->
-    <div id="addInjuryForm" style="display: none; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); border-radius: 8px; background-color: #fff; width: 100%; max-width: 500px; padding: 30px;">
+    <div id="addInjuryForm"
+        style="display: none; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); border-radius: 8px; background-color: #fff; width: 100%; max-width: 500px; padding: 30px;">
         <table class="table table-striped table-nomargin table-mail shownbtnn">
-            
-        <tbody>
-    <tr>
-        <td style="display: flex; flex-direction: row; align-items: center;">
-            <!-- Input Fields -->
-            <input type="text" class="typ form-control" name="name" placeholder="Enter Injury name" style="margin-right: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
 
-            <input type="hidden" class="cat" name="cat" value="6">
-            <input type="hidden" class="active_status_id" name="active_status_id" value="1">
-            
-            <!-- Add Button -->
-            <input type="button" class="btnsysadd" value="Add" style="
+            <tbody>
+                <tr>
+                    <td style="display: flex; flex-direction: row; align-items: center;">
+                        <!-- Input Fields -->
+                        <input type="text" class="typ form-control" name="name" placeholder="Enter Injury name"
+                            style="margin-right: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+
+                        <input type="hidden" class="cat" name="cat" value="6">
+                        <input type="hidden" class="active_status_id" name="active_status_id" value="1">
+
+                        <!-- Add Button -->
+                        <input type="button" class="btnsysadd" value="Add" style="
                 background-color: #007bff; 
                 color: white; 
                 border: none; 
@@ -31,15 +33,16 @@
                 padding: 10px 15px; 
                 cursor: pointer; 
                 transition: background-color 0.3s;">
-        </td>
-    </tr>
-</tbody>
+                    </td>
+                </tr>
+            </tbody>
 
         </table>
     </div>
 
     <!-- Injury List Table -->
-    <table class="table table-striped table-nomargin table-mail" style="box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); border-radius: 8px; background-color: #fff; width: 100%; max-width: 900px;">
+    <table class="table table-striped table-nomargin table-mail"
+        style="box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); border-radius: 8px; background-color: #fff; width: 100%; max-width: 900px;">
         <thead>
             <tr>
                 <th class="sys text-center" style="width: 10%;">#</th>
@@ -81,15 +84,15 @@
 
                         <!-- Button Hover Effects -->
                         <style>
-                        .btnupsys:hover {
-                            background-color: #218838;
-                            transform: translateY(-2px);
-                        }
+                            .btnupsys:hover {
+                                background-color: #218838;
+                                transform: translateY(-2px);
+                            }
 
-                        .btnupsys:focus {
-                            outline: none;
-                            box-shadow: 0 0 5px rgba(40, 167, 69, 0.7);
-                        }
+                            .btnupsys:focus {
+                                outline: none;
+                                box-shadow: 0 0 5px rgba(40, 167, 69, 0.7);
+                            }
                         </style>
 
                         <!-- Delete Form with updated icon and button style -->
@@ -120,129 +123,129 @@
     <div class="d-flex justify-content-center mt-3">
         {!! $injuries->links('pagination::bootstrap-5') !!}
     </div>
-    
+
 </div>
 
 
 <script>
-document.getElementById('showFormBtn').addEventListener('click', function() {
-            var form = document.getElementById('addInjuryForm');
+    document.getElementById('showFormBtn').addEventListener('click', function () {
+        var form = document.getElementById('addInjuryForm');
 
-            // Toggle form visibility
-            // form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        // Toggle form visibility
+        // form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+
+    $(document).ready(function () {
+        $('.frombtnn').click(function (e) {
+            e.preventDefault();
+
+            // Get the corresponding form container for the clicked button
+            $(this).closest('.container').find('#addInjuryForm').toggle(); // Toggles visibility
         });
 
-        $(document).ready(function() {
-            $('.frombtnn').click(function(e) {
-                e.preventDefault();
+        $('.btnsysadd').click(function (e) {
+            e.preventDefault();
 
-                // Get the corresponding form container for the clicked button
-                $(this).closest('.container').find('#addInjuryForm').toggle(); // Toggles visibility
-            });
+            var $row = $(this).closest('tr');
 
-            $('.btnsysadd').click(function(e) {
-                e.preventDefault();
+            var name = $row.find('.typ').val().trim();
 
-                var $row = $(this).closest('tr');
+            var cat = $row.find('.cat').val().trim();
 
-                var name = $row.find('.typ').val().trim();
-
-                var cat = $row.find('.cat').val().trim();
-
-                var active_status_id = $row.find('.active_status_id').val().trim();
+            var active_status_id = $row.find('.active_status_id').val().trim();
 
 
 
-                var token = $('meta[name="csrf-token"]').attr('content');
+            var token = $('meta[name="csrf-token"]').attr('content');
 
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('injuryadd') }}',
-                    data: {
-                        op_component_name: name,
-                        op_component_type: cat,
-                        active_status: active_status_id,
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('injuryadd') }}',
+                data: {
+                    op_component_name: name,
+                    op_component_type: cat,
+                    active_status: active_status_id,
 
-                        _token: token
-                    },
-                    success: function(response) {
-                        var messages = $('.messages');
+                    _token: token
+                },
+                success: function (response) {
+                    var messages = $('.messages');
 
-                        var successHtml = '<div class="alert alert-success">' +
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></</strong> ' +
-                            response.message +
-                            '</div>';
+                    var successHtml = '<div class="alert alert-success">' +
+                        '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                        '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></</strong> ' +
+                        response.message +
+                        '</div>';
 
-                        $(messages).html(successHtml);
-
-
-                        console.log(response);
-                        setTimeout(function() {
-                            window.location.href = ''; // Replace with your target URL
-                        }, 2000);
+                    $(messages).html(successHtml);
 
 
-                        toastr.success(response.message, 'Success');
+                    console.log(response);
+                    setTimeout(function () {
+                        window.location.href = ''; // Replace with your target URL
+                    }, 2000);
+
+
+                    toastr.success(response.message, 'Success');
 
 
 
-                    },
-                    error: function(response) {
-                        alert(response.error);
-                        console.error(xhr);
+                },
+                error: function (response) {
+                    alert(response.error);
+                    console.error(xhr);
 
-                    }
-                });
+                }
             });
         });
+    });
 
-        $(document).ready(function() {
-            $('.btnupsys').click(function(e) {
+    $(document).ready(function () {
+        $('.btnupsys').click(function (e) {
 
-                var $row = $(this).closest('tr');
+            var $row = $(this).closest('tr');
 
-                var mdinjuryValue = $row.find('.mdinjury').val().trim();
+            var mdinjuryValue = $row.find('.mdinjury').val().trim();
 
-                var injuryIdValue = $row.find('.op_component_id').val().trim();
-                var op_component_type = $row.find('.op_component_type').val().trim();
-
-
-                var token = $('meta[name="csrf-token"]').attr('content');
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('injuryupdate') }}',
-                    data: {
-                        op_component_name: mdinjuryValue,
-                        op_component_id: injuryIdValue,
-                        op_component_type: op_component_type,
-                        _token: token
-                    },
-                    success: function(response) {
-
-                        var messages = $('.messages');
-
-                        var successHtml = '<div class="alert alert-success">' +
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></</strong> ' +
-                            response.message +
-                            '</div>';
-
-                        $(messages).html(successHtml);
+            var injuryIdValue = $row.find('.op_component_id').val().trim();
+            var op_component_type = $row.find('.op_component_type').val().trim();
 
 
-                        console.log(response);
+            var token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('injuryupdate') }}',
+                data: {
+                    op_component_name: mdinjuryValue,
+                    op_component_id: injuryIdValue,
+                    op_component_type: op_component_type,
+                    _token: token
+                },
+                success: function (response) {
 
-                    },
-                    error: function(xhr) {
-                        alert("Error: " + xhr.responseText);
+                    var messages = $('.messages');
+
+                    var successHtml = '<div class="alert alert-success">' +
+                        '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                        '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></</strong> ' +
+                        response.message +
+                        '</div>';
+
+                    $(messages).html(successHtml);
 
 
-                        console.error(xhr);
+                    console.log(response);
 
-                    }
-                });
+                },
+                error: function (xhr) {
+                    alert("Error: " + xhr.responseText);
+
+
+                    console.error(xhr);
+
+                }
             });
         });
+    });
 
 </script>

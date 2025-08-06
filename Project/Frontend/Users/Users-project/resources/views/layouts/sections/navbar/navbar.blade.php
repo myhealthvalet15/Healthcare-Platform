@@ -260,7 +260,7 @@ $navbarDetached = ($navbarDetached ?? '');
                 </div>
               </li>
               <form method="GET" id="logout-form" action="{{ route('auth-logout') }}">
-
+                @csrf
               </form>
             </ul>
           </li>

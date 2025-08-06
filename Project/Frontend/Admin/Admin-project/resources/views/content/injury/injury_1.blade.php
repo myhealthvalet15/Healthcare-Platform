@@ -1,5 +1,5 @@
 <head>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 </head>
 <div class="container" style="display: flex; flex-direction: column; gap: 30px; align-items: center;">
     <!-- Injury List Table -->
@@ -80,15 +80,15 @@
 
                         <!-- Button Hover Effects -->
                         <style>
-                        .btnupsys:hover {
-                            background-color: #218838;
-                            transform: translateY(-2px);
-                        }
+                            .btnupsys:hover {
+                                background-color: #218838;
+                                transform: translateY(-2px);
+                            }
 
-                        .btnupsys:focus {
-                            outline: none;
-                            box-shadow: 0 0 5px rgba(40, 167, 69, 0.7);
-                        }
+                            .btnupsys:focus {
+                                outline: none;
+                                box-shadow: 0 0 5px rgba(40, 167, 69, 0.7);
+                            }
                         </style>
 
                         <!-- Delete Form with updated icon and button style -->
@@ -123,127 +123,127 @@
 </div>
 
 <script>
-document.getElementById('showFormBtn').addEventListener('click', function() {
-    var form = document.getElementById('addInjuryForm');
+    document.getElementById('showFormBtn').addEventListener('click', function () {
+        var form = document.getElementById('addInjuryForm');
 
-    // Toggle form visibility
-    // form.style.display = form.style.display === 'none' ? 'block' : 'none';
-});
-
-$(document).ready(function() {
-    $('.frombtnn').click(function(e) {
-        e.preventDefault();
-
-        // Get the corresponding form container for the clicked button
-        $(this).closest('.container').find('#addInjuryForm').toggle(); // Toggles visibility
+        // Toggle form visibility
+        // form.style.display = form.style.display === 'none' ? 'block' : 'none';
     });
 
-    $(document).ready(function() {
-        $('.btnsysadd').click(function(e) {
+    $(document).ready(function () {
+        $('.frombtnn').click(function (e) {
             e.preventDefault();
 
-            // Get input values
-            var name = $('.typ').val().trim();
-            var cat = $('.cat').val().trim();
-            var active_status_id = $('.active_status_id').val().trim();
-            var token = $('meta[name="csrf-token"]').attr('content'); // CSRF Token
+            // Get the corresponding form container for the clicked button
+            $(this).closest('.container').find('#addInjuryForm').toggle(); // Toggles visibility
+        });
 
-            // Basic validation
-            if (!name) {
-                toastr.error('Injury name is required.', 'Error');
-                return;
-            }
+        $(document).ready(function () {
+            $('.btnsysadd').click(function (e) {
+                e.preventDefault();
 
-            // AJAX Request
-            $.ajax({
-                type: 'POST',
-                url: '{{ route('injuryadd') }}',
-                data: {
-                    op_component_name: name,
-                    op_component_type: cat,
-                    active_status: active_status_id,
-                    _token: token
-                },
-                success: function(response) {
-                    // Display success message
-                    var successHtml = `
+                // Get input values
+                var name = $('.typ').val().trim();
+                var cat = $('.cat').val().trim();
+                var active_status_id = $('.active_status_id').val().trim();
+                var token = $('meta[name="csrf-token"]').attr('content'); // CSRF Token
+
+                // Basic validation
+                if (!name) {
+                    toastr.error('Injury name is required.', 'Error');
+                    return;
+                }
+
+                // AJAX Request
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('injuryadd') }}',
+                    data: {
+                        op_component_name: name,
+                        op_component_type: cat,
+                        active_status: active_status_id,
+                        _token: token
+                    },
+                    success: function (response) {
+                        // Display success message
+                        var successHtml = `
                     <div class="alert alert-success">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> 
                         ${response.message}
                     </div>`;
-                    $('.messages').html(successHtml);
+                        $('.messages').html(successHtml);
 
-                    // Reset form
-                    $('#injuryForm')[0].reset();
+                        // Reset form
+                        $('#injuryForm')[0].reset();
 
 
-                    setTimeout(function() {
-                        $('#tab-content-3').show();
-                        window.location.href = '';
+                        setTimeout(function () {
+                            $('#tab-content-3').show();
+                            window.location.href = '';
 
-                    }, 1000);
+                        }, 1000);
 
-                    toastr.success(response.message, 'Success');
-                    console.log(response);
+                        toastr.success(response.message, 'Success');
+                        console.log(response);
+                    },
+                    error: function (xhr) {
+                        var response = xhr.responseJSON || {};
+                        var errorMessage = response.message ||
+                            'An error occurred. Please try again.';
+                        toastr.error(errorMessage, 'Error');
+                        console.error(xhr);
+                    }
+                });
+            });
+        });
+    });
+
+    $(document).ready(function () {
+        $('.btnupsys').click(function (e) {
+
+            var $row = $(this).closest('tr');
+
+            var mdinjuryValue = $row.find('.mdinjury').val().trim();
+
+            var injuryIdValue = $row.find('.op_component_id').val().trim();
+            var op_component_type = $row.find('.op_component_type').val().trim();
+
+
+            var token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('injuryupdate') }}',
+                data: {
+                    op_component_name: mdinjuryValue,
+                    op_component_id: injuryIdValue,
+                    op_component_type: op_component_type,
+                    _token: token
                 },
-                error: function(xhr) {
-                    var response = xhr.responseJSON || {};
-                    var errorMessage = response.message ||
-                        'An error occurred. Please try again.';
-                    toastr.error(errorMessage, 'Error');
+                success: function (response) {
+
+                    var messages = $('.messages');
+
+                    var successHtml = '<div class="alert alert-success">' +
+                        '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                        '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></</strong> ' +
+                        response.message +
+                        '</div>';
+
+                    $(messages).html(successHtml);
+
+
+                    console.log(response);
+
+                },
+                error: function (xhr) {
+                    alert("Error: " + xhr.responseText);
+
+
                     console.error(xhr);
+
                 }
             });
         });
     });
-});
-
-$(document).ready(function() {
-    $('.btnupsys').click(function(e) {
-
-        var $row = $(this).closest('tr');
-
-        var mdinjuryValue = $row.find('.mdinjury').val().trim();
-
-        var injuryIdValue = $row.find('.op_component_id').val().trim();
-        var op_component_type = $row.find('.op_component_type').val().trim();
-
-
-        var token = $('meta[name="csrf-token"]').attr('content');
-        $.ajax({
-            type: 'POST',
-            url: '{{ route('injuryupdate') }}',
-            data: {
-                op_component_name: mdinjuryValue,
-                op_component_id: injuryIdValue,
-                op_component_type: op_component_type,
-                _token: token
-            },
-            success: function(response) {
-
-                var messages = $('.messages');
-
-                var successHtml = '<div class="alert alert-success">' +
-                    '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
-                    '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></</strong> ' +
-                    response.message +
-                    '</div>';
-
-                $(messages).html(successHtml);
-
-
-                console.log(response);
-
-            },
-            error: function(xhr) {
-                alert("Error: " + xhr.responseText);
-
-
-                console.error(xhr);
-
-            }
-        });
-    });
-});
 </script>

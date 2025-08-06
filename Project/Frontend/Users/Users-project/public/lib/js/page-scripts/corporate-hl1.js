@@ -84,9 +84,7 @@
         var dt_responsive_table = $('.dt-responsive');
         var currentRow = null;
         var currentId = null;
-       // var dataSet = @json($hl1);
-        var dataSet = @json($hl1 ?? []);
-       // console.log(dataSet);
+      
         var dt_responsive = dt_responsive_table.DataTable({
             data:dataSet,
             columns: [

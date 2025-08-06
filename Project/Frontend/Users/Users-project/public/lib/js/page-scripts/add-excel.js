@@ -38,27 +38,24 @@ $(document).ready(function () {
           let formData = new FormData();
           let file = myDropzone.getQueuedFiles()[0];
           formData.append("file", file);
-          showToast("info", "Uploading file, please wait...");
           formData.append("corporate_id", document.getElementById("corporate_id").value ?? "");
           formData.append("location_id", document.getElementById("location_id").value ?? "");
-          $.ajax({
+
+          showToast("info", "Uploading file, please wait...");
+          document.getElementById("preloader").style.display = "block";
+
+          apiRequest({
             url: "/corporate/upload/add-corporate-users",
-            type: "POST",
+            method: "POST",
             data: formData,
-            contentType: false,
-            processData: false,
-            headers: {
-              Accept: "application/json",
-              "X-CSRF-TOKEN": document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content"),
-            },
-            success: function (response) {
+            onSuccess: function (response) {
               document.getElementById("preloader").style.display = "none";
               myDropzone.removeAllFiles(true);
-              if (response.result === 'success') {
+
+              if (response.result === "success") {
                 const successMessage = `${response.message} ${response.valid_rows} rows accepted, ${response.errors} rows will be rejected.`;
                 showToast("success", successMessage);
+
                 window.open(
                   "/corporate/view-uploaded-users/" +
                   document.getElementById("corporate_id").value +
@@ -68,22 +65,24 @@ $(document).ready(function () {
                   response.file_name,
                   "_blank"
                 );
+
                 corporateDropdown.selectedIndex = 0;
                 locationDropdown.selectedIndex = 0;
               } else {
                 showToast("error", response.message);
               }
             },
-            error: function (xhr, status, error) {
+            onError: function (errorMessage) {
               document.getElementById("preloader").style.display = "none";
-              const response = JSON.parse(xhr.responseText);
-              showToast("error", response.message);
-            },
+              showToast("error", errorMessage);
+            }
           });
+
         } else {
           showToast("error", "Please add a file before uploading.");
           document.getElementById("preloader").style.display = "none";
         }
+
       });
   }
   const apiUrl =

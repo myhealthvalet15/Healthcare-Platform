@@ -77,5 +77,12 @@
     </div>
   </div>
 </div>
+<script>
+  const employeeId = "{{ session('employee_id') }}".toLowerCase();
+  const employeeDetailsUrl = "{{ route('employee-user-details') }}?employee_id=" + employeeId;
+  const employeeName = "{{ session('employee_name') }}";
+  const employeeGender = "{{ session('employee_gender') }}";
+  const employeeAge = "{{ session('employee_age') }}";
+</script>
 <script src="/lib/js/page-scripts/user_employee_prescription.js"></script>
 @endsection

@@ -74,7 +74,7 @@
     </div>
     <div class="offcanvas-body flex-grow-1">
         <form class="add-new-record pt-0 row g-2" id="form-add-new-record" method="post" action="/hl1create">
-
+            @csrf
             <div class="col-sm-12">
                 <label class="form-label" for="hl1_name">Department Name</label>
                 <div class="input-group input-group-merge">
@@ -117,7 +117,7 @@
     </div>
     <div class="offcanvas-body flex-grow-1">
         <form id="editForm" method="POST">
-
+            @csrf
             <div class="mb-3">
                 <label for="edit_hl1_name" class="form-label">Department
                     Name</label>
@@ -162,6 +162,8 @@
         </div>
     </div>
 </div>
-
+<script>
+    var dataSet = @json($hl1 ?? []);
+</script>
 <script src="/lib/js/page-scripts/corporate-hl1.js"></script>
 @endsection

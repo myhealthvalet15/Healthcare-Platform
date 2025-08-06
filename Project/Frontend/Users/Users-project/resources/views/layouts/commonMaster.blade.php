@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 @php
-    $menuFixed =
-        $configData['layout'] === 'vertical'
-            ? $menuFixed ?? ''
-            : ($configData['layout'] === 'front'
-                ? ''
-                : $configData['headerType']);
-    $navbarType =
-        $configData['layout'] === 'vertical'
-            ? $configData['navbarType'] ?? ''
-            : ($configData['layout'] === 'front'
-                ? 'layout-navbar-fixed'
-                : '');
-    $isFront = ($isFront ?? '') == true ? 'Front' : '';
-    $contentLayout = isset($container) ? ($container === 'container-xxl' ? 'layout-compact' : 'layout-wide') : '';
+$menuFixed =
+$configData['layout'] === 'vertical'
+? $menuFixed ?? ''
+: ($configData['layout'] === 'front'
+? ''
+: $configData['headerType']);
+$navbarType =
+$configData['layout'] === 'vertical'
+? $configData['navbarType'] ?? ''
+: ($configData['layout'] === 'front'
+? 'layout-navbar-fixed'
+: '');
+$isFront = ($isFront ?? '') == true ? 'Front' : '';
+$contentLayout = isset($container) ? ($container === 'container-xxl' ? 'layout-compact' : 'layout-wide') : '';
 @endphp
 
 <html lang="{{ session()->get('locale') ?? app()->getLocale() }}"
@@ -25,6 +25,7 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
@@ -32,6 +33,7 @@
         {{ config('variables.templateName') ? config('variables.templateName') : 'TemplateName' }} -
         {{ config('variables.templateSuffix') ? config('variables.templateSuffix') : 'TemplateSuffix' }}
     </title>
+
     <meta name="description"
         content="{{ config('variables.templateDescription') ? config('variables.templateDescription') : '' }}" />
     <meta name="keywords"

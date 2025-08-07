@@ -143,5 +143,8 @@
 </div>
 <!-- /Validation Wizard -->
 </div>
+<script>
+    const url = "{{ route('get-ohc-menu', ['id' => $corporateuser['id']]) }}";
+</script>
    <script src="/lib/js/page-scripts/ohc-rights.js"></script>
 @endsection

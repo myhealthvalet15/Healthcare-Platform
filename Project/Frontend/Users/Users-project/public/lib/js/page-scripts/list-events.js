@@ -6,22 +6,29 @@ document.addEventListener('DOMContentLoaded', function (e) {
         const preloader = document.getElementById('preloader');
         const table = document.getElementById('drugtemplate-table');
         const tbody = document.getElementById('drugtemplate-body');
-
     })();
-
     $(function () {
         var dt_basic_table = $('.datatables-basic');
-
         if (dt_basic_table.length) {
             var dt_basic = dt_basic_table.DataTable({
-                ajax: {
-                    url: '/mhc/events/get-events',
-                    dataSrc: function (json) {
-                        console.log(json);
-                        return json.result && json.data.length > 0 ? json.data : []; // Ensure an empty array if no data
-                    }
+                ajax: function (data, callback, settings) {
+                    apiRequest({
+                        url: '/mhc/events/get-events',
+                        method: 'GET',
+                        onSuccess: function (response) {
+                            console.log(response);
+                            if (response.result && response.data.length > 0) {
+                                callback({ data: response.data });
+                            } else {
+                                callback({ data: [] });
+                            }
+                        },
+                        onError: function (errorMessage) {
+                            console.error(errorMessage);
+                            callback({ data: [] });
+                        }
+                    });
                 },
-
                 columns: [
                     {
                         data: 'event_id',
@@ -37,8 +44,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                             const toDate = new Date(row.to_datetime).toLocaleDateString();
                             return `${fromDate}<br>${toDate}`;
                         }
-                    }
-                    ,
+                    },
                     {
                         data: 'event_name',
                         title: 'Event Name',
@@ -54,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
     `;
                         }
                     },
-
                     {
                         data: 'guest_name',
                         title: 'Guest Name',
@@ -65,9 +70,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         title: 'Employee Type / Department',
                         width: '20%',
                         render: function (data) {
-                            const empTypes = data?.employee_type_names
-                                ? Object.values(data.employee_type_names).join(', ')
-                                : 'N/A';
+                            const empTypes = data?.employee_type_names ? Object.values(data.employee_type_names).join(', ') : 'N/A';
                             const depts = data?.department_names
                                 ? Object.values(data.department_names)
                                     .map(name => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
@@ -76,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
                             return ` ${empTypes}<br> ${depts}`;
                         }
                     },
-
                     {
                         data: null,
                         title: 'Action',
@@ -95,10 +97,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         }
                     }
                 ],
-
-
                 order: [[0, 'desc']],
-                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"B>>' +
+                dom:
+                    '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"B>>' +
                     '<"col-sm-12"f>' +
                     't' +
                     '<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
@@ -110,29 +111,28 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         previous: '<i class="ti ti-chevron-left ti-sm"></i>'
                     }
                 },
-                buttons: [{
-                    extend: 'excelHtml5',
-                    text: '<i class="fa-sharp fa-solid fa-file-excel"></i>',
-                    titleAttr: 'Export to Excel',
-                    filename: 'OTC Export',
-                    className: 'btn-link ms-3',
-                    exportOptions: { modifier: { page: 'all' } },
-                    columns: null
-                }],
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa-sharp fa-solid fa-file-excel"></i>',
+                        titleAttr: 'Export to Excel',
+                        filename: 'OTC Export',
+                        className: 'btn-link ms-3',
+                        exportOptions: { modifier: { page: 'all' } },
+                        columns: null
+                    }
+                ],
                 responsive: true,
                 initComplete: function () {
                     var api = this.api();
-
                     api.rows().every(function () {
                         var rowData = this.data();
                         var expiryDate = new Date(rowData.expiry_date);
                         var today = new Date();
                         var diffTime = expiryDate - today;
-                        var diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // Convert milliseconds to days
-
-                        // Check if expiry date is between 45 and 60 days
+                        var diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
                         if (diffDays >= 45 && diffDays <= 60) {
-                            $(this.node()).addClass('highlight-row'); // Highlight the row
+                            $(this.node()).addClass('highlight-row');
                         }
                     });
                     var count = api.data().count();
@@ -142,21 +142,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         const eventId = $(this).data('id');
                         const rowData = dt_basic.row($(this).closest('tr')).data();
                         const details = rowData.details || {};
-
                         const empTypes = details?.employee_type_names
                             ? Object.values(details.employee_type_names).join(', ')
                             : 'N/A';
-
                         const depts = details?.department_names
                             ? Object.values(details.department_names)
                                 .map(name => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
                                 .join(', ')
                             : 'N/A';
-
                         const tests = details?.test_names
-                            ? Object.values(details.test_names).map(test => `<li>${test}</li>`).join('')
+                            ? Object.values(details.test_names)
+                                .map(test => `<li>${test}</li>`)
+                                .join('')
                             : '<li>N/A</li>';
-
                         $('#testModalLabel').text(`Event  - ${rowData.event_name}`);
                         $('#testModalBody').html(`
   <div class="row mb-2">
@@ -189,97 +187,62 @@ document.addEventListener('DOMContentLoaded', function (e) {
     </div>
   </div>
 `);
-
                         $('#testModal').modal('show');
                     });
-
-
                 }
-
-
             });
-
-            $('#DataTables_Table_0_filter label').contents().filter(function () {
-                return this.nodeType === 3; // This filters out the text nodes (like "Search:")
-            }).remove();
-
+            $('#DataTables_Table_0_filter label')
+                .contents()
+                .filter(function () {
+                    return this.nodeType === 3;
+                })
+                .remove();
             $('#DataTables_Table_0_filter input').attr('placeholder', 'Search by Event / Guest Name');
-            // Adjust the search input width
-            $('input[type="search"]').css('width', '300px');  // Set width to 300px, adjust as needed
+            $('input[type="search"]').css('width', '300px');
             $('#DataTables_Table_0_filter input').css('height', '37px');
             $('#DataTables_Table_0_filter input').css('font-size', '15px');
-
-            // Move the search filter to the left of the header (if needed)
-            $('.dataTables_filter').addClass('search-container').prependTo('.d-flex.justify-content-end.align-items-center.card-header');
-
-            // Find the "Add New Drug Template" button
+            $('.dataTables_filter')
+                .addClass('search-container')
+                .prependTo('.d-flex.justify-content-end.align-items-center.card-header');
             var existingAddButton = $('.d-flex.justify-content-end.align-items-center.card-header .add-new');
-
-            // Append the "Add New Drug Template" button to the right end of the header
             $('.d-flex.justify-content-end.align-items-center.card-header').append(existingAddButton);
-
-            // Move the Excel export button next to the "Add New Drug Template" button
             var excelExportButtonContainer = $('.dt-buttons.btn-group.flex-wrap');
-
-            // Remove the existing "ms-auto" class from the add-new button (if necessary)
             existingAddButton.removeClass('ms-auto');
-
-            // Add the Excel export button next to the "Add New Drug Template" button
             $('.d-flex.justify-content-end.align-items-center.card-header').append(excelExportButtonContainer);
-
-            // Optionally, you can add a specific spacing or styling between the buttons if needed.
-            excelExportButtonContainer.find('button')
-                .addClass('ms-3')  // Add margin-left if needed
-                .removeClass('ms-3');  // Remove any previous margin that might not fit the layout
-
-            // Modify the Excel export button appearance
+            excelExportButtonContainer.find('button').addClass('ms-3').removeClass('ms-3');
             var excelExportButton = excelExportButtonContainer.find('.buttons-excel');
             excelExportButton
                 .removeClass('btn-secondary')
                 .addClass('btn-link')
-                .find('span').addClass('d-flex justify-content-center')
+                .find('span')
+                .addClass('d-flex justify-content-center')
                 .html('<i class="fa-sharp fa-solid fa-file-excel" style="font-size:30px;"></i>');
-
-            // Optionally, adjust the layout of the "Add New Drug Template" button if needed
             existingAddButton.addClass('ms-auto');
-
-            // Move the select dropdown to the appropriate cell
             var selectElement = $('.dataTables_length select');
             var targetCell = $('.advance-search th');
             targetCell.append(selectElement);
             $('.dataTables_length label').remove();
             selectElement.css({
-                'width': '65px',
+                width: '65px',
                 'background-color': '#fff'
             });
             selectElement.addClass('ms-3');
             targetCell.find('.d-flex').append(selectElement);
-
-
         }
-
         $('.datatables-basic tbody').on('click', '.edit-record', function () {
             var id = $(this).data('id');
             console.log(id);
         });
     });
-
-
-
-    flatpickr("#modalmanufacter_date", {
-        dateFormat: "d/m/Y", // Set format to DD/MM/YYYY
+    flatpickr('#modalmanufacter_date', {
+        dateFormat: 'd/m/Y'
     });
-
-    flatpickr("#modalexpiry_date", {
-        dateFormat: "d/m/Y", // Set format to DD/MM/YYYY
+    flatpickr('#modalexpiry_date', {
+        dateFormat: 'd/m/Y'
     });
-
 });
 $(document).on('click', '.deleteBtn', function () {
-    // var eventId = $(this).data('event_id');
-    var eventId = $(this).data('id'); // ✅ Correct
-
-
+    var eventId = $(this).data('id');
     console.log(eventId);
     Swal.fire({
         title: 'Are you sure?',
@@ -295,13 +258,10 @@ $(document).on('click', '.deleteBtn', function () {
         buttonsStyling: false
     }).then(function (result) {
         if (result.isConfirmed) {
-            $.ajax({
+            apiRequest({
                 url: `/mhc/events/delete/${eventId}`,
-                type: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
+                method: 'DELETE',
+                onSuccess: function (response) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Deleted!',
@@ -312,28 +272,27 @@ $(document).on('click', '.deleteBtn', function () {
                     });
                     $('.datatables-basic').DataTable().ajax.reload();
                 },
-                error: function (xhr) {
+                onError: function (errorMessage) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: xhr.responseJSON?.message || 'An error occurred while deleting.',
+                        text: errorMessage || 'An error occurred while deleting.',
                         customClass: {
                             confirmButton: 'btn btn-danger'
                         }
                     });
                 }
             });
+
         }
     });
 });
-
 $(document).on('click', '.edit-record', function () {
     var id = $(this).data('id');
-    console.log("Clicked Edit ID:", id);
+    console.log('Clicked Edit ID:', id);
     if (id) {
         window.location.href = `/mhc/events/edit-events/${id}`;
     } else {
-        console.error("No event ID found for editing.");
+        console.error('No event ID found for editing.');
     }
 });
-

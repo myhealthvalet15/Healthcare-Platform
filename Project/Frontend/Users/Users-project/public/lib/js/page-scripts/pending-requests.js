@@ -437,25 +437,24 @@ $(function () {
             ...item,
             order_status: 0
         }));
-        $.ajax({
-            type: 'POST',
+
+        apiRequest({
             url: 'https://login-users.hygeiaes.com/requests/issue-partly-prescription',
-            data: JSON.stringify(payloadToSend),
-            contentType: 'application/json',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (response) {
+            method: 'POST',
+            data: payloadToSend,
+            onSuccess: function (response) {
                 toastr.success('Prescription submitted successfully!', 'Success');
                 groupingTable.ajax.reload(null, false);
             },
-            error: function (xhr, status, error) {
+            onError: function (error) {
                 console.error(error);
                 alert("Error editing prescription.");
             }
         });
+
         $('#editIssueModal').fadeOut();
     });
+
     $('#cancelEditIssue').on('click', function () {
         $('#editIssueModal').fadeOut(function () {
             if (currentEditGroup) {
@@ -550,25 +549,24 @@ $(function () {
             ...item,
             order_status: 1
         }));
-        $.ajax({
-            type: 'POST',
+
+        apiRequest({
             url: 'https://login-users.hygeiaes.com/requests/close-prescription',
-            data: JSON.stringify(pendingPayload),
-            contentType: 'application/json',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (response) {
+            method: 'POST',
+            data: payloadToSend,
+            onSuccess: function (response) {
                 toastr.success('Prescription Closed successfully!', 'Success');
                 groupingTable.ajax.reload(null, false);
             },
-            error: function (xhr, status, error) {
+            onError: function (error) {
                 console.error(error);
                 alert("Error submitting prescription issue.");
             }
         });
+
         $('#issueModal').fadeOut();
     });
+
     $('#cancelIssue').on('click', function () {
         $('#issueModal').fadeOut();
     });

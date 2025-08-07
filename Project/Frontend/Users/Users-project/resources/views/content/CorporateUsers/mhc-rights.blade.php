@@ -135,6 +135,9 @@
     </div>
     <!-- /Validation Wizard -->
     </div>
+    <script>
+        const url = "{{ route('get-mhc-menu', ['id' => $corporateuser['id']]) }}";
+    </script>
    <script src="/lib/js/page-scripts/mhc-rights.js"></script>
 
 

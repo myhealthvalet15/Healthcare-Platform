@@ -135,8 +135,18 @@
 
 
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script>
+        $('#corporate_inventory_id').val("{{ $inventory['corporate_inventory_id'] ?? '' }}");
+    $('#equipment_name_display').text("{{ $inventory['equipment_name'] ?? '' }} ");
+    $('#equipment_code_display').text("{{ $inventory['equipment_code'] ?? '' }} ");
 
+    $('#equipment_cost_display').text("Rs. " + ({{ $inventory['equipment_cost'] ?? '0' }}).toLocaleString());
+$('#manufacturers_display').text("{{ $inventory['manufacturers'] ?? '' }}");
+$('#vendors_display').text("{{ $inventory['vendors'] ?? '' }}");
+$('#purchase_order_display').text("{{ $inventory['purchase_order'] ?? '' }}");
+$('#manufacture_date_display').text(moment("{{ $inventory['manufacture_date'] ?? '' }}").format('DD-MM-YYYY'));
+$('#purchase_date_display').text(moment("{{ $inventory['date'] ?? '' }}").format('D-M-Y'));
+</script>
 
     <script src="/lib/js/page-scripts/inventory-edit.js"></script>
 @endsection

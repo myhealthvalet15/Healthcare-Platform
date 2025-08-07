@@ -98,26 +98,17 @@ document.addEventListener('DOMContentLoaded', function (e) {
         const spinnerStartTime = Date.now();
         const minSpinnerTime = 1500;
         employeeTable.clear().draw();
-        fetch(`https://login-users.hygeiaes.com/ohc/health-registry/add-registry/search/${encodeURIComponent(searchValue)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const contentType = response.headers.get("content-type");
-                if (!contentType || !contentType.includes("application/json")) {
-                    throw new Error("Response is not JSON");
-                }
-                return response.json();
-            })
-            .then(data => {
+        apiRequest({
+            url: `https://login-users.hygeiaes.com/ohc/health-registry/add-registry/search/${encodeURIComponent(searchValue)}`,
+            onSuccess: (data) => {
                 const elapsedTime = Date.now() - spinnerStartTime;
                 const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
                 setTimeout(() => {
                     $('#searchSpinner').hide();
                     handleSearchResponse(data);
                 }, remainingTime);
-            })
-            .catch(error => {
+            },
+            onError: (error) => {
                 console.error('Error fetching employee data:', error);
                 const elapsedTime = Date.now() - spinnerStartTime;
                 const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
@@ -125,7 +116,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     $('#searchSpinner').hide();
                     handleSearchError(error);
                 }, remainingTime);
-            });
+            }
+        });
+
     }
     function handleSearchResponse(data) {
         try {

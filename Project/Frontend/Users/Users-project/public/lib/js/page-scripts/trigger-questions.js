@@ -11,10 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 url: 'https://mhv-admin.hygeiaes.com/hra/get-all-questions',
                 method: 'GET',
             });
-
             if (response && Array.isArray(response.data)) {
                 showToast('success', 'Questions fetched successfully');
-
                 const triggeredQuestionsData = await fetchExistingTriggeredQuestions();
                 document.getElementById('preloader').style.display = 'none';
                 document.getElementById('contents-container').style.display = 'block';
@@ -26,8 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     return max;
                 }, -Infinity);
-
-
                 const triggerQuestionDropdowns = document.querySelectorAll('select[id^="select2Multiple_key"]');
                 const maxDropdowns = Array.from(triggerQuestionDropdowns).reduce((max, select) => {
                     const match = select.id.match(/select2Multiple_key(\d+)/);
@@ -36,10 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     return max;
                 }, -Infinity);
-
-
-
-
                 const populateDropdowns = (triggers = null) => {
                     if (triggers === null) {
                         triggerQuestionDropdowns.forEach(dropdown => {
@@ -65,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             });
                             $(dropdown).select2('destroy').select2();
                         });
-
                         setTimeout(() => {
                             let i = 0;
                             Object.values(triggers).forEach(trigger => {
@@ -81,8 +72,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 i++;
                             });
                         }, 100);
-
-
                     }
                 };
                 if (maxTriggers <= maxDropdowns) {
@@ -91,12 +80,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     populateDropdowns();
                 }
             } else {
-                // console.error('Error: No data found in response', response);
                 showToast('error', 'Failed to load questions: No data found');
             }
             return response;
         } catch (error) {
-            // console.error('Error fetching questions:', error);
             showToast('error', 'An unexpected error occurred');
             return null;
         }
@@ -109,13 +96,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             return response;
         } catch (error) {
-            // console.error('Error fetching triggered questions:', error);
             showToast('error', 'An unexpected error occurred');
             return null;
         }
     }
     fetchAndPopulateQuestions();
-
     document.getElementById('save-changes-button').addEventListener('click', function () {
         const triggerQuestions = [];
         document.querySelectorAll('[id^="select2Multiple_"]').forEach(dropdown => {
@@ -144,4 +129,3 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.href = `https://mhv-admin.hygeiaes.com/hra/templates/${template_id}/factor-priority/view-question-priority`;
     });
 });
-

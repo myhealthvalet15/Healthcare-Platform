@@ -66,7 +66,7 @@
                 </div>
                 <div class="mb-3 col-md-6">
                     <label for="guest_name" class="form-label">Guest Name</label>
-                    <'input type="text" class="form-control" id="guest_name" name="guest_name">
+                    <input type="text" class="form-control" id="guest_name" name="guest_name">
                         <div class="invalid-feedback d-block" id="guest_name_error"></div>
                 </div>
             </div>

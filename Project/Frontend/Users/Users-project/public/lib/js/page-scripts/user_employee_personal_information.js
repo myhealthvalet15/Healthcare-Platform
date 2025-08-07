@@ -1,8 +1,9 @@
 document.getElementById('editProfileBtn').addEventListener('click', function () {
     document.getElementById('editProfileCard').style.display = 'block';
-    fetch(employeeDetailsUrl)
-        .then(res => res.json())
-        .then(data => {
+    apiRequest({
+        url: employeeDetailsUrl,
+        method: 'GET',
+        onSuccess: function (data) {
             document.getElementById('editFirstName').value = data.employee_firstname || '';
             document.getElementById('editLastName').value = data.employee_lastname || '';
             document.getElementById('editDob').value = data.employee_dob || '';
@@ -13,25 +14,31 @@ document.getElementById('editProfileBtn').addEventListener('click', function () 
             document.getElementById('editAbhaId').value = data.abha_id || '';
             document.getElementById('editArea').value = data.area || '';
             document.getElementById('editZipcode').value = data.zipcode || '';
-        });
-}); document.addEventListener('DOMContentLoaded', function () {
+        },
+        onError: function () {
+            alert('Failed to load employee details.');
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
     fetchEmployeeDetails(employeeId);
 });
 function fetchEmployeeDetails(employeeId) {
     apiRequest({
         url: employeeDetailsUrl,
-        method: "GET",
-        onSuccess: (data) => {
+        method: 'GET',
+        onSuccess: data => {
             if (data && data.employee_id) {
-                document.getElementById("empName").textContent = `${data.employee_firstname} ${data.employee_lastname}`;
-                document.getElementById("empType").textContent = capitalizeFirstLetter(data.employee_type_name || '-');
-                document.getElementById("empDepartment").textContent = capitalizeFirstLetter(data.employee_department || '-');
-                document.getElementById("empDesignation").textContent = capitalizeFirstLetter(data.employee_designation || '-');
-                document.getElementById("empLocation").textContent = data.employee_location_name || '-';
-                document.getElementById("empDateOfJoining").textContent = data.dateOfJoining || '-';
-                document.getElementById("profileImage").src = data.profile_pic || "{{ asset('assets/img/avatars/1.png') }}";
-                document.getElementById("bannerImage").src = data.banner || "{{ asset('assets/img/pages/profile-banner.png') }}";
-                const infoList = document.getElementById("employeeInfoList");
+                document.getElementById('empName').textContent = `${data.employee_firstname} ${data.employee_lastname}`;
+                document.getElementById('empType').textContent = capitalizeFirstLetter(data.employee_type_name || '-');
+                document.getElementById('empDepartment').textContent = capitalizeFirstLetter(data.employee_department || '-');
+                document.getElementById('empDesignation').textContent = capitalizeFirstLetter(data.employee_designation || '-');
+                document.getElementById('empLocation').textContent = data.employee_location_name || '-';
+                document.getElementById('empDateOfJoining').textContent = data.dateOfJoining || '-';
+                document.getElementById('profileImage').src = data.profile_pic || "{{ asset('assets/img/avatars/1.png') }}";
+                document.getElementById('bannerImage').src =
+                    data.banner || "{{ asset('assets/img/pages/profile-banner.png') }}";
+                const infoList = document.getElementById('employeeInfoList');
                 infoList.innerHTML = '';
                 const firstLine = document.createElement('li');
                 firstLine.className = 'list-inline-item d-flex gap-3 align-items-center flex-wrap';
@@ -41,13 +48,13 @@ function fetchEmployeeDetails(employeeId) {
             <span><i class="ti ti-user ti-lg"></i> ${data.employee_age || '?'} yrs • ${capitalizeFirstLetter(data.employee_gender || '')}</span>
           `;
                 infoList.appendChild(firstLine);
-                const connectedBtn = document.getElementById("connectedBtn");
+                const connectedBtn = document.getElementById('connectedBtn');
                 if (connectedBtn) {
                     connectedBtn.innerHTML = `<i class='ti ti-user-check ti-xs me-2'></i>Connected to ${data.employee_corporate_name || 'Corporate'}`;
                 }
             }
         },
-        onError: (error) => console.error('Error fetching employee details:', error)
+        onError: error => console.error('Error fetching employee details:', error)
     });
 }
 function capitalizeFirstLetter(string) {
@@ -71,15 +78,12 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
     const bannerInput = document.getElementById('editBanner');
     const profilePic = profilePicInput.files[0];
     const banner = bannerInput.files[0];
-
     const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/tiff', 'image/webp'];
-
     if (!firstName) return showToast('error', 'Validation Error', 'First name is required.');
     if (!lastName) return showToast('error', 'Validation Error', 'Last name is required.');
     if (!dob) return showToast('error', 'Validation Error', 'Date of birth is required.');
     if (!gender) return showToast('error', 'Validation Error', 'Gender is required.');
     if (!phone) return showToast('error', 'Validation Error', 'Phone number is required.');
-
     if (profilePic) {
         if (!validImageTypes.includes(profilePic.type)) {
             return showToast('error', 'Invalid Image', 'Profile picture must be a valid image type.');
@@ -88,7 +92,6 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
             return showToast('error', 'File Too Large', 'Profile picture must be under 200KB.');
         }
     }
-
     if (banner) {
         if (!validImageTypes.includes(banner.type)) {
             return showToast('error', 'Invalid Image', 'Banner image must be a valid image type.');
@@ -97,7 +100,6 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
             return showToast('error', 'File Too Large', 'Banner image must be under 1MB.');
         }
     }
-
     function fileToBase64(file) {
         return new Promise((resolve, reject) => {
             if (!file) resolve(null);
@@ -107,24 +109,20 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
             reader.readAsDataURL(file);
         });
     }
-
     Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to update your profile?",
-        icon: "question",
+        title: 'Are you sure?',
+        text: 'Do you want to update your profile?',
+        icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, update it!"
-    }).then(async (result) => {
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, update it!'
+    }).then(async result => {
         if (!result.isConfirmed) return;
-
         const updateUrl = `/UserEmployee/updateProfileDetails/${employeeId}`;
-
         try {
             const profilePicBase64 = await fileToBase64(profilePic);
             const bannerBase64 = await fileToBase64(banner);
-
             const payload = {
                 first_name: firstName,
                 last_name: lastName,
@@ -139,12 +137,11 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
                 profile_pic: profilePicBase64,
                 banner: bannerBase64
             };
-
             await apiRequest({
                 url: updateUrl,
                 method: 'POST',
                 data: payload,
-                onSuccess: (data) => {
+                onSuccess: data => {
                     showToast('success', 'Success', 'Profile updated successfully!');
                     fetchEmployeeDetails(employeeId);
                     setTimeout(() => {
@@ -153,11 +150,10 @@ document.getElementById('editProfileForm').addEventListener('submit', function (
                         document.getElementById('editProfileCard').style.display = 'none';
                     }, 400);
                 },
-                onError: (message) => {
+                onError: message => {
                     showToast('error', 'Error', message || 'Failed to update profile.');
                 }
             });
-
         } catch (error) {
             console.error('Error:', error);
             showToast('error', 'Error', 'Failed to update profile.');

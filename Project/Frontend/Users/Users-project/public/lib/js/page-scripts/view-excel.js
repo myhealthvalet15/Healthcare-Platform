@@ -17,18 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }, 5000);
     }
-    function sendAjaxRequest(form, method, url) {
-        const formData = new FormData(form);
-        return fetch(url, {
-            method: method,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: formData
-        });
-    }
     document.getElementById('addDataForm').addEventListener('submit', function (event) {
         event.preventDefault();
         const url = new URL(window.location.href);
@@ -51,11 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 formData.append('locationid', locationid);
                 fetch(this.dataset.route, {
                     method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
                     body: formData
                 })
                     .then(response => {
@@ -77,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     })
                     .catch(error => {
                         document.getElementById('preloader').style.display = 'none';
-                        // console.error('Error:', error);
                         toastr.error('An error occurred. Check the console for more details.');
                     });
             }
@@ -85,6 +67,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     document.getElementById('revokeDataForm').addEventListener('submit', function (event) {
         event.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        const route = form.dataset.route;
         Swal.fire({
             title: 'Are you sure?',
             text: "You are about to revoke the data from the Excel file.",
@@ -96,25 +81,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('preloader').style.display = 'block';
-                sendAjaxRequest(this, 'POST', this.dataset.route)
-                    .then(response => response.json())
-                    .then(data => {
+                apiRequest({
+                    url: route,
+                    method: 'POST',
+                    data: formData,
+                    onSuccess: function (data) {
+                        document.getElementById('preloader').style.display = 'none';
                         if (data.result) {
                             toastr.success('Data revoked successfully!');
-                            document.getElementById('preloader').style.display = 'none';
                             setTimeout(function () {
                                 window.open('https://login-users.hygeiaes.com/employees/corporate/add-corporate-users/', '_blank');
                                 window.close();
                             }, 2000);
                         } else {
-                            document.getElementById('preloader').style.display = 'none';
                             toastr.error('Failed to revoke data!');
                         }
-                    })
-                    .catch(error => {
+                    },
+                    onError: function (error) {
                         document.getElementById('preloader').style.display = 'none';
                         toastr.error('An error occurred. Check the console for more details.');
-                    });
+                        console.error(error);
+                    }
+                });
             }
         });
     });

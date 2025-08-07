@@ -220,11 +220,14 @@ document.getElementById('eventForm').addEventListener('submit', function (e) {
     };
     apiRequest({
         url: `/mhc/events/update-events/${EVENT_ID}`,
-        method: 'POST',
+        method: 'PUT',
         data: formData,
         onSuccess: function (res) {
             if (res.result) {
-                Swal.fire('Success', 'Event updated successfully!', 'success');
+                Swal.fire('Success', 'Event updated successfully!', 'success').then(() => {
+                // Redirect after user clicks "OK"
+                window.location.href = 'https://login-users.hygeiaes.com/mhc/events/list-events';
+            });
             } else {
                 Swal.fire('Error', res.message || 'Update failed.', 'error');
             }

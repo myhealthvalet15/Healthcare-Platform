@@ -28,54 +28,58 @@ $(function () {
         dt_row_grouping_table = $('.dt-row-grouping');
     var groupColumn = 0;
     var sortColumn = 1;
-
     if (dt_row_grouping_table.length) {
         var groupingTable = dt_row_grouping_table.DataTable({
-            ajax: {
-                url: `https://login-users.hygeiaes.com/UserEmployee/getuserPrescription?employee_id=${employeeId}`,
-                dataSrc: function (json) {
-                    if (json.result && json.data.length > 0) {
+            ajax: function (data, callback, settings) {
+                apiRequest({
+                    url: `https://login-users.hygeiaes.com/UserEmployee/getuserPrescription?employee_id=${employeeId}`,
+                    method: 'GET',
+                    onSuccess: function (json) {
                         let formattedData = [];
-                        json.data.forEach(prescription => {
-                            prescription.prescription_details.forEach(detail => {
-                                formattedData.push({
-                                    prescription_id: prescription.prescription_id,
-                                    body_part_names: prescription.body_part_names.join(', '),
-                                    op_registry_id: prescription.op_registry_id,
-                                    employee_name: `${prescription.employee.employee_firstname} ${prescription.employee.employee_lastname}`,
-                                    employee_age: prescription.employee.employee_age,
-                                    employee_gender: prescription.employee.employee_gender,
-                                    employee_id: prescription.employee.employee_id,
-                                    drug_name: detail.drug_name,
-                                    drug_strength: detail.drug_strength,
-                                    drug_type: detail.drug_type,
-                                    prescribed_days: detail.prescribed_days,
-                                    morning: detail.morning,
-                                    afternoon: detail.afternoon,
-                                    evening: detail.evening,
-                                    night: detail.night,
-                                    intake_condition: detail.intake_condition,
-                                    remarks: detail.remarks,
-                                    UserId: prescription.prescription_id,
-                                    master_doctor_id: prescription.master_doctor_id,
-                                    doctor_firstname: prescription.doctor_firstname,
-                                    doctor_lastname: prescription.doctor_lastname,
-                                    prescription_type: detail.prescription_type,
-                                    prescription_details_id: detail.prescription_details_id,
-                                    body_part_names: prescription.body_part_names.join(', '),
-                                    type_of_incident: prescription.type_of_incident,
-                                    past_medical_history: prescription.past_medical_history,
-                                    prescription_attachments: prescription.prescription_attachments,
-                                    registry_doctor_notes: prescription.doctor_notes,
-                                    registry_user_notes: prescription.user_notes,
-                                    registry_doctor_id: prescription.registry_doctor_id
+                        if (json.result && Array.isArray(json.data)) {
+                            json.data.forEach(prescription => {
+                                prescription.prescription_details.forEach(detail => {
+                                    formattedData.push({
+                                        prescription_id: prescription.prescription_id,
+                                        body_part_names: prescription.body_part_names.join(', '),
+                                        op_registry_id: prescription.op_registry_id,
+                                        employee_name: `${prescription.employee.employee_firstname} ${prescription.employee.employee_lastname}`,
+                                        employee_age: prescription.employee.employee_age,
+                                        employee_gender: prescription.employee.employee_gender,
+                                        employee_id: prescription.employee.employee_id,
+                                        drug_name: detail.drug_name,
+                                        drug_strength: detail.drug_strength,
+                                        drug_type: detail.drug_type,
+                                        prescribed_days: detail.prescribed_days,
+                                        morning: detail.morning,
+                                        afternoon: detail.afternoon,
+                                        evening: detail.evening,
+                                        night: detail.night,
+                                        intake_condition: detail.intake_condition,
+                                        remarks: detail.remarks,
+                                        UserId: prescription.prescription_id,
+                                        master_doctor_id: prescription.master_doctor_id,
+                                        doctor_firstname: prescription.doctor_firstname,
+                                        doctor_lastname: prescription.doctor_lastname,
+                                        prescription_type: detail.prescription_type,
+                                        prescription_details_id: detail.prescription_details_id,
+                                        type_of_incident: prescription.type_of_incident,
+                                        past_medical_history: prescription.past_medical_history,
+                                        prescription_attachments: prescription.prescription_attachments,
+                                        registry_doctor_notes: prescription.doctor_notes,
+                                        registry_user_notes: prescription.user_notes,
+                                        registry_doctor_id: prescription.registry_doctor_id
+                                    });
                                 });
                             });
-                        });
-                        return formattedData;
+                        }
+                        callback({ data: formattedData });
+                    },
+                    onError: function () {
+                        callback({ data: [] });
+                        alert('Failed to load prescriptions.');
                     }
-                    return [];
-                }
+                });
             },
             columns: [
                 { data: 'prescription_id' },

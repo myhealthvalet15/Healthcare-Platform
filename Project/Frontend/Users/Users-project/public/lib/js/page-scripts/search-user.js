@@ -86,9 +86,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
         $('#resultsCard').hide();
         const spinnerStartTime = Date.now();
         const minSpinnerTime = 1500;
-        fetch(`https://login-users.hygeiaes.com/ohc/health-registry/add-registry/search/${searchValue}`)
-            .then(response => response.json())
-            .then(data => {
+        apiRequest({
+            url: `https://login-users.hygeiaes.com/ohc/health-registry/add-registry/search/${searchValue}`,
+            method: 'GET',
+            onSuccess: (data) => {
                 employeeTable.clear();
                 const elapsedTime = Date.now() - spinnerStartTime;
                 const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
@@ -116,8 +117,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         showToast("info", "No employees found matching your search criteria.");
                     }
                 }, remainingTime);
-            })
-            .catch(error => {
+            },
+            onError: (error) => {
                 console.error('Error fetching employee data:', error);
                 const elapsedTime = Date.now() - spinnerStartTime;
                 const remainingTime = Math.max(0, minSpinnerTime - elapsedTime);
@@ -125,7 +126,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     $('#searchSpinner').hide();
                     showToast('error', 'An error occurred while searching for employees. Please try again.');
                 }, remainingTime);
-            });
+            }
+        });
     });
     function createEmployeeIdCell(userId, initials) {
         const stateNum = Math.floor(Math.random() * 6);
@@ -166,7 +168,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
         const employeeId = $(this).data('employee-id').toString().toLowerCase();
         window.location = '/prescription/add-employee-prescription/' + employeeId;
     });
-
     $('#searchEmployees').on('keypress', function (e) {
         if (e.which === 13) {
             $('#searchBtn').click();

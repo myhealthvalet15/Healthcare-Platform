@@ -7,7 +7,7 @@ $(document).ready(function () {
         }
     });
     apiRequest({
-        url: "{{ route('drugTypesAndIngredients') }}",
+        url: "/DrugTemplate/getDrugTypesAndIngredients",
         method: 'GET',
         onSuccess: function (response) {
             if (response.drugTypes && response.drugIngredients) {

@@ -1,7 +1,6 @@
 class TestResultsManager {
     constructor() {
         this.testData = {};
-        this.csrfToken = '';
         this.saveButtonId = 'saveResultsBtn';
         this.apiEndpoint = '/ohc/test-details/save-results';
         this.testCodeValue = '';
@@ -9,7 +8,6 @@ class TestResultsManager {
     init(testData, testCode) {
         this.testData = testData || {};
         this.testCodeValue = testCode || '';
-        this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         this.setupEventListeners();
         this.detectPatientGender();
     }

@@ -128,7 +128,7 @@ function deleteRow(btn) {
 }
 function fetchDrugOptions(selectElement) {
     apiRequest({
-        url: "{{ route('getDrugTemplateDetails') }}",
+        url: "/PharmacyStock/getDrugTemplateDetails",
         method: 'GET',
         onSuccess: (response) => {
             const drugTypeMapping = {
@@ -188,7 +188,7 @@ function fetchDrugOptions(selectElement) {
 }
 $(document).ready(function () {
     apiRequest({
-        url: "{{ route('getDrugTemplateDetails') }}",
+        url: "/PharmacyStock/getDrugTemplateDetails",
         method: 'GET',
         onSuccess: (response) => {
             console.log("Full Response:", response);

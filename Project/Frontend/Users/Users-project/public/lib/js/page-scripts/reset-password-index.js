@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('#formAuthentication').on('submit', function(e) {
+    $('#formAuthentication').on('submit', function (e) {
         const newPassword = $('#new-password').val();
         const confirmPassword = $('#confirm-password').val();
 
@@ -10,13 +10,17 @@ $(document).ready(function () {
         }
     });
     $('#reload').click(function () {
-        $.ajax({
-            type: 'GET',
+        apiRequest({
             url: '/reload-captcha',
-            success: function (data) {
-                $(".captcha span").html(data.captcha)
+            method: 'GET',
+            onSuccess: function (data) {
+                $(".captcha span").html(data.captcha);
+            },
+            onError: function (xhr) {
+                console.error('Captcha reload failed:', xhr);
+                toastr.error('Could not reload captcha.');
             }
-        })
+        });
     });
     const captchaType = document.getElementById("captchaType").value;
     if (captchaType !== "google_v3" && captchaType !== "anCaptcha") {
@@ -43,7 +47,7 @@ $(document).ready(function () {
             this.submit();
         }
     });
-    function encryptAndSubmit() { 
+    function encryptAndSubmit() {
         const publicKey = `-----BEGIN PUBLIC KEY-----
                     MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmbxM48khEYD5JcqcSBLA
                     hbq7OAyX55wekJlOM0iG22uZjk5XsXd2K0DxJDIL8ocAlZBV9rLzsHQA3MQ9S3Qn

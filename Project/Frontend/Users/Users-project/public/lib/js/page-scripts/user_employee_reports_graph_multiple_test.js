@@ -562,19 +562,6 @@ function updateChartWithDataForDifferential(data) {
             '');
     document.getElementById('chartLegend').innerHTML = `<div style="display:flex;gap:20px;">${legendHTML}</div>`;
 }
-function apiRequest({
-    url,
-    method,
-    onSuccess,
-    onError
-}) {
-    fetch(url, {
-        method
-    })
-        .then(res => res.json())
-        .then(onSuccess)
-        .catch(onError);
-}
 function updateChartWithBPData(data) {
     const canvas = document.getElementById('lineChart');
     const chart = Chart.getChart(canvas);

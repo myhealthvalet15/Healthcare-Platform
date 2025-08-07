@@ -375,6 +375,7 @@ public function updateInvoice(Request $request, $corporate_invoice_id)
 // In InvoiceController.php
 public function getPoBalance(Request $request)
 {
+   // return $request;
     // Validate input parameters
     $validator = Validator::make($request->all(), [
         'corporate_po_id' => 'required|integer',
@@ -404,7 +405,7 @@ public function getPoBalance(Request $request)
 
     // Calculate the remaining balance
     $remainingBalance = $poValue - $poBalanceUsed;
-
+    //return $remainingBalance;
     // Return the response with the remaining balance
     return response()->json([
         'result' => true,

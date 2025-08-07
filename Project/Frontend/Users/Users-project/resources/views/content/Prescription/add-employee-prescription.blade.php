@@ -555,7 +555,9 @@ $referal_type = $opRegistryData['op_registry']['type_of_incident'] ?? [];
             </div>
         </div>
     </div>
-    
+    <script>
+        const userType = "{{ session('user_type') }}";
+    </script>
     <script src="/lib/js/page-scripts/add-employee-prescription.js"></script>
 
     @endsection

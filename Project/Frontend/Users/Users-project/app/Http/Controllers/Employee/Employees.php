@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Employee;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class Employees extends Controller
 
     public function getAllEmployeeList(Request $request)
     {
-       // return 'Hieeeee';
+        // return 'Hieeeee';
         $corporate_id = session('corporate_id');
         $location_id = session('location_id');
         if (!$corporate_id || !$location_id) {
@@ -28,7 +29,7 @@ class Employees extends Controller
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
         ])->post("https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/getAllEmployeeData/" . $corporate_id . '/' . $location_id);
-       // return $response;
+
         if ($response->successful()) {
             return response()->json(['result' => true, 'message' => $response['message']]);
         } else {
@@ -36,7 +37,7 @@ class Employees extends Controller
         }
     }
 
-  
+
 
 
 }

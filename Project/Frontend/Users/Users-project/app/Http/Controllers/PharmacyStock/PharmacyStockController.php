@@ -32,12 +32,12 @@ class PharmacyStockController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllPharmacyStock/' . $locationId);
-            // return $response;
+
             if ($response->successful()) {
 
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }
-            //return $response;
+
             return response()->json(['result' => false, 'data' => 'Invalid request'], $response->status());
         } catch (\Exception $e) {
             return response()->json(['result' => false, 'data' => 'Error in Fetching data'], 503);
@@ -57,7 +57,7 @@ class PharmacyStockController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getDrugTemplateDetails/');
-            //return $response;
+
             if ($response->successful()) {
                 $data = $response->json(); // Get the response as an array
                 return response()->json([
@@ -116,7 +116,7 @@ class PharmacyStockController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->put('https://api-user.hygeiaes.com/V1/corporate/corporate-components/updatePharmacyStock/' . $id, $request);
-            //return $response;
+
             return response()->json($response->json());
         } catch (\Exception $e) {
             return response()->json([
@@ -204,7 +204,7 @@ class PharmacyStockController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
                 'drug_id' => $drug_id,
-                'mainStoreId'=>$mainStoreId,
+                'mainStoreId' => $mainStoreId,
             ];
             //return  $newStockData;
 
@@ -213,7 +213,7 @@ class PharmacyStockController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/moveStocktoMainStore', $newStockData);
-            //return $response;
+
             // Return the response from the external API
             return response()->json($response->json());
 
@@ -233,7 +233,7 @@ class PharmacyStockController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getMainStockDetails/' . $request->drug_template_id);
-            //return $response;
+
             // Return the response from the external API
             return response()->json($response->json());
 
@@ -270,7 +270,7 @@ class PharmacyStockController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getSubPharmacyStockById/' . $id);
-            //return $response;
+
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }
@@ -297,7 +297,7 @@ class PharmacyStockController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getStockByAvailability/' . $id . '/' . $storeId);
-            //return $response;
+
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }

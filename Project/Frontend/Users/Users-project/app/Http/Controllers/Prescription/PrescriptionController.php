@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+
 class PrescriptionController extends Controller
 {
     /**
@@ -126,7 +127,7 @@ class PrescriptionController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getPrescriptionTemplateById/' . $id);
-            // return $response;
+
             if ($response->successful()) {
 
                 $prescription = $response['data'];
@@ -169,7 +170,7 @@ class PrescriptionController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->put('https://api-user.hygeiaes.com/V1/corporate/corporate-components/updatePrescriptionTemplate/' . $id, $requestData);
-            // return $response;
+
             if ($response->successful()) {
                 return response()->json([
                     'result' => true,
@@ -217,7 +218,7 @@ class PrescriptionController extends Controller
                     'message' => 'Invalid Request: Missing location ID'
                 ]);
             }
-           
+
             if ($op_registry_id === null) {
                 $employeeResponse = Http::withHeaders([
                     'Content-Type' => 'application/json',
@@ -231,20 +232,20 @@ class PrescriptionController extends Controller
                     'Authorization' => 'Bearer ' . request()->cookie('access_token'),
                 ])->get('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/checkEmployeeId/followUp/' . 0 .  '/' . $employee_id . "/op/" . $op_registry_id);
             }
-           //return $employeeResponse;
+            //return $employeeResponse;
             // Second API Request: Get prescription templates
             $prescriptionResponse = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . request()->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getOnlyPrescriptionTemplate/' . $locationId);
-          //return $prescriptionResponse;
+            //return $prescriptionResponse;
             $pharmacyResponse = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . request()->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getPharmacyDetails/' . $locationId);
-          // return $pharmacyResponse;
+            // return $pharmacyResponse;
             if ($employeeResponse->successful() && $prescriptionResponse->successful() && $pharmacyResponse->successful()) {
                 $employeeData = $employeeResponse->json();
                 $prescriptionData = $prescriptionResponse->json();
@@ -278,7 +279,7 @@ class PrescriptionController extends Controller
     }
     public function store_EmployeePrescription(Request $request)
     {
-       // return $request;
+        // return $request;
         Log::info('User Type: ' . $request->user_type);
 
         $locationId = session('location_id');
@@ -291,22 +292,22 @@ class PrescriptionController extends Controller
             'location_id' => $locationId,
             'corporate_id' => $corporateId,
             'corporate_user_id' => $userId,
-            'user_type'=> $user_type,
-            'prescription_attachments' => $prescriptionImages 
+            'user_type' => $user_type,
+            'prescription_attachments' => $prescriptionImages
 
-              
+
         ]);
         try {
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-        ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPrescription', $requestData);
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPrescription', $requestData);
 
-        return $response;
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'An error occurred while sending prescription data.'], 500);
-    }
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while sending prescription data.'], 500);
+        }
     }
     public function prescriptionView()
     {
@@ -347,7 +348,7 @@ class PrescriptionController extends Controller
 
 
             // Uncomment if you want to debug the raw response
-            //return $response;
+
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -495,7 +496,7 @@ class PrescriptionController extends Controller
                 'https://api-user.hygeiaes.com/V1/corporate/corporate-components/getPrintPrescriptionById/' . $id,
                 $request
             );
-            // return $response;
+
             if ($response->successful()) {
 
                 $prescription = $response['data'];

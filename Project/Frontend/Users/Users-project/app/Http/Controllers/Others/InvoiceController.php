@@ -37,7 +37,7 @@ class InvoiceController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllInvoiceDetails/' . $locationId, $request->all());
-            // return $response;
+
             // Get the data from the response
             $data = $response->json()['data'];
             // return $data;
@@ -89,7 +89,7 @@ class InvoiceController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getVendorDetails/' . $locationId);
-            //return $response;
+
             // Get the data from the response
             $data = $response->json()['data'];
             if ($fromDate && $toDate) {
@@ -150,7 +150,7 @@ class InvoiceController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addVendor', $requestData);
-            //return $response;
+
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => 'Vendor Added Successfully']);
             } else {
@@ -232,7 +232,7 @@ class InvoiceController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addInvoice', $requestData);
-            //return $response;
+
             // Handle API response
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => 'Invoice Added Successfully']);
@@ -258,7 +258,7 @@ class InvoiceController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getInvoiceById/' . $id);
-            // return $response;
+
             if ($response->successful()) {
                 $invoice = $response['data'];
                 $headerData = 'Edit Invoice Details';
@@ -331,7 +331,7 @@ class InvoiceController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->put('https://api-user.hygeiaes.com/V1/corporate/corporate-components/updateInvoice/' . $id, $requestData);
-            //return $response;
+
             // Check if the response is successful
             if ($response->successful()) {
                 return response()->json([
@@ -371,6 +371,7 @@ class InvoiceController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getPoBalance/' . $locationId, $request->all());
+
             if ($response->successful()) {
                 // Assuming the response is a JSON with 'result' and 'remainingBalance'
                 $responseData = $response->json();

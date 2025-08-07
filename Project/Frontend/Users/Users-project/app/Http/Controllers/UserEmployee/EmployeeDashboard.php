@@ -82,7 +82,7 @@ class EmployeeDashboard extends Controller
             'template_id' => $templateId,
             'answers' => $validated['answers'],
             'is_partial' => $isPartial, 
-        ]); return $response;
+        ]); 
         if ($response->successful()) {
             return response()->json(['result' => true, 'data' => $response['data']]);
         }

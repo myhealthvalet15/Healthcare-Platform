@@ -35,7 +35,7 @@ class CorporateUserController extends Controller
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
 
             ])->get('https://api-user.hygeiaes.com/V1/corporate-users/users/getAllUsersDetails/' . $corporateId . '/' . $locationId, $request->all());
-            //return $response;
+
             // Get the data from the response
             $data = $response->json()['data'];
             // return $data;
@@ -88,7 +88,7 @@ class CorporateUserController extends Controller
                 'aadhar' => 'nullable|string',
                 'mobile_num' => 'required|integer',
                 'setting' => 'nullable|string',
-  
+
             ]);
             if ($request->input('aadhar') !== null) {
                 if (!ctype_digit($request->input('aadhar')) || strlen($request->input('aadhar')) !== 12) {
@@ -120,8 +120,8 @@ class CorporateUserController extends Controller
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => 'Data Added Successfully']);
             }
-                return response()->json(['result' => false, 'message' => 'Error in adding User', 'details' => $response->body()]);
-        
+            return response()->json(['result' => false, 'message' => 'Error in adding User', 'details' => $response->body()]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'result' => 'error',
@@ -140,7 +140,7 @@ class CorporateUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate-users/users/getUserById/' . $id);
-            // return $response;
+
             if ($response->successful()) {
                 $corporateuser = $response['data'];
                 //return $corporateuser;
@@ -208,7 +208,7 @@ class CorporateUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->put('https://api-user.hygeiaes.com/V1/corporate-users/users/updateUser/' . $id, $requestData);
-            // return $response;
+
             // Check if the response is successful
             if ($response->successful()) {
                 return response()->json([
@@ -239,15 +239,15 @@ class CorporateUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate-users/users/getUserById/' . $id);
-            
-            // return $response;
+
+
             if ($response->successful()) {
                 $corporateuser = $response['data'];
                 $corporateuser_dept = $response['data2'];
-                
-              // return $mhcrights;
+
+                // return $mhcrights;
                 $headerData = 'MHC Rights';
-                return view('content.CorporateUsers.mhc-rights', compact('corporateuser','corporateuser_dept'), ['HeaderData' => $headerData]);
+                return view('content.CorporateUsers.mhc-rights', compact('corporateuser', 'corporateuser_dept'), ['HeaderData' => $headerData]);
             } else {
                 return redirect()->back()->with('error', 'An error occurred: ');
             }
@@ -255,7 +255,7 @@ class CorporateUserController extends Controller
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
-    public function getmhcMenu(Request $request,$id)
+    public function getmhcMenu(Request $request, $id)
     {
         $locationId = session('location_id');
         $corporateId = session('corporate_id');
@@ -276,12 +276,12 @@ class CorporateUserController extends Controller
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
 
             ])->get('https://api-user.hygeiaes.com/V1/corporate-users/users/getmhcmenu/' . $corporateId . '/' . $locationId.'/'. $id);
-           // return $response->json()['data'];
+            // return $response->json()['data'];
             // Get the data from the response
 
             $datas1 = $response->json()['data'];
             $datas2 = $response->json()['data2'];
-        
+
             return response()->json([
                 'result' => true,
                 'data' => array_values($datas1),
@@ -311,8 +311,8 @@ class CorporateUserController extends Controller
             'events' => 'nullable|string|in:0,1,2',
             'health_partner' => 'nullable|string|in:0,1,2',
             'corporate_user_id' => 'required|string',
-           
-        ]); 
+
+        ]);
         if (! $validatedData) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validatedData], 422);
         }
@@ -328,15 +328,15 @@ class CorporateUserController extends Controller
                 'message' => 'Invalid Request'
             ]);
         }
-      
+
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
         ])->post('https://api-user.hygeiaes.com/V1/corporate-users/users/mhcRightsSave', [
-           
-           
+
+
             'location_id' => $locationId,
             'corporate_admin_user_id' => $userId,
             'employees' => $request->input('employees'),
@@ -349,9 +349,9 @@ class CorporateUserController extends Controller
             'reports' => $request->input('reports_radio'),
             'health_partner' => $request->input('module_5_radio'),
             'corporate_user_id' => $request->input('corporate_user_id')
-            
+
            ]);
-       // return $response;
+
         if ($response->successful()) {
             return response()->json(['result' => true, 'message' => 'Menu Rights added Successfully']);
         }
@@ -373,8 +373,8 @@ class CorporateUserController extends Controller
             'events' => 'nullable|string|in:0,1,2',
             'health_partner' => 'nullable|string|in:0,1,2',
             'corporate_user_id' => 'required|string',
-           
-        ]); 
+
+        ]);
         if (! $validatedData) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validatedData], 422);
         }
@@ -390,14 +390,14 @@ class CorporateUserController extends Controller
                 'message' => 'Invalid Request'
             ]);
         }
-      
-       
+
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
         ])->put('https://api-user.hygeiaes.com/V1/corporate-users/users/mhcRightsUpdate', [
-           
+
             'id' => $request->input('corporate_menu_rights_id'),
             'location_id' => $locationId,
             'corporate_admin_user_id' => $userId,
@@ -411,15 +411,15 @@ class CorporateUserController extends Controller
             'reports' => $request->input('reports_radio'),
             'health_partner' => $request->input('module_5_radio'),
             'corporate_user_id' => $request->input('corporate_user_id')
-            
+
            ]);
-       // return $response;
+
         if ($response->successful()) {
             return response()->json(['result' => true, 'message' => 'Menu Rights added Successfully']);
         }
         return response()->json(['result' => false, 'message' => 'Invalid Request'], $response->status());
     }
-    
+
     //OHC MENU RIGHTS
 
     public function ohcRights(Request $request, $id)
@@ -430,15 +430,15 @@ class CorporateUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate-users/users/getUserById/' . $id);
-            
-            // return $response;
+
+
             if ($response->successful()) {
                 $corporateuser = $response['data'];
                 $corporateuser_dept = $response['data2'];
-                
-              // return $mhcrights;
+
+                // return $mhcrights;
                 $headerData = 'OHC Rights';
-                return view('content.CorporateUsers.ohc-rights', compact('corporateuser','corporateuser_dept'), ['HeaderData' => $headerData]);
+                return view('content.CorporateUsers.ohc-rights', compact('corporateuser', 'corporateuser_dept'), ['HeaderData' => $headerData]);
             } else {
                 return redirect()->back()->with('error', 'An error occurred: ');
             }
@@ -446,7 +446,7 @@ class CorporateUserController extends Controller
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
-    public function getohcMenu(Request $request,$id)
+    public function getohcMenu(Request $request, $id)
     {
         $locationId = session('location_id');
         $corporateId = session('corporate_id');
@@ -467,12 +467,12 @@ class CorporateUserController extends Controller
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
 
             ])->get('https://api-user.hygeiaes.com/V1/corporate-users/users/getohcmenu/' . $corporateId . '/' . $locationId.'/'. $id);
-           // return $response->json()['data'];
+            // return $response->json()['data'];
             // Get the data from the response
 
             $datas1 = $response->json()['data'];
             $datas2 = $response->json()['data2'];
-        
+
             return response()->json([
                 'result' => true,
                 'data' => array_values($datas1),
@@ -506,7 +506,7 @@ class CorporateUserController extends Controller
             'inventory' => 'nullable|string|in:0,1,2',
             'forms' =>  'nullable|string|in:0,1,2',
             'corporate_user_id' => 'required|string',
-        ]); 
+        ]);
         if (! $validatedData) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validatedData], 422);
         }
@@ -522,15 +522,15 @@ class CorporateUserController extends Controller
                 'message' => 'Invalid Request'
             ]);
         }
-      
+
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
         ])->post('https://api-user.hygeiaes.com/V1/corporate-users/users/ohcRightsSave', [
-           
-           
+
+
             'ohc_dashboard' => $locationId,
             'out_patient' => $userId,
             'prescription' => $request->input('employees'),
@@ -544,9 +544,9 @@ class CorporateUserController extends Controller
             'inventory' => $request->input('module_5_radio'),
             'forms' => $request->input('module_5_radio'),
             'corporate_user_id' => $request->input('corporate_user_id')
-            
+
            ]);
-       // return $response;
+
         if ($response->successful()) {
             return response()->json(['result' => true, 'message' => 'Menu Rights added Successfully']);
         }
@@ -571,8 +571,8 @@ class CorporateUserController extends Controller
             'inventory' => 'nullable|string|in:0,1,2',
             'forms' =>  'nullable|string|in:0,1,2',
             'corporate_user_id' => 'required|string',
-           
-        ]); 
+
+        ]);
         if (! $validatedData) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validatedData], 422);
         }
@@ -588,14 +588,14 @@ class CorporateUserController extends Controller
                 'message' => 'Invalid Request'
             ]);
         }
-      
-       
+
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
         ])->put('https://api-user.hygeiaes.com/V1/corporate-users/users/ohcRightsUpdate', [
-           
+
             'id' => $request->input('corporate_ohc_rights_id'),
             'ohc_dashboard' => $locationId,
             'out_patient' => $userId,
@@ -610,14 +610,14 @@ class CorporateUserController extends Controller
             'inventory' => $request->input('module_5_radio'),
             'forms' => $request->input('module_5_radio'),
             'corporate_user_id' => $request->input('corporate_user_id')
-            
+
            ]);
-       // return $response;
+
         if ($response->successful()) {
             return response()->json(['result' => true, 'message' => 'Menu Rights added Successfully']);
         }
         return response()->json(['result' => false, 'message' => 'Invalid Request'], $response->status());
     }
-    
-   
+
+
 }

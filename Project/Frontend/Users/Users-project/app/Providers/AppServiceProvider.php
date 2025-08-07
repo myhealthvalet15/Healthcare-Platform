@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
                     'Accept' => 'application/json',
                     'Authorization' => 'Bearer ' . request()->cookie('access_token'),
                 ])->get("https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllComponent/accessRights/corpId/{$corporateId}");
-                // return $response;
+
                 if ($response->successful() && !empty($response['data'])) {
 
 

@@ -166,7 +166,7 @@ class EditCorporateController extends Controller
                     'Authorization' => 'Bearer ' . $request->cookie('access_token'),
                 ],
             ]);
-           // return $response;
+
             if ($response['success']) {
                 $emptypes = $response['data'];
                 if (!isset($emptypes['user'])) {
@@ -186,7 +186,7 @@ class EditCorporateController extends Controller
     }
     public function updateAdminUsers(Request $request, $id)
     {
-       // return 'Hai';
+        // return 'Hai';
         Log::debug('Incoming request data', $request->all());
         try {
             $data = $request->all();
@@ -213,7 +213,7 @@ class EditCorporateController extends Controller
                 'signup_on' => now(),
                  'active_status' => (bool) $data['active_status'],
             ];
-         
+
             $response = $this->httpClient->request('POST', "/api/Corporate_admin_user/update/{$id}", [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $request->cookie('access_token'),
@@ -221,8 +221,8 @@ class EditCorporateController extends Controller
                 ],
                 'json' => $employeeData,
             ]);
-            
-          // return $response;
+
+
             if ($response['success']) {
                 return redirect()->route('corporate-list')->with('success', 'User updated successfully');
             }

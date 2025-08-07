@@ -7,10 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-
 class corporateOHC extends Controller
 {
-
     public function corporateOHCList(Request $request)
     {
         $headerData = 'Corporate OHC Details';
@@ -31,7 +29,6 @@ class corporateOHC extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllOHCDetails/' . $locationId);
-            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }
@@ -59,7 +56,7 @@ class corporateOHC extends Controller
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }
-            //return $response;
+
             return response()->json(['result' => false, 'data' => 'Invalid request'], $response->status());
         } catch (\Exception $e) {
             return response()->json(['result' => false, 'data' => 'Error in Fetching data'], 503);
@@ -80,7 +77,6 @@ class corporateOHC extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addCorporateOHCData', $request);
-            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => 'Corporate OHC added sucssaascessfully']);
             } else {
@@ -145,7 +141,6 @@ class corporateOHC extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPharmacyData', $request);
-            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => 'Pharmacy OHC added sucssaascessfully']);
             } else {
@@ -179,7 +174,7 @@ class corporateOHC extends Controller
                 'status' => $validated['status'],
                 'main_pharmacy' => $validated['main_pharmacy']
             ]);
-            // return $response;
+
             if ($response->successful()) {
                 return response()->json([
                     'result' => true,

@@ -59,7 +59,7 @@ class InventoryController extends Controller
 
     public function addInventorytoDB(Request $request)
     {
-       //return $request;
+      // return $request;
         // Validate incoming request according to the schema
         $validator = Validator::make($request->all(), [
             'date' => 'required',

@@ -31,7 +31,7 @@ class InventoryController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllInventory/' . $locationId, $request->all());
-            //return $response;
+
             $data = $response->json()['data'];
             return response()->json([
                 'result' => true,
@@ -56,7 +56,7 @@ class InventoryController extends Controller
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getInventoryById/' . $id);
 
-            //return $response;
+
             $headerData = 'Bhava';
             if ($response->successful()) {
                 $inventory = $response['data'];
@@ -83,7 +83,7 @@ class InventoryController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addInventorytoDB', $requestData);
-            //return $response;
+            return $response;
             return response()->json($response->json());
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred: ');
@@ -128,7 +128,6 @@ class InventoryController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getCalibrationHistory/' . $id);
-            return $response;
             if ($response->successful()) {
                 $inventory = $response['data'];
                 return $inventory;

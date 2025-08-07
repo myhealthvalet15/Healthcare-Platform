@@ -620,7 +620,6 @@ class health_registry extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/getEmployeesDetailById/' . $employeeId);
-            return $response;
             if ($response->successful()) {
                 $employee_details = $response->json();
                 return response()->json($employee_details);

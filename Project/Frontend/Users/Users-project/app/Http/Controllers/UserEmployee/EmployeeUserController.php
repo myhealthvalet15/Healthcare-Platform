@@ -36,7 +36,6 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getPrescriptionByEmployeeId/' . $employeeid);
-            return $response;
             if ($response->successful()) {
 
                 $prescription = $response['data'];
@@ -58,7 +57,6 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getPrescriptionForOtcByEmployeeId/' . $employeeid);
-            return $response;
             if ($response->successful()) {
 
                 $prescription = $response['data'];
@@ -149,7 +147,6 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getEmployeesDetailById/' . $employeeId);
-            return $response;
             if ($response->successful()) {
                 $employee_details = $response->json();
                 return response()->json($employee_details);
@@ -171,7 +168,7 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getEmployeesDetailById/' . $employeeId);
-            // return $response;
+
             if ($response->successful()) {
                 $employee_details = $response->json();
                 return response()->json($employee_details);
@@ -268,7 +265,6 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get($url);
-            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }
@@ -346,7 +342,7 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getEventsforEmployees/' . $master_user_user_id);
-            // return $response;
+
             if ($response->successful()) {
                 $events = $response['data'];
                 return response()->json($events);
@@ -366,7 +362,6 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getEventDetails/' . $employeeId);
-            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }
@@ -434,7 +429,6 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getHospitalizationList/' . $user_id);
-            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             } else {
@@ -457,7 +451,6 @@ class EmployeeUserController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/master-user/masteruser/getMedicalCondition');
-            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             } else {

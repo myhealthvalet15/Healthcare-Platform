@@ -135,7 +135,7 @@
 
         // AJAX request to save the data
         $.ajax({
-            url: "{{ route('Others.store') }}", // Adjust the route if needed
+            url: "/others/store", // Adjust the route if needed
             method: 'POST',
             data: formData,
             success: function(response) {

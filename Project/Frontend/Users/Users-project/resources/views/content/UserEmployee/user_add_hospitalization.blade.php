@@ -3,12 +3,14 @@
 @section('vendor-style')
 @vite([
 'resources/assets/vendor/libs/select2/select2.scss',
-'resources/assets/vendor/libs/@form-validation/form-validation.scss'
+'resources/assets/vendor/libs/@form-validation/form-validation.scss',
+'resources/assets/vendor/libs/flatpickr/flatpickr.scss',
 ])
 @endsection
 @section('vendor-script')
 @vite([
-'resources/assets/vendor/libs/select2/select2.js'])
+'resources/assets/vendor/libs/select2/select2.js',
+'resources/assets/vendor/libs/flatpickr/flatpickr.js',])
 @endsection
 @section('page-script')
 @vite(['resources/assets/js/form-wizard-numbered.js'])
@@ -100,5 +102,5 @@
         </div>
     </div>
 </div>
-<script src="/lib/js/page-scripts/user_add_hospitalization.js"></script>
+<script src="/lib/js/page-scripts/hospitalization-details.js"></script>
 @endsection

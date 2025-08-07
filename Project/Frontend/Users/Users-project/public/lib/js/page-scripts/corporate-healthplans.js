@@ -2,36 +2,24 @@ var healthPlanPermission = 1;
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.querySelector('#healthPlanHeader');
     if (container) {
-        // Clear any existing content
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
-
-        // Create wrapper div
         const wrapper = document.createElement('div');
         wrapper.className = 'd-flex justify-content-between align-items-center mb-3';
-
-        // Create heading
         const heading = document.createElement('h5');
         heading.className = 'm-0';
-
-        // Create button
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'btn btn-primary';
         button.setAttribute('data-bs-toggle', 'modal');
         button.setAttribute('data-bs-target', '#addNewHealthPlanModal');
         button.textContent = 'Add New Health Plan';
-
-        // Append heading and button to wrapper
         wrapper.appendChild(heading);
         wrapper.appendChild(button);
-
-        // Append wrapper to container
         container.appendChild(wrapper);
     }
 });
-
 let storedHealthPlans = [], originalHealthPlans = [], filteredHealthPlans = [];
 function sendNewHealthPlanData(corporate_id) {
     if (!corporate_id) {

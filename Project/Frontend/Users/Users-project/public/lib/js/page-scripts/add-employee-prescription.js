@@ -396,7 +396,7 @@ $(document).ready(function () {
                 formData.drugs.push(rowOutsideData);
             }
         });
-        const userType = "{{ session('user_type') }}";
+        
         apiRequest({
             url: "/prescription/store_EmployeePrescription",
             method: 'POST',

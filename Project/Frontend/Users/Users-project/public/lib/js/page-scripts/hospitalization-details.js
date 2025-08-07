@@ -1,6 +1,7 @@
   //Corporate Code
   $('#hospital_id').on('change', function () {
-    if ($(this).val() === '0') {
+    if ($(this).val() ===
+     '0') {
         $('#hospital_name_div').show();
     } else {
         $('#hospital_name_div').hide();
@@ -297,10 +298,10 @@ function loadMedicalCondition() {
                 $conditionSelect.html('<option disabled>No conditions found</option>');
             }
         },
-        onError: function (error) {
-            showToast('error', 'Error', 'Failed to load medical conditions');
-            $conditionSelect.html('<option disabled>Error loading conditions</option>');
-        }
+        //onError: function (error) {
+          //  showToast('error', 'Error', 'Failed to load medical conditions');
+           // $conditionSelect.html('<option disabled>Error loading conditions</option>');
+        //}
     });
 }
 

@@ -6,18 +6,3 @@ view past history - Pending
 edit question bug - Pending
 redirect on login and other endpoints - Pending
 Cloudfare Proxy - Pending
----------------------------------------------------------------------------
-Resources Folder 
-Views 
-    - Deleting all unwanted Files and Folders
-    - Moving all js
-
-    - removing comments
-    - formatting
-    - use custom apirequest
-    - use custom showtoast
-
-    - Folder wise segregation
-    - Proper Naming Conventions
----------------------------------------------------------------------------
-Middleware, Controllers

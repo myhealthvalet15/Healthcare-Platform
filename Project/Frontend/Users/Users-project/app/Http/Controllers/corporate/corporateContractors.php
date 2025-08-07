@@ -32,7 +32,6 @@ class corporateContractors extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get("https://api-user.hygeiaes.com/V1/corporate/corporate-components/viewContractors/" . $locationId);
-            return $response;
             if ($response->successful()) {
                 $contractordata = $response['data'];
                 return view('content.corporate-contractors.index', compact('contractordata'), ['HeaderData' => $headerData]);
@@ -123,7 +122,6 @@ class corporateContractors extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->put('https://api-user.hygeiaes.com/V1/corporate/corporate-components/modifyContractors/' . $id, $modified_data);
-            return $response;
             if ($response->successful() and $response->getStatusCode() === 201) {
                 return response()->json([
                     'result' => true,

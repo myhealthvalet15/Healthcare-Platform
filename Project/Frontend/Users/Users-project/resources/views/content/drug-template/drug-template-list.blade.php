@@ -100,6 +100,12 @@
 </div>
 <hr class="my-12">
 
-
+<script>
+    var drugtemplates = @json($drugtemplates);
+    var drugTypes = @json($drugTypes);
+    var drugIngredients = @json($drugIngredients);
+    var drugTypeName = @json($drugTypes)[rowData.drug_type] || 'Unknown';
+    var drugIngredientsId = @json($drugIngredients)[id] || null;
+</script>
   <script src="/lib/js/page-scripts/drug-template-list.js"></script>
 @endsection

@@ -154,6 +154,28 @@
     </div>
     <!-- /Validation Wizard -->
     </div>
-
+<script>
+    $(document).ready(function () {
+    @if (isset($drugtemplates['bill_status']) && $drugtemplates['bill_status'] == 1)
+        $('#bill_status').prop('checked', true);
+    $('#bill-status-label').text('Active');
+    @else
+    $('#bill-status-label').text('Inactive');
+    @endif
+    $('#bill_status').change(function () {
+        if ($(this).is(':checked')) {
+            $('#bill-status-label').text('Active');
+        } else {
+            $('#bill-status-label').text('Inactive');
+        }
+    });
+    @if (isset($drugtemplates['otc']) && $drugtemplates['otc'] == 1)
+        $('#otc').prop('checked', true);
+    @endif
+    @if (isset($drugtemplates['crd']) && $drugtemplates['crd'] == 1)
+        $('#crd').prop('checked', true);
+    @endif
+});
+</script>
     <script src="/lib/js/page-scripts/drug-template-edit.js"></script>
 @endsection

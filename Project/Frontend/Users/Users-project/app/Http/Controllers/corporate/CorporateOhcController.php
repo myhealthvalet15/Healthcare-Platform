@@ -7,10 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-
 class CorporateOhcController extends Controller
 {
-
     public function corporateOHCList(Request $request)
     {
         $headerData = 'Corporate OHC Details';
@@ -36,7 +34,7 @@ class CorporateOhcController extends Controller
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }
-            //return $response;
+
             return response()->json(['result' => false, 'data' => 'Invalid request'], $response->status());
         } catch (\Exception $e) {
             return response()->json(['result' => false, 'data' => 'Error in Fetching data'], 503);
@@ -52,7 +50,7 @@ class CorporateOhcController extends Controller
             ]);
         }
 
-        try {   
+        try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
@@ -61,7 +59,7 @@ class CorporateOhcController extends Controller
             if ($response->successful()) {
                 return response()->json(['result' => true, 'data' => $response['data']]);
             }
-            //return $response;
+
             return response()->json(['result' => false, 'data' => 'Invalid request'], $response->status());
         } catch (\Exception $e) {
             return response()->json(['result' => false, 'data' => 'Error in Fetching data'], 503);
@@ -69,7 +67,7 @@ class CorporateOhcController extends Controller
     }
     public function addCorporateOHC(Request $request)
     {
-        $locationId = session('location_id');        
+        $locationId = session('location_id');
         $corporateId = session('corporate_id');
         $requestData = $request->all();  // Get all request input data
         $requestData['location_id'] = $locationId;  // Add location_id to the data
@@ -84,7 +82,6 @@ class CorporateOhcController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addCorporateOHCData', $requestData);
-            return $response;
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => 'Corporate OHC added sucssaascessfully']);
             } else {
@@ -137,7 +134,7 @@ class CorporateOhcController extends Controller
     }
     public function addPharmacy(Request $request)
     {
-        $locationId = session('location_id');        
+        $locationId = session('location_id');
         $corporateId = session('corporate_id');
         $requestData = $request->all();  // Get all request input data
         $requestData['location_id'] = $locationId;  // Add location_id to the data
@@ -153,7 +150,7 @@ class CorporateOhcController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPharmacyData', $requestData);
-          // return $response;
+
             if ($response->successful()) {
                 return response()->json(['result' => true, 'message' => 'Pharmacy OHC added sucssaascessfully']);
             } else {
@@ -171,7 +168,7 @@ class CorporateOhcController extends Controller
     }
     public function updatePharmacy(Request $request, $id)
     {
-       // return $id;
+        // return $id;
         try {
             $validated = $request->validate([
                 'pharmacy_name' => 'required|string|max:255',
@@ -187,7 +184,7 @@ class CorporateOhcController extends Controller
                 'status' => $validated['status'],
                 'main_pharmacy' => $validated['main_pharmacy']
             ]);
-           // return $response;
+
             if ($response->successful()) {
                 return response()->json([
                     'result' => true,

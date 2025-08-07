@@ -10,15 +10,14 @@ use Illuminate\Support\Facades\Cache;
 class RequestController extends Controller
 {
     public function getPendingRequests()
-
     {
         $menuData = Cache::get('menuData');
-        $headerData = 'Pending Requests';       
+        $headerData = 'Pending Requests';
         return view('content.requests.pending-requests', [
             'HeaderData' => $headerData,
            // 'menuData'   => $menuData,
         ]);
-     }
+    }
     public function getAllEmployeePrescription(Request $request)
     {
         // Get the location ID from the session
@@ -51,7 +50,7 @@ class RequestController extends Controller
 
 
             // Uncomment if you want to debug the raw response
-            //return $response;
+
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -112,7 +111,8 @@ class RequestController extends Controller
         }
     }
 
-    public function closePrescription(Request $request){
+    public function closePrescription(Request $request)
+    {
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -125,7 +125,8 @@ class RequestController extends Controller
             return redirect()->back()->with('error', 'An error occurred: ');
         }
     }
-    public function issuePartlyPrescription(Request $request){
+    public function issuePartlyPrescription(Request $request)
+    {
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -143,7 +144,7 @@ class RequestController extends Controller
         $headerData = 'Completed Requests';
         return view('content.requests.complete-requests', ['HeaderData' => $headerData]);
     }
-    
+
     public function getCompletedPrescription(Request $request)
     {
         // Get the location ID from the session
@@ -173,10 +174,6 @@ class RequestController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllClosedPrescription/' . $userId, $requestData);
-
-
-            // Uncomment if you want to debug the raw response
-            return $response;
 
             if ($response->successful()) {
                 $data = $response->json();

@@ -8,13 +8,13 @@ use Illuminate\Http\Request;
 
 class OtcController extends Controller
 {
-   public function searchOTC()
+    public function searchOTC()
     {
         $headerData = 'OTC Details';
         return view('content.otc.otc-add', ['HeaderData' => $headerData]);
-   
+
     }
-  
+
     public function addOTC($employee_id = null, $op_registry_id = null)
     {
         $locationId = session('location_id');
@@ -35,15 +35,15 @@ class OtcController extends Controller
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Authorization' => 'Bearer ' . request()->cookie('access_token'),
-        ])->get($url); 
+        ])->get($url);
         $pharmacyResponse = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . request()->cookie('access_token'),
             ])->get('https://api-user.hygeiaes.com/V1/corporate/corporate-components/getPharmacyDetails/' . $locationId);
-           
 
-      //  return $response;
+
+
         if ($response->successful() && $pharmacyResponse->successful()) {
             $data = $response->json();
             if (!isset($data['result']) || !$data['result']) {
@@ -66,9 +66,9 @@ class OtcController extends Controller
         }
         return "Invalid Request";
     }
-     public function storeOTC(Request $request)
-      {
-        $locationId = session('location_id');      
+    public function storeOTC(Request $request)
+    {
+        $locationId = session('location_id');
         $corporateId = session('corporate_id');
         $userId = session('corporate_admin_user_id');
         $requestData = array_merge($request->all(), [
@@ -82,7 +82,7 @@ class OtcController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPrescriptionForOTC', $requestData);
-           // return $response;
+
             //return response()->json($response->json());
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred: ');
@@ -92,38 +92,37 @@ class OtcController extends Controller
     {
         $headerData = 'List OTC Details';
         return view('content.otc.list-otc', ['HeaderData' => $headerData]);
-   
+
     }
- public function listotcdetails(Request $request)
-{
-    $locationId = session('location_id');
-  // return $employee_id = session('employee_id');        
+    public function listotcdetails(Request $request)
+    {
+        $locationId = session('location_id');
+        // return $employee_id = session('employee_id');
 
-    if (!$locationId) {
-        return response()->json([
-            'result' => false,
-            'message' => 'Invalid Requestsssss'
-        ]);
-    }
-
-    try {
-        $url = 'https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllotcDetails/' . $locationId;
-
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $request->cookie('access_token'),
-        ])->get($url);
-        return $response;
-        if ($response->successful()) {
-            return response()->json(['result' => true, 'data' => $response['data']]);
+        if (!$locationId) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Invalid Requestsssss'
+            ]);
         }
- 
-        return response()->json(['result' => false, 'data' => 'Invalid request'], $response->status());
-    } catch (\Exception $e) {
-        return response()->json(['result' => false, 'data' => 'Error in Fetching data'], 503);
+
+        try {
+            $url = 'https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllotcDetails/' . $locationId;
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $request->cookie('access_token'),
+            ])->get($url);
+            if ($response->successful()) {
+                return response()->json(['result' => true, 'data' => $response['data']]);
+            }
+
+            return response()->json(['result' => false, 'data' => 'Invalid request'], $response->status());
+        } catch (\Exception $e) {
+            return response()->json(['result' => false, 'data' => 'Error in Fetching data'], 503);
+        }
     }
-}
 
 
 }

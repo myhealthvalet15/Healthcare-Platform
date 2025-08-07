@@ -134,8 +134,8 @@ class DrugTemplateController extends Controller
     }
     public function updateDrugTemplate(Request $request, $id)
     {
-       Log::info('Incoming request data:', $request->all());
-  
+        Log::info('Incoming request data:', $request->all());
+
         // Validate incoming request according to the schema
         $validator = Validator::make($request->all(), [
             'drug_name' => 'required|string|max:255',
@@ -180,17 +180,17 @@ class DrugTemplateController extends Controller
             $drugTemplateData['drug_ingredient'] = $ingredients; // update ingredients
             $drugTemplateData['bill_status'] = $request->bill_status ? 1 : 0;  // convert to 1 or 0 based on checkbox
 
-           // Log data being updated (for debugging purposes)
-           // Log::info('Updating DrugTemplate with data:', $drugTemplateData);
-          //dd($drugTemplateData);
+            // Log data being updated (for debugging purposes)
+            // Log::info('Updating DrugTemplate with data:', $drugTemplateData);
+            //dd($drugTemplateData);
             // Update the record in the database
-             $updated = $drugTemplate->update($drugTemplateData);
-             //Log::info('Update Status:', ['updated' => $updated]);
+            $updated = $drugTemplate->update($drugTemplateData);
+            //Log::info('Update Status:', ['updated' => $updated]);
 
 
 
             // Return success response
-            // return $response;
+
             return response()->json(['success' => true, 'data' => $drugTemplate], 200);
         } catch (\Exception $e) {
             // Log the exception message with more details

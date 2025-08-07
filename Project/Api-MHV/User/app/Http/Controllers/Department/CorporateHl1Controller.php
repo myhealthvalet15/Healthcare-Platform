@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Http\Controllers\Department;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Department\CorporateHl1;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Exception;
+
 class CorporateHl1Controller extends Controller
 {
     public function index(Request $request)
@@ -13,12 +16,12 @@ class CorporateHl1Controller extends Controller
         //return 'Hello';
         try {
             $corporateHl1Records = CorporateHl1::all();
-          //  return $corporateHl1Records;
+            //  return $corporateHl1Records;
             return response()->json([
                 'success' => true,
                 'data' => $corporateHl1Records,
             ], 200);
-            //return $response;
+
         } catch (Exception $e) {
             Log::error('Error fetching CorporateHl1 records', ['error' => $e->getMessage()]);
             return response()->json([
@@ -72,7 +75,7 @@ class CorporateHl1Controller extends Controller
             'hl1_code' => 'nullable|string',
             'active_status' => 'nullable|boolean',
         ]);
-    
+
         // If validation fails, return the error messages
         if ($validator->fails()) {
             return response()->json([
@@ -80,18 +83,18 @@ class CorporateHl1Controller extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
-    
+
         try {
             // Try to find the CorporateHl1 record by ID
             $corporateHl1 = CorporateHl1::findOrFail($id);
-    
+
             // Update the record with validated data
             $corporateHl1->update([
                 'hl1_name' => $request->hl1_name,
                 'hl1_code' => $request->hl1_code,
                 'active_status' => $request->active_status,
             ]);
-    
+
             // Return a success response with the updated data
             return response()->json([
                 'success' => true,
@@ -120,7 +123,7 @@ class CorporateHl1Controller extends Controller
             ], 500);
         }
     }
-    
+
     public function destroy($id)
     {
         try {

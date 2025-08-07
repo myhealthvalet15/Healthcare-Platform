@@ -7,23 +7,22 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
-
 class CorporateFormController extends Controller
 {
-     public function listCorporateForms(Request $request)
+    public function listCorporateForms(Request $request)
     {
         return view('content.forms.list-forms');
-    }  
-        public function getAllForms(Request $request)
+    }
+    public function getAllForms(Request $request)
     {
-       // return 'Hello';
+        // return 'Hello';
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-admin.hygeiaes.com/V1/forms-stubs/forms-stubs/getAllCorporateForms');
-            //return $response;
+
             if ($response->status() === 401) {
                 return response()->json(['result' => 'error', 'message' => 'Unauthenticated'], 401);
             }
@@ -35,16 +34,16 @@ class CorporateFormController extends Controller
             return response()->json(['error' => 'Server error'], 500);
         }
     }
-     public function getAllStates(Request $request)
+    public function getAllStates(Request $request)
     {
-       // return 'Hello';
+        // return 'Hello';
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-admin.hygeiaes.com/V1/forms-stubs/forms-stubs/getAllStates');
-            //return $response;
+
             if ($response->status() === 401) {
                 return response()->json(['result' => 'error', 'message' => 'Unauthenticated'], 401);
             }
@@ -56,14 +55,14 @@ class CorporateFormController extends Controller
             return response()->json(['error' => 'Server error'], 500);
         }
     }
-     public function addNewForm(Request $request)
-    { 
+    public function addNewForm(Request $request)
+    {
         //return 'Hello';
         //Log::info('Request data:', $request->all());
         try {
             $validated = $request->validate([
                 'form_name' => 'required|string|max:255',
-                'statename'=>'required|integer',
+                'statename' => 'required|integer',
                 'status' => 'required|boolean',
             ]);
             $response = Http::withHeaders([
@@ -93,13 +92,13 @@ class CorporateFormController extends Controller
             return response()->json(['result' => "error", 'message' => 'error: ' . $e->getMessage()]);
         }
     }
-      public function editForm(Request $request, $id)
+    public function editForm(Request $request, $id)
     {
         try {
-             $validated = $request->validate([
-                'form_name' => 'required|string|max:255',
-                'statename'=>'required|integer',
-                'status' => 'required|boolean',
+            $validated = $request->validate([
+               'form_name' => 'required|string|max:255',
+               'statename' => 'required|integer',
+               'status' => 'required|boolean',
             ]);
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -110,7 +109,7 @@ class CorporateFormController extends Controller
                 'statename' => $validated['statename'],
                 'status' => $validated['status'],
             ]);
-            //return $response;
+
             if ($response->status() === 401) {
                 return response()->json(['result' => 'error', 'message' => 'Unauthenticated'], 401);
             }
@@ -149,7 +148,7 @@ class CorporateFormController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->delete('https://api-admin.hygeiaes.com/V1/forms-stubs/forms-stubs/deleteForms/' . $id);
-            //return $response;
+
             if ($response->status() === 401) {
                 return response()->json(['result' => 'error', 'message' => 'Unauthenticated'], 401);
             }
@@ -163,4 +162,3 @@ class CorporateFormController extends Controller
     }
 
 }
-?>

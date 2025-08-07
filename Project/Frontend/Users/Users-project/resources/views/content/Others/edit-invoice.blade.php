@@ -162,6 +162,75 @@
         </div>
     </div>
 
-
+<script>
+     $('#vendor_name_edit').text("{{ $invoice['vendor_name'] ?? '' }} ");
+    $('#ponumber_edit').text("{{ $invoice['po_number'] ?? '' }} ");
+    var cashInvoiceDate = "{{ $invoice['invoice_date'] ?? '' }}";
+    if (cashInvoiceDate) {
+        $('#cash_invoice_date').val(formatDate(cashInvoiceDate));
+    }
+    var cashEntryDate = "{{ $invoice['entry_date'] ?? '' }}";
+    if (cashEntryDate) {
+        $('#cash_entry_date').val(formatDate(cashEntryDate));
+    }
+    var invoiceDate = "{{ $invoice['invoice_date'] ?? '' }}";
+    if (invoiceDate) {
+        $('#invoice_date').val(formatDate(invoiceDate));
+    }
+    var entryDate = "{{ $invoice['entry_date'] ?? '' }}";
+    if (entryDate) {
+        $('#entry_date').val(formatDate(entryDate));
+    }
+    var ohcVerifyDate = "{{ $invoice['ohc_verify_date'] ?? '' }}";
+    if (ohcVerifyDate) {
+        $('#ohc_verify_date').val(formatDate(ohcVerifyDate));
+    }
+    var hrVerifyDate = "{{ $invoice['hr_verify_date'] ?? '' }}";
+    if (hrVerifyDate) {
+        $('#hr_verify_date').val(formatDate(hrVerifyDate));
+    }
+    var sesDate = "{{ $invoice['ses_date'] ?? '' }}";
+    if (sesDate) {
+        $('#ses_date').val(formatDate(sesDate));
+    }
+    var headVerifyDate = "{{ $invoice['head_verify_date'] ?? '' }}";
+    if (headVerifyDate) {
+        $('#head_verify_date').val(formatDate(headVerifyDate));
+    }
+    var sesReleaseDate = "{{ $invoice['ses_release_date'] ?? '' }}";
+    if (sesReleaseDate) {
+        $('#ses_release_date').val(formatDate(sesReleaseDate));
+    }
+    var submissionDate = "{{ $invoice['submission_date'] ?? '' }}";
+    if (submissionDate) {
+        $('#submission_date').val(formatDate(submissionDate));
+    }
+    var paymentDate = "{{ $invoice['payment_date'] ?? '' }}";
+    if (paymentDate) {
+        $('#payment_date').val(formatDate(paymentDate));
+    }
+    $('input[name="invoice_type"]').change(function () {
+        if (this.value === 'po') {
+            $('#po_invoice_form').show();
+            $('#cash_invoice_form').hide();
+        } else {
+            $('#po_invoice_form').hide();
+            $('#cash_invoice_form').show();
+        }
+    });
+    $('input[name="invoice_type"]').prop('checked', false);
+    var corporatePoId = "{{ $invoice['corporate_po_id'] ?? '' }}";
+    console.log('corporatePoId:', corporatePoId);
+    let invoiceType = corporatePoId && corporatePoId.trim() !== '' ? 'po' : 'cash';
+    $('#' + invoiceType + '_invoice').prop('checked', true).trigger('change');
+    $('#invoice_number').val("{{ $invoice['invoice_number'] ?? '' }}");
+    $('#invoice_amount').val("{{ $invoice['invoice_amount'] ?? '' }}");
+    $('#ses_number').val("{{ $invoice['ses_number'] ?? '' }}");
+    $('#cash_invoice_number').val("{{ $invoice['invoice_number'] ?? '' }}");
+    $('#cash_amount').val("{{ $invoice['invoice_amount'] ?? '' }}");
+    $('#cash_vendor').val("{{ $invoice['cash_vendor'] ?? '' }}");
+    $('#cash_invoice_details').val("{{ $invoice['cash_invoice_details'] ?? '' }}");
+    
+</script>
     <script src="/lib/js/page-scripts/edit-invoice.js"></script>
 @endsection

@@ -344,8 +344,8 @@ class ComponentController extends Controller
             'Accept'        => 'application/json',
             'Authorization' => 'Bearer ' . $request->cookie('access_token'),
         ])->get("https://api-admin.hygeiaes.com/V1/corporate/corporate-components/getAssignedForms/{$corporate_id}/{$location_id}");
-            //return $response;
-            //return $response;
+
+
             if ($response->status() === 401) {
                 return response()->json([
                     'success' => false,
@@ -383,7 +383,7 @@ class ComponentController extends Controller
                 'Accept'        => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->get('https://api-admin.hygeiaes.com/V1/corporate/corporate-components/getModule4Submodules');
-            // return $response;
+
             if ($response->status() === 401) {
                 return response()->json([
                     'success' => false,

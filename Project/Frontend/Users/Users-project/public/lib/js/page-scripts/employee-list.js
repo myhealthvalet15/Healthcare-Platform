@@ -1,4 +1,3 @@
-
 'use strict';
 let fv, offCanvasEl;
 document.addEventListener('DOMContentLoaded', function (e) {
@@ -99,18 +98,18 @@ $(function () {
         dt_row_grouping_table = $('.dt-row-grouping'),
         dt_multilingual_table = $('.dt-multilingual'),
         dt_basic;
-    $.ajax({
+    apiRequest({
         url: '/employees/getAllEmployees',
         method: 'GET',
-        success: function (response) {
+        onSuccess: function (response) {
             console.log(response);
             if (response.result) {
-                var employeeData = response.message;
+                const employeeData = response.message;
                 initializeDataTable(employeeData);
             }
         },
-        error: function (error) {
-            console.error('Failed to fetch data:', error);
+        onError: function (errorMessage) {
+            console.error('Failed to fetch data:', errorMessage);
         }
     });
     $(document).on('click', '.showDetailsBtn', function () {
@@ -123,7 +122,6 @@ $(function () {
         $('#modalDepartment').text(rowData.hl1_name);
         $('#employeeModal').modal('show');
     });
-
     function initializeDataTable(employeeData) {
         console.log(employeeData);
         if (dt_basic_table.length) {

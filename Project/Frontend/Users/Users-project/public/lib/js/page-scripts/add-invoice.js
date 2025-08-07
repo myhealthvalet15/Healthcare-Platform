@@ -1,4 +1,4 @@
-$(document).ready(function () {
+ $(document).ready(function () {
     $("#invoice_date").flatpickr({
         dateFormat: "d-m-Y",
         maxDate: "today",

@@ -44,7 +44,6 @@ async function apiRequest({ url, method = 'GET', data = null, headers = {}, onSu
         return responseData;
     } catch (error) {
         if (onError) onError(error.message);
-        // console.error('API Request Error:', error);
     }
 }
 

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+Bhavani
+    - replacing alerts with showToast 
+    - remove unwanted alerts and console.log and console.errors
+    - Checking functionality of all the pages and making it work
+Praveen
+    - Deleting all unwanted Files and Folders
+    - Moving all js and css
+    - replacinng ajax and fetch with apiRequest custom function
+    - removing all the csrf
+    - removing all blade codes from js and placing it in blade file 
+    - formatting all JS, CSS, Blade, Controllers
+---------------------------------------------------------------------------

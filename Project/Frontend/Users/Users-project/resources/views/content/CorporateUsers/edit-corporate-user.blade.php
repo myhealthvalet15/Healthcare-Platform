@@ -143,8 +143,16 @@
         </div>
     </div>
 </div>
-
+<script>
+    $('#first_name').val("{{ $corporateuser['first_name'] ?? '' }} ");
+    $('#last_name').val("{{ $corporateuser['last_name'] ?? '' }} ");
+    $('#email').val("{{ $corporateuser['email'] ?? '' }} ");
+    $('#mobile_country_code').val("{{ $corporateuser['mobile_country_code'] ?? '' }} ");
+    $('#mobile_num').val("{{ $corporateuser['mobile_num'] ?? '' }} ");
+    $('#aadhar').val("{{ $corporateuser['aadhar'] ?? '' }} ");
+    var gender = "{{ $corporateuser['gender'] ?? '' }}";
+    var setting = "{{ $corporateuser['setting'] ?? '' }}";
+    var selectedDepartment = "{{ $corporateuser['department'] ?? '' }}";
+</script>
 <script src="/lib/js/page-scripts/edit-corporate-user.js"></script>
-
-
 @endsection

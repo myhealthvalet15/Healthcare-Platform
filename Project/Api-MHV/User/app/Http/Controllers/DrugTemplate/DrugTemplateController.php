@@ -50,9 +50,8 @@ class DrugTemplateController extends Controller
     }
     public function addDrugTemplate(Request $request)
     {
-        //return $request;
+       // return $request;
         $ingredients = implode(',', $request->drug_ingredients);
-        // Validate incoming request according to the schema
         $validator = Validator::make($request->all(), [
             'drug_name' => 'required|string|max:255',
             'drug_manufacturer' => 'required|string|max:255',
@@ -72,7 +71,7 @@ class DrugTemplateController extends Controller
             'sgst' => 'required|numeric',  // float in schema
             'cgst' => 'required|numeric',  // float in schema
             'igst' => 'required|numeric',  // float in schema
-            'bill_status' => 'required|string|max:255',
+            'bill_status' => 'required|integer|max:255',
             'otc' => 'nullable|boolean',
             'crd' => 'nullable|boolean',
              // varchar(255) in schema

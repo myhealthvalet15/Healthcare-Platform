@@ -217,13 +217,13 @@ $(document).ready(function () {
             method: 'POST',
             data: formData,
             onSuccess: function (response) {
-                if (response.success) {
-                    toastr.success('Prescription submitted successfully!', 'Success');
-                    window.location.href = '/prescription/prescription-template';
-                } else {
-                    alert('Error: ' + response.message);
-                }
-            },
+    if (response.result === true) {
+        toastr.success('Prescription submitted successfully!', 'Success');
+        window.location.href = '/prescription/prescription-template';
+    } else {
+        alert('Error: ' + response.message);
+    }
+},
             onError: function (errorMessage) {
                 console.error('Error submitting prescription: ' + errorMessage);
                 alert('Something went wrong. Please try again.');

@@ -14,21 +14,21 @@ use App\Models\Employee\EmployeeType;
 use App\Models\PrescribedTest;
 use App\Models\PrescribedTestData;
 use App\Models\Corporate\MasterUser;
-
-
-
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class MhcReportsController extends Controller
 {
   
-   public function getEmployeeHealthData($location_id, $corporate_id, Request $request)
+public function getEmployeeHealthData($location_id, $corporate_id, Request $request)
 {
     $validated = $request->validate([
         'employeeType'     => 'nullable|integer',
         'medicalCondition' => 'nullable|string',
         'department'       => 'nullable|integer',
         'ageGroup'         => 'nullable|string',
+        'fromDate'         => 'nullable|string',
+        'toDate'           => 'nullable|string',
     ]);
 
     $query = PrescribedTest::with([
@@ -36,7 +36,7 @@ class MhcReportsController extends Controller
         'user.corporateHL1',
         'user.masterUser',
         'masterTest'
-     ])
+    ])
     ->where('location_id', $location_id)
     ->where('corporate_id', $corporate_id);
 
@@ -44,7 +44,7 @@ class MhcReportsController extends Controller
         $query->whereHas('user', fn($q) => $q->where('employee_type_id', $validated['employeeType']));
     }
 
-    if (!empty($validated['department'])) {
+    if (!empty($validated['department']) && $validated['department'] != '0') {
         $query->whereHas('user', fn($q) => $q->where('hl1_id', $validated['department']));
     }
 
@@ -59,15 +59,30 @@ class MhcReportsController extends Controller
         $query->where('test_code', $validated['medicalCondition']);
     }
 
+    if (!empty($validated['fromDate']) && !empty($validated['toDate'])) {
+        try {
+            $from = Carbon::createFromFormat('d/m/Y', $validated['fromDate'])->startOfDay();
+            $to = Carbon::createFromFormat('d/m/Y', $validated['toDate'])->endOfDay();
+
+            $query->whereBetween('test_date', [$from, $to]);
+        } catch (\Exception $e) {
+            return response()->json(['result' => false, 'message' => 'Invalid date format']);
+        }
+    }
+
     $prescribedTests = $query->get();
 
+    if ($prescribedTests->isEmpty()) {
+        return response()->json(['result' => true, 'data' => []]);
+    }
+
     $testCodes = $prescribedTests->pluck('test_code')->unique()->toArray();
-    $userIds = $prescribedTests->pluck('user_id')->unique()->toArray();
+    $prescriptionIds = $prescribedTests->pluck('prescription_id')->unique()->toArray();
 
     $testResults = PrescribedTestData::whereIn('test_code', $testCodes)
-        ->whereIn('user_id', $userIds)
+        ->whereIn('prescription_id', $prescriptionIds)
         ->get()
-        ->groupBy(fn($item) => $item->test_code . '-' . $item->user_id);
+        ->groupBy(fn($item) => $item->test_code . '-' . $item->prescription_id);
 
     $groupedData = [];
 
@@ -89,14 +104,15 @@ class MhcReportsController extends Controller
             default => 'Unknown'
         };
 
-        // Match test result
-        $key = $test->test_code . '-' . $test->user_id;
+        // Get result using test_code + prescription_id
+        $key = $test->test_code . '-' . $test->prescription_id;
         $resultRow = $testResults[$key][0] ?? null;
+
         if (!$resultRow || !is_numeric($resultRow->test_results)) continue;
 
         $value = (float) $resultRow->test_results;
 
-        // Parse min/max range
+        // Parse min/max range from master test
         [$min, $max] = explode('-', $master->m_min_max ?? '0-0');
         $min = (float) $min;
         $max = (float) $max;

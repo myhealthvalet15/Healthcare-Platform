@@ -80,6 +80,9 @@ class PrescriptionController extends Controller
             }
             return response()->json(['result' => true, 'message' => 'Prescription added successfully'], 201);
         } catch (\Exception $e) {
+             Log::error('Failed to add prescription template: ' . $e->getMessage(), [
+        'trace' => $e->getTraceAsString()
+    ]);
             return response()->json(['result' => false, 'message' => 'An error occurred while saving the prescription.'], 500);
         }
     }

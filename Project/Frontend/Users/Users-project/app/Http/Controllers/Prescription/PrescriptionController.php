@@ -108,7 +108,7 @@ class PrescriptionController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPrescriptionTemplate', $requestData);
-
+           // return $response;
             return response()->json($response->json());
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred: ');
@@ -304,7 +304,7 @@ class PrescriptionController extends Controller
                 'Authorization' => 'Bearer ' . $request->cookie('access_token'),
             ])->post('https://api-user.hygeiaes.com/V1/corporate/corporate-components/addPrescription', $requestData);
 
-            return $response;
+            //return $response;
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while sending prescription data.'], 500);
         }

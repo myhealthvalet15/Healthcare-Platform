@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', function () {
 const attachmentInput = document.getElementById('prescriptionAttachment');
 const thumbnailsContainer = document.getElementById('prescriptionThumbnails');
 attachmentInput.addEventListener('change', function () {
@@ -35,6 +36,8 @@ attachmentInput.addEventListener('change', function () {
         reader.readAsDataURL(file);
     });
 });
+});
+
 function addRow1(isPrefilling = false, lastRowId = 0) {
     var container = document.querySelector('.prescription-inputs');
     var rowCount = isPrefilling ? lastRowId + 1 : container.querySelectorAll('.prescription-row').length + 1;
@@ -773,3 +776,4 @@ document.getElementById('prescriptionAttachment').addEventListener('change', asy
         });
     }
 });
+

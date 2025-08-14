@@ -18,7 +18,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
     }
     /**
      * Bootstrap services.
@@ -33,8 +32,6 @@ class AppServiceProvider extends ServiceProvider
             $horizontalMenuJson = file_get_contents(base_path('resources/menu/horizontalMenu.json'));
             $horizontalMenuData = json_decode($horizontalMenuJson, true);
             $menuData = [$verticalMenuData, $horizontalMenuData];
-
-
             $corporateId = Session('corporate_id');
             if ($corporateId) {
                 $response = Http::withHeaders([
@@ -42,22 +39,15 @@ class AppServiceProvider extends ServiceProvider
                     'Accept' => 'application/json',
                     'Authorization' => 'Bearer ' . request()->cookie('access_token'),
                 ])->get("https://api-user.hygeiaes.com/V1/corporate/corporate-components/getAllComponent/accessRights/corpId/{$corporateId}");
-
                 if ($response->successful() && !empty($response['data'])) {
-
-
                     $isSuperAdmin = $response['is_super_admin'] ?? false;
                     $ohcRights = $response['ohc_menu_rights'] ?? [];
                     $mhcRights = $response['mhc_menu_rights'] ?? [];
-
                     $verticalMenuData = $verticalMenuData;
-                    $horizontalMenuData = []; // Assuming it will be filled somewhere else
-
-                    // Permission check helper
+                    $horizontalMenuData = [];
                     $hasPermission = function ($rights, $key) {
                         return isset($rights[$key]) && intval($rights[$key]) > 0;
                     };
-
                     foreach ($response['data'] as $module) {
                         if (!empty($module['submodules'])) {
                             $moduleName = strtolower(str_replace(' ', '-', $module['module_name']));
@@ -68,7 +58,6 @@ class AppServiceProvider extends ServiceProvider
                                 'is_header' => true
                             ];
                             $moduleSubmodules = [];
-
                             foreach ($module['submodules'] as $submodule) {
                                 $subModuleName = strtolower(str_replace(' ', '-', $submodule['sub_module_name']));
                                 if ($moduleName === "others" && in_array($subModuleName, ['bio-medical-waste', 'inventory', 'invoice'])) {
@@ -88,8 +77,6 @@ class AppServiceProvider extends ServiceProvider
                                 }
                                 $moduleSubmodules[] = $newMenuItem;
                             }
-
-                            // ----- MHC Static Menus Based on Permissions -----
                             if ($moduleName === 'mhc') {
                                 if ($hasPermission($mhcRights, 'reports')) {
                                     $moduleSubmodules[] = [
@@ -114,8 +101,6 @@ class AppServiceProvider extends ServiceProvider
                                     ];
                                 }
                             }
-
-                            // ----- OHC Static Menus Based on Permissions -----
                             if ($moduleName === 'ohc') {
                                 if ($hasPermission($ohcRights, 'ohc_dashboard')) {
                                     $moduleSubmodules[] = [
@@ -125,18 +110,12 @@ class AppServiceProvider extends ServiceProvider
                                         'slug' => 'ohc-ohc-dashboard'
                                     ];
                                 }
-
-                                // if ($isSuperAdmin) {
-                                //  if ($hasPermission($ohcRights, 'corporate_ohc')) {
                                 $moduleSubmodules[] = [
                                     'url' => '/mhc/ohc-list',
                                     'name' => 'Corporate OHC',
                                     'icon' => "menu-icon tf-icons ti ti-package",
                                     'slug' => 'corporate-ohc-list'
                                 ];
-                                // }
-
-                                //  if ($hasPermission($ohcRights, 'drug_dispensation')) {
                                 $moduleSubmodules[] = [
                                     'name' => 'Drug Dispensation',
                                     'icon' => "menu-icon tf-icons ti ti-package",
@@ -146,24 +125,15 @@ class AppServiceProvider extends ServiceProvider
                                         ['url' => '/requests/complete-requests', 'name' => 'Completed Requests', 'slug' => 'requests-completed-requests', 'moduleName' => $moduleName],
                                     ]
                                 ];
-                                // }
-                                //}
-
-
-
                                 if ($hasPermission($ohcRights, 'prescription')) {
                                     $permission = intval($ohcRights['prescription']);
                                     $submenu = [];
-
-                                    // Always show "View Prescription"
                                     $submenu[] = [
                                         'url' => '/prescription/prescription-view',
                                         'name' => 'View Prescription',
                                         'slug' => 'ohc-prescription-view',
                                         'moduleName' => $moduleName
                                     ];
-
-                                    // Show "Prescription Template" only if permission is 2
                                     if ($permission === 2) {
                                         $submenu[] = [
                                             'url' => '/prescription/prescription-template',
@@ -172,7 +142,6 @@ class AppServiceProvider extends ServiceProvider
                                             'moduleName' => $moduleName
                                         ];
                                     }
-
                                     $moduleSubmodules[] = [
                                         'name' => 'Prescription',
                                         'icon' => "menu-icon tf-icons ti ti-package",
@@ -180,7 +149,6 @@ class AppServiceProvider extends ServiceProvider
                                         'submenu' => $submenu
                                     ];
                                 }
-
                                 if ($hasPermission($ohcRights, 'tests')) {
                                     $moduleSubmodules[] = [
                                         'name' => 'Test',
@@ -189,13 +157,10 @@ class AppServiceProvider extends ServiceProvider
                                         'url' => '/ohc/test-list',
                                     ];
                                 }
-
                                 if ($hasPermission($ohcRights, 'stocks')) {
                                     $permission = intval($ohcRights['stocks']);
                                     $submenu = [];
-
                                     if ($permission === 2) {
-                                        // Full access: Show all submenus
                                         $submenu = [
                                             [
                                                 'url' => '/drugs/drug-template-list',
@@ -217,7 +182,6 @@ class AppServiceProvider extends ServiceProvider
                                             ],
                                         ];
                                     } elseif ($permission === 1) {
-                                        // Limited access: Only show "Stock"
                                         $submenu = [
                                             [
                                                 'url' => '/pharmacy/pharmacy-stock-list',
@@ -227,7 +191,6 @@ class AppServiceProvider extends ServiceProvider
                                             ]
                                         ];
                                     }
-
                                     $moduleSubmodules[] = [
                                         'name' => 'Stocks',
                                         'icon' => "menu-icon tf-icons ti ti-package",
@@ -235,8 +198,6 @@ class AppServiceProvider extends ServiceProvider
                                         'submenu' => $submenu
                                     ];
                                 }
-
-
                                 if ($hasPermission($ohcRights, 'ohc_report')) {
                                     $moduleSubmodules[] = [
                                         'name' => 'Reports',
@@ -258,24 +219,18 @@ class AppServiceProvider extends ServiceProvider
                                 }
                             }
                             if ($moduleName === 'pre-employment') {
-
                             }
-
-                            // Add all submodules to final vertical menu
                             foreach ($moduleSubmodules as $submodule) {
                                 $verticalMenuData['menu'][] = $submodule;
                             }
                         }
                     }
-
                     $verticalMenuData = json_decode(json_encode($verticalMenuData));
                     $horizontalMenuData = json_decode(json_encode($horizontalMenuData));
                     $menuData = [$verticalMenuData, $horizontalMenuData];
-                    // print_r($menuData);
                     View::share('ohcRights', $ohcRights);
                     View::share('mhcRights', $mhcRights);
                 } View::share('menuData', $menuData);
-
             }
         });
     }
@@ -291,14 +246,12 @@ class AppServiceProvider extends ServiceProvider
         $customSubmenus = [];
         if ($subModuleName === 'diagnostic-assessment') {
             $permission = isset($mhcRights['diagnostic_assessment']) ? intval($mhcRights['diagnostic_assessment']) : 0;
-
             $customSubmenus[]  = [
                 'url' => "/{$moduleName}/{$subModuleName}/assign-health-plan-list",
                 'name' => 'List',
                 'slug' => 'diagnostic-assessment-list',
                 'moduleName' => $moduleName
             ];
-
             if ($permission === 2) {
                 $customSubmenus[] = [
                     'url' => "/{$moduleName}/{$subModuleName}/healthplans",
@@ -315,14 +268,12 @@ class AppServiceProvider extends ServiceProvider
             }
         } elseif ($subModuleName === 'health-risk-assessment') {
             $permission = isset($mhcRights['hra']) ? intval($mhcRights['hra']) : 0;
-
             $customSubmenus[] = [
                 'url' => "/{$moduleName}/{$subModuleName}/list",
                 'name' => 'List',
                 'slug' => 'health-risk-assessment-list',
                 'moduleName' => $moduleName
             ];
-
             if ($permission === 2) {
                 $customSubmenus[] = [
                     'url' => "/{$moduleName}/{$subModuleName}/templates",
@@ -344,6 +295,10 @@ class AppServiceProvider extends ServiceProvider
         } elseif ($subModuleName === 'events') {
             $customSubmenus = [
                 ['url' => "/{$moduleName}/{$subModuleName}/list-events", 'name' => 'List Events', 'slug' => 'events-list-events', 'moduleName' => $moduleName],
+            ];
+        } elseif ($subModuleName === 'otc') {
+            $customSubmenus = [
+                ['url' => "/otc/list-otc", 'name' => 'otc_test', 'slug' => 'otc_test', 'moduleName' => $moduleName],
             ];
         }
         return $customSubmenus;

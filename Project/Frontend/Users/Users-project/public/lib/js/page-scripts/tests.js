@@ -1,15 +1,4 @@
-var SubModulePermission = 1;
-if (typeof $apiMenuData !== 'undefined') {
-    $apiMenuData.forEach(function (module) {
-        if (module.module_name === 'OHC') {
-            module.submodules.forEach(function (submodule) {
-                if (submodule.sub_module_name === 'Test') {
-                    SubModulePermission = submodule.permission;
-                }
-            });
-        }
-    });
-}
+
 document.addEventListener("DOMContentLoaded", function () {
     const tableBody = document.querySelector('.table-border-bottom-0');
     let originalTestsData = [];

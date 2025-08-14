@@ -190,5 +190,19 @@
     </table>
   </div>
 </div>
+<script>
+  var SubModulePermission = 1;
+if (typeof $apiMenuData !== 'undefined') {
+    $apiMenuData.forEach(function (module) {
+        if (module.module_name === 'OHC') {
+            module.submodules.forEach(function (submodule) {
+                if (submodule.sub_module_name === 'Test') {
+                    SubModulePermission = submodule.permission;
+                }
+            });
+        }
+    });
+}
+</script>
 <script src="/lib/js/page-scripts/tests.js"></script>
 @endsection

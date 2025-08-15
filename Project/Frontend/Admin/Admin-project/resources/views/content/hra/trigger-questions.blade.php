@@ -1,21 +1,15 @@
 @extends('layouts/layoutMaster')
-
 @section('title', 'HRA Factor Priority')
-
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/select2/select2.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
 'resources/assets/vendor/libs/bootstrap-select/bootstrap-select.scss',
 'resources/assets/vendor/libs/typeahead-js/typeahead.scss'])
 @endsection
-
-<!-- Vendor Scripts -->
 @section('vendor-script')
 @vite(['resources/assets/vendor/libs/select2/select2.js', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
 'resources/assets/vendor/libs/bootstrap-select/bootstrap-select.js',
 'resources/assets/vendor/libs/typeahead-js/typeahead.js', 'resources/assets/vendor/libs/bloodhound/bloodhound.js'])
 @endsection
-
-<!-- Page Scripts -->
 @section('page-script')
 @vite(['resources/assets/js/forms-selects.js', 'resources/assets/js/extended-ui-sweetalert2.js',
 'resources/assets/js/form-basic-inputs.js', 'resources/assets/js/forms-typeahead.js'])
@@ -25,11 +19,9 @@
     .factor-row {
         transition: all 0.3s ease;
     }
-
     .factor-row:hover {
         background-color: rgba(0, 0, 0, 0.05);
     }
-
     .priority-badge {
         min-width: 30px;
         display: inline-block;
@@ -80,18 +72,13 @@
                             @if (!empty($answers) && !empty($points))
                             @foreach ($answers as $key => $answer)
                             <div class="list-group-item d-flex align-items-center">
-                                <!-- Answer -->
                                 <div class="me-3" style="min-width: 150px;">
                                     {{ $answer === 'null' || $answer === null || empty($answer) ? 'N/A' : $answer }}
                                 </div>
-
-                                <!-- Points -->
                                 <div class="me-3" style="min-width: 50px;">
                                     {{ ($points[$key] ?? null) === null || ($points[$key] ?? null) === 'null' ||
                                     empty($points[$key] ?? null) ? 'N/A' : ($points[$key] ?? 'N/A') }}
                                 </div>
-
-                                <!-- Dropdown -->
                                 <div class="me-3" style="width: 100%;">
                                     <div class="mb-3">
                                         <label for="select2Multiple_{{ $key }}" class="form-label">Select Trigger
@@ -117,8 +104,6 @@
                             @endif
                         </div>
                     </div>
-
-                    <!-- Save Changes Button -->
                     <div class="card-footer text-center">
                         <button id="save-changes-button" class="btn btn-primary d-none">
                             <i class="bx bx-save me-1"></i> Save Changes
@@ -126,7 +111,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

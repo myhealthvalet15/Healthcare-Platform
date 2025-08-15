@@ -150,7 +150,7 @@
     </div>
 
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
 
     <script src="/lib/js/page-scripts/PharmacyStockAdd.js"></script>
 @endsection

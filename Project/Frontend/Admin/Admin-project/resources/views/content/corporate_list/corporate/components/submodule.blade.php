@@ -3,18 +3,15 @@
 @section('description', 'Manage Components ')
 @section('content')
 <div class="container py-5">
-    <!-- Form Section -->
     <div class="col-md-8 col-lg-6 mx-auto">
         <div class="card shadow-sm border-0 p-4" style="background-color: #f9f9f9;">
             <h4 class="text-primary mb-4 text-center">Add New Sub-Module</h4>
-            <!-- Success Message -->
             @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             @endif
-            <!-- Form -->
             <form action="{{ route('components_submodule_store') }}" method="POST">
                 @csrf
                 <div class="mb-4">
@@ -50,7 +47,6 @@
         </div>
     </div>
     <hr class="my-5">
-    <!-- Existing Modules Section -->
     <div class="card shadow-sm border-0 bg-white">
         <div class="card-body">
             <h4 class="card-title text-primary mb-4">Existing Sub Modules</h4>

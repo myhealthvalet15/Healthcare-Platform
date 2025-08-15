@@ -2,66 +2,6 @@
 @section('title', 'My Dashboard')
 @section('description', 'Description of my dashboard')
 @section('content')
-<div class="container mt-5">
-    <!-- Back Button -->
-    <div class="mb-4">
-        <a href="{{ url()->previous() }}" class="btn btn-secondary shadow-sm">
-            <i class="bi bi-arrow-left-circle"></i> Back
-        </a>
-    </div>
-
-    <!-- Certification Card -->
-    <div class="card shadow-sm border-0 rounded-lg" style="background-color: #fff;">
-        <div class="card-header text-center py-4" style="background-color: #fff; border-bottom: 1px solid #ddd;">
-            <h2 class="m-0 text-primary" style="font-weight: bold; font-size: 1.8rem;">Certification Details</h2>
-        </div>
-        <div class="card-body px-4 py-5">
-            <!-- Certification Title -->
-            <div class="row mb-4">
-                <div class="col-md-4 text-secondary font-weight-bold">Certification Title:</div>
-                <div class="col-md-8 text-dark">{{ $certification['certification_title'] }}</div>
-            </div>
-            
-            <!-- Short Tag -->
-            <div class="row mb-4">
-                <div class="col-md-4 text-secondary font-weight-bold">Short Tag:</div>
-                <div class="col-md-8 text-dark">{{ $certification['short_tag'] }}</div>
-            </div>
-            
-            <!-- Content -->
-            <div class="row mb-4">
-                <div class="col-md-4 text-secondary font-weight-bold">Content:</div>
-                <div class="col-md-8 text-dark">{{ $certification['content'] }}</div>
-            </div>
-            
-            <!-- Conditions -->
-            <div class="row mb-4">
-                <div class="col-md-4 text-secondary font-weight-bold">Conditions:</div>
-                <div class="col-md-8">
-                    <ul class="list-group list-group-flush">
-                        @foreach ($certification['condition'] as $index => $condition)
-                            <li class="list-group-item d-flex align-items-center justify-content-between px-3 py-2 border-0" style="background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;">
-                                <span class="text-dark">{{ $condition }}</span>
-                                <div class="color-box" style="width: 30px; height: 30px; background-color: {{ $certification['color_condition'][$index] }}; border-radius: 50%; border: 1px solid #ccc;"></div>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Active Status -->
-            <div class="row">
-                <div class="col-md-4 text-secondary font-weight-bold">Active Status:</div>
-                <div class="col-md-8">
-                    <span class="badge px-3 py-2 {{ $certification['active_status'] == 1 ? 'bg-success' : 'bg-danger' }}" style="font-size: 1rem;">
-                        {{ $certification['active_status'] == 1 ? 'Active' : 'Inactive' }}
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
     body {
         background-color: #f5f5f5; /* Subtle light gray background */
@@ -92,4 +32,51 @@
         letter-spacing: 0.5px;
     }
 </style>
+<div class="container mt-5">
+    <div class="mb-4">
+        <a href="{{ url()->previous() }}" class="btn btn-secondary shadow-sm">
+            <i class="bi bi-arrow-left-circle"></i> Back
+        </a>
+    </div>
+    <div class="card shadow-sm border-0 rounded-lg" style="background-color: #fff;">
+        <div class="card-header text-center py-4" style="background-color: #fff; border-bottom: 1px solid #ddd;">
+            <h2 class="m-0 text-primary" style="font-weight: bold; font-size: 1.8rem;">Certification Details</h2>
+        </div>
+        <div class="card-body px-4 py-5">
+            <div class="row mb-4">
+                <div class="col-md-4 text-secondary font-weight-bold">Certification Title:</div>
+                <div class="col-md-8 text-dark">{{ $certification['certification_title'] }}</div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-4 text-secondary font-weight-bold">Short Tag:</div>
+                <div class="col-md-8 text-dark">{{ $certification['short_tag'] }}</div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-4 text-secondary font-weight-bold">Content:</div>
+                <div class="col-md-8 text-dark">{{ $certification['content'] }}</div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-4 text-secondary font-weight-bold">Conditions:</div>
+                <div class="col-md-8">
+                    <ul class="list-group list-group-flush">
+                        @foreach ($certification['condition'] as $index => $condition)
+                            <li class="list-group-item d-flex align-items-center justify-content-between px-3 py-2 border-0" style="background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;">
+                                <span class="text-dark">{{ $condition }}</span>
+                                <div class="color-box" style="width: 30px; height: 30px; background-color: {{ $certification['color_condition'][$index] }}; border-radius: 50%; border: 1px solid #ccc;"></div>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 text-secondary font-weight-bold">Active Status:</div>
+                <div class="col-md-8">
+                    <span class="badge px-3 py-2 {{ $certification['active_status'] == 1 ? 'bg-success' : 'bg-danger' }}" style="font-size: 1rem;">
+                        {{ $certification['active_status'] == 1 ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

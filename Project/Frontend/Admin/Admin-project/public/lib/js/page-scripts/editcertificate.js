@@ -1,0 +1,54 @@
+document.getElementById('addConditionBtn').addEventListener('click', function () {
+    conditionCount++;
+    const conditionsContainer = document.getElementById('conditionsContainer');
+    const newCondition = document.createElement('div');
+    newCondition.classList.add('col-md-6', 'mt-3', 'condition-block');
+    const inputGroup = document.createElement('div');
+    inputGroup.classList.add('input-group', 'mb-3', 'p-3', 'border', 'rounded-3');
+    const topFlex = document.createElement('div');
+    topFlex.classList.add('d-flex', 'justify-content-between', 'w-100');
+    const leftFlex = document.createElement('div');
+    leftFlex.classList.add('d-flex', 'align-items-center');
+    const label = document.createElement('label');
+    label.classList.add('fw-bold', 'me-3');
+    label.setAttribute('for', `colorCondition${conditionCount}`);
+    label.style.minWidth = '100px';
+    label.textContent = 'Select Color';
+    const colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    colorInput.id = `colorCondition${conditionCount}`;
+    colorInput.name = 'color_condition[]';
+    colorInput.classList.add('form-control', 'form-control-color');
+    colorInput.value = '#66cc00';
+    colorInput.style.width = '200px';
+    colorInput.style.height = '60px';
+    colorInput.style.padding = '0';
+    leftFlex.append(label, colorInput);
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.classList.add('btn', 'btn-sm', 'btn-danger', 'ms-2', 'remove-condition');
+    removeBtn.style.height = '35px';
+    removeBtn.style.width = '35px';
+    removeBtn.style.padding = '0';
+    const trashIcon = document.createElement('i');
+    trashIcon.classList.add('fas', 'fa-trash-alt');
+    removeBtn.appendChild(trashIcon);
+    topFlex.append(leftFlex, removeBtn);
+    const textarea = document.createElement('textarea');
+    textarea.name = 'condition[]';
+    textarea.classList.add('form-control', 'mt-2');
+    textarea.placeholder = 'Enter condition';
+    textarea.rows = 2;
+    textarea.required = true;
+    inputGroup.append(topFlex, textarea);
+    newCondition.appendChild(inputGroup);
+    conditionsContainer.appendChild(newCondition);
+    removeBtn.addEventListener('click', function () {
+        newCondition.remove();
+    });
+});
+document.querySelectorAll('.remove-condition').forEach(button => {
+    button.addEventListener('click', function () {
+        button.closest('.condition-block').remove();
+    });
+});

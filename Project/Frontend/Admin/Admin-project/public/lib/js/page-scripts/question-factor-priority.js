@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const questionsDropdown = document.querySelector('#questionsDropdown');
     const noQuestions = document.getElementById('no-questions-container');
     const saveChangesButton = document.getElementById('save-changes');
+
     function showButtonLoading() {
         saveChangesButton.classList.add('btn-loading');
         saveChangesButton.disabled = true;
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         `;
     }
+
     function hideButtonLoading() {
         saveChangesButton.classList.remove('btn-loading');
         saveChangesButton.disabled = false;
@@ -72,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
             hideButtonLoading();
         }
     });
+
     function getQuestionPriority() {
         const listItems = document.querySelectorAll('#existing-questions-container .list-group-item');
         return Array.from(listItems).map(item => item.getAttribute('data-id'));
@@ -126,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     let existingQuestionsSortable;
+
     function initializeSortable() {
         const existingQuestionsContainer = document.getElementById('existing-questions-container');
         if (existingQuestionsSortable) {
@@ -139,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
     function createQuestionListItem(question, priority) {
         const listItem = document.createElement('li');
         listItem.classList.add(
@@ -195,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
     function hideExistingQuestionsInDropdown() {
         const existingQuestions = existingFactorsContainer.querySelectorAll('.list-group-item');
         existingQuestions.forEach(function (item) {
@@ -202,12 +208,14 @@ document.addEventListener('DOMContentLoaded', function () {
             $(`#questionsDropdown option[data-id='${questionId}']`).remove();
         });
     }
+
     function createTextElement(tag, text, classes = []) {
         const element = document.createElement(tag);
         element.textContent = text;
         classes.forEach(className => element.classList.add(className));
         return element;
     }
+
     function updatePriorities() {
         const listItems = document.querySelectorAll('#existing-questions-container .list-group-item');
         listItems.forEach((item, index) => {

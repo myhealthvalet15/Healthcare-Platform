@@ -113,7 +113,7 @@ class LoginBasic extends Controller
                 'login_reset' => $request->login_reset ? $request->login_reset : 0,
                 'en_c' => 1,
                 // 'Ien_c' => 1,
-            ]);
+            ]); 
             if ($apiResponse->successful() && $apiResponse->status() == 200) {
                 $responseData = $apiResponse->json();
                // print_r($responseData);

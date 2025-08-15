@@ -383,8 +383,8 @@ Route::middleware([Authcheck::class])->group(function () {
     });
     //injury
     Route::get('/outpatient/injury', [InjuryController::class, 'index'])->name('outpatient-injury');
-    Route::post('addinjury', [InjuryController::class, 'create'])->name('injuryadd');
-    Route::post('update_injury', [InjuryController::class, 'update'])->name('injuryupdate');
+    Route::post('/addinjury', [InjuryController::class, 'create'])->name('injuryadd');
+    Route::post('/update_injury', [InjuryController::class, 'update'])->name('injuryupdate');
     Route::delete('/delete/{id}', [InjuryController::class, 'destroy'])->name('injurydelete');
     // doctor_qualifications
     Route::group(['prefix' => 'others/doctor-qualifications'], function () {

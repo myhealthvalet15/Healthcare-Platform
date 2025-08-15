@@ -1,7 +1,5 @@
 @extends('layouts/layoutMaster')
-
 @section('title', 'HRA Questions')
-
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
 'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
@@ -12,11 +10,9 @@
 'resources/assets/vendor/libs/quill/katex.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
 'resources/assets/vendor/libs/quill/editor.scss'])
 @endsection
-
 @section('page-style')
 @vite('resources/assets/vendor/scss/pages/app-ecommerce.scss')
 @endsection
-
 @section('vendor-script')
 @vite(['resources/assets/vendor/libs/moment/moment.js',
 'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
@@ -26,13 +22,11 @@
 'resources/assets/vendor/libs/quill/quill.js', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
 'resources/assets/vendor/libs/tagify/tagify.js'])
 @endsection
-
 @section('page-script')
 @vite([
 'resources/assets/js/extended-ui-sweetalert2.js',
 'resources/assets/js/ui-toasts.js', 'resources/assets/js/add-question.js'])
 @endsection
-
 @section('content')
 <style>
     .preloader-container {
@@ -49,26 +43,19 @@
         padding: 20px;
         border-radius: 10px;
     }
-
     .spinner-border {
         margin-bottom: 10px;
     }
-
     #offcanvasEcommerceCategoryList {
         width: 600px;
-        /* Adjust this value as per your requirement */
     }
-
     @media (min-width: 768px) {
         #offcanvasEcommerceCategoryList {
             width: 700px;
-            /* Adjust for larger screens */
         }
     }
 </style>
 <div class="app-ecommerce-category">
-
-    <!-- Category List Table -->
     <div class="card">
         <div class="card-datatable table-responsive">
             <table class="datatables-category-list table border-top">
@@ -83,18 +70,14 @@
             </table>
         </div>
     </div>
-    <!-- Offcanvas to add new customer -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEcommerceCategoryList"
         enctype="multipart/form-data">
-        <!-- Offcanvas Header -->
         <div class="offcanvas-header py-6">
             <h5 id="offcanvasEcommerceCategoryListLabel" class="offcanvas-title">Edit Question</h5>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <!-- Offcanvas Body -->
         <div class="offcanvas-body border-top">
             <form class="pt-0" id="eCommerceCategoryListForm">
-                <!-- Title -->
                 <div class="mb-6">
                     <label class="form-label" for="Question_text">Question</label>
                     <input type="text" class="form-control" id="Question_text" placeholder="Enter category title"
@@ -105,7 +88,6 @@
                     <input type="hidden" class="form-control" id="Question_text_old" placeholder="Enter category title"
                         name="categoryTitle" aria-label="category title">
                 </div>
-                <!-- Slug -->
                 <div class="mb-6">
                     <label class="form-label" for="Question_formula">Formula</label>
                     <input type="text" id="Question_formula" class="form-control">
@@ -140,8 +122,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Image Upload and Preview Section -->
                 <div class="mb-6">
                     <label class="form-label" for="hra_question_image">Attachment</label>
                     <input class="form-control" type="file" id="hra_question_image" accept="image/*">
@@ -175,7 +155,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Gender Selection -->
                 <div class="col-md mb-4">
                     <label for="hra_gender" class="form-label master_gender mb-2">Select
                         Gender</label>
@@ -198,8 +177,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Checkboxes -->
                 <div class="row align-items-center mb-4">
                     <div class="col-6">
                         <div class="form-check form-switch">
@@ -214,14 +191,11 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Comments -->
                 <div class="mb-4">
                     <label class="form-label" for="hra_comments">Comments</label>
                     <textarea class="form-control hra_comments" id="hra_comments" placeholder="Type Comments Here"
                         name="hra_comments" aria-label="hra_comments" rows="4"></textarea>
                 </div>
-                <!-- Submit and reset -->
                 <div class="mb-6">
                     <button class="btn btn-primary me-sm-3 me-1 data-submit" id="save-modifications">Modify</button>
                     <button type="reset" class="btn btn-label-danger" data-bs-dismiss="offcanvas">Cancel</button>

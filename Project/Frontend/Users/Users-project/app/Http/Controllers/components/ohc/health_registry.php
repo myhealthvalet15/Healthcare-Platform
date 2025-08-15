@@ -57,7 +57,7 @@ class health_registry extends Controller
         }
         $url = 'https://api-user.hygeiaes.com/V1/corporate-stubs/stubs/getAllHealthRegistry/'
             . $corporateId . '/' . $locationId
-            . ($employeeId === null ? '' : '/' . $employeeId) . '?masterUserEmployeeId=' . urlencode($masterUserEmployeeId);
+            . ($employeeId === null ? '' : '/' . $employeeId);
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',

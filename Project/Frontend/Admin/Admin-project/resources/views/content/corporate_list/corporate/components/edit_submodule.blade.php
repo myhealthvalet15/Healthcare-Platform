@@ -14,7 +14,6 @@
         <form action="{{ route('submodule.update',$submodule['sub_module_id']) }}" method="POST">
             @csrf
             @method('PUT')
-            <!-- Sub-Module Name -->
             <div class="mb-4">
                 <label for="sub_module_name" class="form-label fw-semibold">Sub-Module Name</label>
                 <input
@@ -34,7 +33,6 @@
                 <div class="text-danger small">{{ $message }}</div>
                 @enderror
             </div>
-            <!-- Module Selection -->
             <div class="mb-3">
                 <label for="module_id" class="form-label">Select Module</label>
                 <select id="module_id" name="module_id" class="select2 form-control border rounded" data-live-search="true">
@@ -49,7 +47,6 @@
                 <div class="text-danger small">{{ $message }}</div>
                 @enderror
             </div>
-            <!-- Buttons -->
             <div class="d-flex gap-3 justify-content-center">
                 <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">Save Changes</button>
                 <button type="reset" class="btn btn-outline-secondary btn-lg w-100 shadow-sm">Reset</button>
